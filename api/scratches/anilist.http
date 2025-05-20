@@ -4,23 +4,26 @@ GET http://localhost:8080/data/anilist/manga
 
 GRAPHQL https://graphql.anilist.co
 
-query ExampleQuery($sort: [MediaSort], $type: MediaType, $popularityGreater: Int, $page: Int, $perPage: Int) {
+query ExampleQuery($userName: String, $type: MediaType, $status: MediaListStatus, $page: Int, $perPage: Int) {
     Page(page: $page, perPage: $perPage) {
         pageInfo {
             currentPage
             hasNextPage
             perPage
         }
-        media(sort: $sort, type: $type, popularity_greater: $popularityGreater) {
-            id
-            title {
-                romaji
-                english
-                native
-            }
-            coverImage {
-                large
-                extraLarge
+        mediaList(userName: $userName, type: $type, status: $status) {
+            score(format: POINT_10)
+            media {
+                id
+                title {
+                    romaji
+                    english
+                    native
+                }
+                coverImage {
+                    large
+                    extraLarge
+                }
             }
         }
     }
@@ -28,9 +31,9 @@ query ExampleQuery($sort: [MediaSort], $type: MediaType, $popularityGreater: Int
 
 
 {
-  "sort": "POPULARITY_DESC",
-  "type": "MANGA",
-  "popularityGreater": 90097,
+  "userName": "ratzzfatzz",
+  "status": "COMPLETED",
+  "type": "ANIME",
   "page": 1,
-  "perPage": 20
+  "perPage": 500
 }

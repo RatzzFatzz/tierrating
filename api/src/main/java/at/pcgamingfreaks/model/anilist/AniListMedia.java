@@ -5,9 +5,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AnilistMedia {
+public class AniListMedia {
 
     private long id;
-    private AnilistMediaTitle title;
+    private AniListMediaTitle title;
     private AniListMediaCoverImage coverImage;
 }

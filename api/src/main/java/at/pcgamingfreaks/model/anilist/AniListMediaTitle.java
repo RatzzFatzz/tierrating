@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AnilistMediaTitle {
+public class AniListMediaTitle {
     private String romaji;
     private String english;
 }
