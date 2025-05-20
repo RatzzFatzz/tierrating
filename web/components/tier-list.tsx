@@ -76,8 +76,8 @@ function DraggableItem({ item }: { item: RatingItem }) {
             {...listeners}
             className="cursor-grab active:cursor-grabbing"
         >
-            <div className="w-full">
-                <AspectRatio ratio={9 / 16}>
+            <div className="w-30">
+                <AspectRatio ratio={460 / 650}>
                     <Image
                         fill={true}
                         src={item.media.coverImage.large}
@@ -276,8 +276,8 @@ export default function TierList({type}) {
                 {/* Drag Overlay */}
                 <DragOverlay>
                     {activeId && activeItem ? (
-                        <div className="w-full opacity-80">
-                            <AspectRatio ratio={9 / 16}>
+                        <div className="opacity-80">
+                            <AspectRatio ratio={460 / 650}>
                                 <Image
                                     fill={true}
                                     src={activeItem.media.coverImage.large}
