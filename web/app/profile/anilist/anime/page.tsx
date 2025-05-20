@@ -1,5 +1,5 @@
 import TierList from "@/components/tier-list";
 
 export default function PrimaryPage() {
-    return <TierList type="manga" />;
+    return <TierList type="anime" />;
 }
