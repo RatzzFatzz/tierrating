@@ -1,11 +1,13 @@
 package at.pcgamingfreaks.controller;
 
 import at.pcgamingfreaks.model.anilist.AniListListEntry;
+import at.pcgamingfreaks.model.anilist.AniListPage;
 import org.springframework.graphql.client.HttpGraphQlClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -47,14 +49,23 @@ public class DataController {
         WebClient webClient = WebClient.create(url);
         HttpGraphQlClient graphQlClient = HttpGraphQlClient.create(webClient);
 
-        return graphQlClient
-                .document(query)
-                .variable("userName", username)
-                .variable("type", type.toUpperCase())
-                .variable("status", "COMPLETED")
-                .variable("page", 1)
-                .variable("perPage", 50)
-                .retrieveSync("Page.mediaList")
-                .toEntityList(AniListListEntry.class);
+        List<AniListListEntry> result = new ArrayList<>();
+
+        AniListPage page;
+        int currentPage = 1;
+        do {
+             page = graphQlClient
+                    .document(query)
+                    .variable("userName", username)
+                    .variable("type", type.toUpperCase())
+                    .variable("status", "COMPLETED")
+                    .variable("page", currentPage++)
+                    .variable("perPage", 50)
+                    .retrieveSync("Page")
+                    .toEntity(AniListPage.class);
+             result.addAll(page.getMediaList());
+        } while (page.getPageInfo().isHasNextPage());
+
+        return result;
     }
 }
