@@ -1,5 +1,6 @@
-import TierList, {RatingItem} from "@/components/tier-list";
+import type { RatingItem } from "@/model/types"
 import {transformScoreToTier} from "@/components/score-to-tier-converter";
+import TierListPage from "@/components/tier-list-page";
 
 interface AniListItem {
     score: number;
@@ -39,5 +40,5 @@ async function fetchData(type: string): Promise<RatingItem[]> {
 
 export default async function AniListManga() {
     const ratingItems = await fetchData("manga");
-    return <TierList itemList={ratingItems} />;
+    return <TierListPage itemList={ratingItems} title={"AniList Manga Tier List"} />;
 }

@@ -1,158 +1,100 @@
 "use client"
 
-import { useState } from "react"
-import {
-    DndContext,
-    DragOverlay,
-    closestCenter,
-    KeyboardSensor,
-    PointerSensor,
-    useSensor,
-    useSensors,
-    type DragStartEvent,
-    type DragEndEvent,
-} from "@dnd-kit/core"
-import { sortableKeyboardCoordinates } from "@dnd-kit/sortable"
+import type React from "react"
 
-import TierContainer from "@/components/tier-container"
-import Item from "@/components/item"
+import { DndProvider } from "react-dnd"
+import { HTML5Backend } from "react-dnd-html5-backend"
+import { TierContainer } from "./tier-container"
+import type { RatingItem } from "@/model/types"
+import { memo } from "react"
 
-export interface RatingItem {
-    id: string;
-    score: number;
-
-    title: string;
-    cover: string;
-
-    tier: string;
+interface TierListProps {
+    items: RatingItem[]
+    setItems: React.Dispatch<React.SetStateAction<RatingItem[]>>
 }
 
-export default function TierList({itemList}: {itemList: RatingItem[]}) {
-    // Initial items in the unassigned container
-    const [items, setItems] = useState<RatingItem[]>(itemList);
+const tiers = [
+    { id: "s", label: "S", color: "bg-red-500" },
+    { id: "a", label: "A", color: "bg-orange-500" },
+    { id: "b", label: "B", color: "bg-yellow-500" },
+    { id: "c", label: "C", color: "bg-green-500" },
+    { id: "d", label: "D", color: "bg-blue-500" },
+    { id: "f", label: "F", color: "bg-purple-500" },
+    { id: "unassigned", label: "", color: "bg-gray-300" },
+]
 
-    const [activeId, setActiveId] = useState<string | null>(null)
+export const TierList = memo(function TierList({ items, setItems }: TierListProps) {
+    const moveItem = (dragIndex: number, hoverIndex: number, sourceTier: string, targetTier: string) => {
+        setItems((prevItems) => {
+            // Create a new array to avoid mutating the state directly
+            const newItems = [...prevItems]
 
-    const tiers = ["s", "a", "b", "c", "d", "f", "unassigned"]
+            // Find the item being dragged by its tier and index
+            const draggedItemIndex = newItems.findIndex(
+                (item, idx) =>
+                    item.tier === sourceTier && newItems.filter((i) => i.tier === sourceTier).indexOf(item) === dragIndex,
+            )
 
-    // Configure the sensors
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                distance: 8, // Increase activation distance for better drag detection
-            },
-        }),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-        }),
-    )
+            if (draggedItemIndex === -1) return prevItems
 
-    // Get items for a specific tier
-    const getItemsByTier = (tier: string) => {
-        return items.filter((item) => item.tier === tier)
-    }
+            // Get the dragged item
+            const draggedItem = { ...newItems[draggedItemIndex] }
 
-    // Handle drag start
-    const handleDragStart = (event: DragStartEvent) => {
-        const { active } = event
-        setActiveId(active.id as string)
-    }
+            // Remove the dragged item from the array
+            newItems.splice(draggedItemIndex, 1)
 
-    // Handle drag end
-    const handleDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event
+            // Update the tier of the dragged item
+            draggedItem.tier = targetTier
 
-        if (over && active.id !== over.id) {
-            setItems((items) => {
-                // Find the item being dragged
-                const activeItem = items.find((item) => item.id === active.id)
+            // Calculate the insertion index in the target tier
+            const itemsInTargetTier = newItems.filter((item) => item.tier === targetTier)
 
-                if (!activeItem) return items
+            // If hoverIndex is greater than the length, place at the end
+            const insertAtIndex = Math.min(hoverIndex, itemsInTargetTier.length)
 
-                const overId = over.id as string
+            // Find where to insert in the overall array
+            let insertionIndex = 0
+            let tierItemsCount = 0
 
-                // Check if dropping directly onto a container
-                if (tiers.includes(overId)) {
-                    // Moving to a different container - place at the end
-                    return items.map((item) => {
-                        if (item.id === active.id) {
-                            return { ...item, tier: overId }
-                        }
-                        return item
-                    })
-                } else {
-                    // Dropping onto or near another item
-                    const overItem = items.find((item) => item.id === overId)
-
-                    if (!overItem) return items
-
-                    // If moving within the same container, reorder
-                    if (activeItem.tier === overItem.tier) {
-                        const itemsInTier = items.filter((item) => item.tier === activeItem.tier)
-                        const otherItems = items.filter((item) => item.tier !== activeItem.tier)
-
-                        const activeIndex = itemsInTier.findIndex((item) => item.id === active.id)
-                        const overIndex = itemsInTier.findIndex((item) => item.id === over.id)
-
-                        // Reorder the items in the tier
-                        const newItemsInTier = [...itemsInTier]
-                        const [movedItem] = newItemsInTier.splice(activeIndex, 1)
-                        newItemsInTier.splice(overIndex, 0, movedItem)
-
-                        return [...otherItems, ...newItemsInTier]
-                    } else {
-                        // Moving to a different container - insert at the position of the target item
-                        const targetTier = overItem.tier
-                        const itemsInTargetTier = items.filter((item) => item.tier === targetTier)
-                        const otherItems = items.filter((item) => item.tier !== targetTier && item.id !== active.id)
-
-                        // Find the position to insert at
-                        const overIndex = itemsInTargetTier.findIndex((item) => item.id === over.id)
-
-                        // Create the moved item with new tier
-                        const movedItem = { ...activeItem, tier: targetTier }
-
-                        // Insert the item at the correct position
-                        const newItemsInTargetTier = [...itemsInTargetTier]
-                        newItemsInTargetTier.splice(overIndex, 0, movedItem)
-
-                        return [...otherItems, ...newItemsInTargetTier]
+            for (let i = 0; i < newItems.length; i++) {
+                if (newItems[i].tier === targetTier) {
+                    if (tierItemsCount === insertAtIndex) {
+                        insertionIndex = i
+                        break
                     }
+                    tierItemsCount++
+                    insertionIndex = i + 1
+                } else if (
+                    tierItemsCount === insertAtIndex &&
+                    (i === 0 || newItems[i - 1].tier === targetTier) &&
+                    newItems[i].tier !== targetTier
+                ) {
+                    insertionIndex = i
+                    break
                 }
-            })
-        }
-        setActiveId(null)
-    }
+            }
 
-    // Find the active item
-    const activeItem = activeId ? items.find((item) => item.id === activeId) : null
+            // Insert the dragged item at the calculated position
+            newItems.splice(insertionIndex, 0, draggedItem)
+
+            return newItems
+        })
+    }
 
     return (
-        <div className="container mx-auto p-4 max-w-5xl">
-            <h1 className="text-3xl font-bold mb-6 text-center">Tier Maker</h1>
-
-            <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
-            >
-                <div className="space-y-4">
-                    {tiers.map((tier) => (
-                        <TierContainer
-                            key={tier}
-                            id={tier}
-                            label={tier === "unassigned" ? "Unassigned" : tier.toUpperCase()}
-                            items={getItemsByTier(tier)}
-                            activeId={activeId}
-                        />
-                    ))}
-                </div>
-
-                <DragOverlay>
-                    {activeId && activeItem ? <Item id={activeItem.id} name={activeItem.title} image={activeItem.cover} /> : null}
-                </DragOverlay>
-            </DndContext>
-        </div>
+        <DndProvider backend={HTML5Backend}>
+            <div>
+                {tiers.map((tier) => (
+                    <TierContainer
+                        key={tier.id}
+                        tier={tier.id}
+                        label={tier.label}
+                        color={tier.color}
+                        items={items.filter((item) => item.tier === tier.id)}
+                        moveItem={moveItem}
+                    />
+                ))}
+            </div>
+        </DndProvider>
     )
-}
+})
