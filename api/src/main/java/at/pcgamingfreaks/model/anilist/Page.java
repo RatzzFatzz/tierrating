@@ -1,4 +1,4 @@
-package at.pcgamingfreaks.model;
+package at.pcgamingfreaks.model.anilist;
 
 import lombok.Getter;
 import lombok.Setter;

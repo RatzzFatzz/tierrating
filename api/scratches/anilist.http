@@ -1,4 +1,23 @@
-GET http://localhost:8080/data/anilist/manga
+GET http://localhost:8080/anilist/ratzzfatzz/manga
+
+###
+
+GET http://localhost:8080/anilist/RatzzFatzzarst
+
+###
+
+GRAPHQL https://graphql.anilist.co
+
+query userExists($name: String) {
+    User(name: $name) {
+        id
+        name
+    }
+}
+
+{
+  "name": "ratzzfatzz"
+}
 
 ###
 

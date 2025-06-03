@@ -1,6 +1,5 @@
 package at.pcgamingfreaks.model.anilist;
 
-import at.pcgamingfreaks.model.Page;
 import lombok.Getter;
 import lombok.Setter;
 
