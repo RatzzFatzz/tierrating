@@ -1,12 +1,16 @@
+"use client"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
+import React from "react";
 
-export default function LinkTree() {
+export default function Profile({params}) {
     // This would typically come from a database or CMS
+    const username = React.use(params).username.toString();
     const profile = {
-        name: "RatzzFatzz",
+        name: username,
         avatar: "/placeholder.svg?height=100&width=100",
         bio: "Customizable placeholder text",
         // Ungrouped links (displayed at the top)
@@ -24,12 +28,12 @@ export default function LinkTree() {
                 links: [
                     {
                         title: "Anime",
-                        path: "/profile/anilist/anime",
+                        path: "/user/"+ username + "/anilist/anime",
                         color: "bg-blue-600 hover:bg-blue-700",
                     },
                     {
                         title: "Manga",
-                        path: "/profile/anilist/manga",
+                        path: "/user/"+ username + "/anilist/manga",
                         color: "bg-blue-500 hover:bg-blue-600",
                     },
                 ],

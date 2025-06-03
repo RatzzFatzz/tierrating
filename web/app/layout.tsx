@@ -5,17 +5,39 @@ import "./globals.css";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 
+import {
+    NavigationMenu,
+    NavigationMenuContent,
+    NavigationMenuIndicator,
+    NavigationMenuItem,
+    NavigationMenuLink,
+    NavigationMenuList,
+    NavigationMenuTrigger,
+    NavigationMenuViewport,
+} from "@/components/ui/navigation-menu"
+import Link from "next/link";
+
+
 export default function Layout({ children }: { children: React.ReactNode }) {
     return (
         <html>
             <body>
-                <SidebarProvider>
-                    <AppSidebar />
-                    <main>
-                        <SidebarTrigger />
-                        {children}
-                    </main>
-                </SidebarProvider>
+                {/*<SidebarProvider>*/}
+                    {/*<AppSidebar />*/}
+                {/*<NavigationMenu className="justify-self-center self-center">*/}
+                {/*    <NavigationMenuList>*/}
+                {/*        <NavigationMenuItem>*/}
+                {/*            <NavigationMenuLink>*/}
+                {/*                <Link href="/">Home</Link>*/}
+                {/*            </NavigationMenuLink>*/}
+                {/*        </NavigationMenuItem>*/}
+                {/*    </NavigationMenuList>*/}
+                {/*</NavigationMenu>*/}
+                <main>
+                    {/*<SidebarTrigger />*/}
+                    {children}
+                </main>
+                {/*</SidebarProvider>*/}
             </body>
         </html>
 )

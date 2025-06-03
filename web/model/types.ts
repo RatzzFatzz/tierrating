@@ -12,3 +12,8 @@ export interface DragItem {
     tier: string
     index: number
 }
+
+export interface User {
+    id: number
+    name: string
+}
