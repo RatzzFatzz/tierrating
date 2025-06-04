@@ -22,7 +22,8 @@ export default function Home() {
         setError('');
 
         try {
-            const response = await fetch(`http://localhost:8080/anilist/${username}`);
+            const API_URL = process.env.API_URL || 'http://localhost:8080';
+            const response = await fetch(`${API_URL}/anilist/${username}`);
             const data = await response.json();
 
             if (data && data.username) {
