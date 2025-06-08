@@ -2,8 +2,8 @@ package at.pcgamingfreaks.controller;
 
 import at.pcgamingfreaks.mapper.ListEntryDtoMapper;
 import at.pcgamingfreaks.mapper.UserDtoMapper;
-import at.pcgamingfreaks.model.ListEntryDTO;
-import at.pcgamingfreaks.model.UserDTO;
+import at.pcgamingfreaks.model.dto.ListEntryDTO;
+import at.pcgamingfreaks.model.dto.UserDTO;
 import at.pcgamingfreaks.model.anilist.AniListListEntry;
 import at.pcgamingfreaks.model.anilist.AniListPage;
 import at.pcgamingfreaks.model.anilist.AniListUser;
