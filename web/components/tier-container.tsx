@@ -1,5 +1,4 @@
 "use client"
-
 import type { DragItem, RatingItem } from "@/model/types"
 import { memo, useRef } from "react"
 import { useDrop } from "react-dnd"
@@ -15,7 +14,6 @@ interface TierContainerProps {
 
 export const TierContainer = memo(function TierContainer({ tier, label, color, items, moveItem }: TierContainerProps) {
     const ref = useRef<HTMLDivElement>(null)
-
     const [{ isOver }, drop] = useDrop({
         accept: "RATING_ITEM",
         collect: (monitor) => ({
@@ -33,7 +31,6 @@ export const TierContainer = memo(function TierContainer({ tier, label, color, i
             if (!ref.current || item.tier === tier) {
                 return
             }
-
             // If hovering over an empty container
             if (items.length === 0) {
                 moveItem(item.index, 0, item.tier, tier)
@@ -42,18 +39,16 @@ export const TierContainer = memo(function TierContainer({ tier, label, color, i
             }
         },
     })
-
     drop(ref)
-
     return (
-        <div className="flex">
+        <div className="flex mb-2 rounded-md overflow-hidden border border-border/40">
             <div className={`${color} flex items-center justify-center w-16 self-stretch text-white font-bold text-xl`}>
                 {label}
             </div>
             <div
                 ref={ref}
-                className={`flex-1 min-h-16 bg-gray-100 p-2 flex flex-wrap gap-2 transition-colors ${
-                    isOver ? "bg-gray-200" : ""
+                className={`flex-1 min-h-16 bg-background/50 p-2 flex flex-wrap gap-2 transition-colors ${
+                    isOver ? "bg-accent/20" : ""
                 }`}
                 style={{ minHeight: "80px" }}
             >

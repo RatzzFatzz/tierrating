@@ -26,7 +26,7 @@ export default function NavBar() {
             <div className="grid grid-cols-3 h-16 items-center px-4 container mx-auto">
                 <div className="justify-self-start">
                     <Link href="/dashboard" className="text-xl font-bold text-primary">
-                        MyApp
+                        TierRating
                     </Link>
                 </div>
 
