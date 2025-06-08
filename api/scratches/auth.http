@@ -1,0 +1,21 @@
+POST http://localhost:8080/auth/signup
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "email": "testing@tierrating.com",
+    "password": "arstarst"
+}
+
+###
+
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "arstarst"
+}
+
+###
+

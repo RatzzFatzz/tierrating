@@ -1,6 +1,6 @@
 package at.pcgamingfreaks.mapper;
 
-import at.pcgamingfreaks.model.ListEntryDTO;
+import at.pcgamingfreaks.model.dto.ListEntryDTO;
 import at.pcgamingfreaks.model.anilist.AniListListEntry;
 import at.pcgamingfreaks.model.anilist.AniListMediaCoverImage;
 import at.pcgamingfreaks.model.anilist.AniListMediaTitle;

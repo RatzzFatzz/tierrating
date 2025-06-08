@@ -1,9 +1,7 @@
 package at.pcgamingfreaks.mapper;
 
-import at.pcgamingfreaks.model.UserDTO;
+import at.pcgamingfreaks.model.dto.UserDTO;
 import at.pcgamingfreaks.model.anilist.AniListUser;
-import lombok.Getter;
-import lombok.Setter;
 
 
 public class UserDtoMapper {
