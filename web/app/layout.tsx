@@ -1,47 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import {Geist, Geist_Mono, Inter} from "next/font/google";
 import "./globals.css";
+import {AuthProvider} from "@/contexts/AuthContext";
+import NavBar from "@/components/navbar";
 
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
-
-import {
-    NavigationMenu,
-    NavigationMenuContent,
-    NavigationMenuIndicator,
-    NavigationMenuItem,
-    NavigationMenuLink,
-    NavigationMenuList,
-    NavigationMenuTrigger,
-    NavigationMenuViewport,
-} from "@/components/ui/navigation-menu"
-import Link from "next/link";
-
-
-export default function Layout({ children }: { children: React.ReactNode }) {
-    return (
-        <html>
-            <body>
-                {/*<SidebarProvider>*/}
-                    {/*<AppSidebar />*/}
-                {/*<NavigationMenu className="justify-self-center self-center">*/}
-                {/*    <NavigationMenuList>*/}
-                {/*        <NavigationMenuItem>*/}
-                {/*            <NavigationMenuLink>*/}
-                {/*                <Link href="/">Home</Link>*/}
-                {/*            </NavigationMenuLink>*/}
-                {/*        </NavigationMenuItem>*/}
-                {/*    </NavigationMenuList>*/}
-                {/*</NavigationMenu>*/}
-                <main>
-                    {/*<SidebarTrigger />*/}
-                    {children}
-                </main>
-                {/*</SidebarProvider>*/}
-            </body>
-        </html>
-)
-}
+const inter = Inter({ subsets: ['latin'] })
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -58,20 +21,19 @@ export const metadata: Metadata = {
   description: "Rate your media content in a tier list",
 };
 
-// export default function RootLayout({
-//   children,
-// }: Readonly<{
-//   children: React.ReactNode;
-// }>) {
-//   return (
-//     <html lang="en">
-//         <body>
-//
-//             <nav>
-//                 <h2>arst</h2>
-//             </nav>
-//             {children}
-//         </body>
-//     </html>
-//   );
-// }
+export default function Layout({ children }: { children: React.ReactNode }) {
+    return (
+        <html lang="en" className="dark">
+            <body className={inter.className}>
+                <AuthProvider>
+                    <div className="min-h-screen flex flex-col">
+                        <NavBar />
+                        <main className="flex-grow">
+                            {children}
+                        </main>
+                    </div>
+                </AuthProvider>
+            </body>
+        </html>
+    )
+}

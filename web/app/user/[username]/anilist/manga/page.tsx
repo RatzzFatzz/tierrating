@@ -1,7 +1,16 @@
-import TierListPage from "@/components/tier-list-page";
-import {fetchData} from "@/components/anilist-functions";
+"use client"
 
-export default async function AniListManga({params}) {
-    const ratingItems = await fetchData( (await params).username, "manga");
-    return <TierListPage itemList={ratingItems} title={"AniList Manga Tier List"} />;
+import ProtectedRoute from "@/components/ProtectedRoute";
+import {use} from "react";
+import AniListTierListPage from "@/components/tier-list/anilist-tier-list-page";
+
+export default function AniListManga({params}) {
+    const resolvedParams = use(params);
+    const username: string = resolvedParams.username;
+
+    return (
+        <ProtectedRoute>
+            <AniListTierListPage username={username} type={"manga"} />
+        </ProtectedRoute>
+    );
 }
