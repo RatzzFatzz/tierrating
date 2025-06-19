@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
