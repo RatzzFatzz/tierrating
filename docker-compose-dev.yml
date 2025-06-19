@@ -1,0 +1,12 @@
+name: tier-rating
+services:
+  db:
+    image: postgres
+    restart: unless-stopped
+    ports:
+      - 5433:5432
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: tierrating
+      POSTGRES_PASSWORD: testingPW

@@ -7,6 +7,30 @@ GET http://localhost:8080/anilist/RatzzFatzzarst
 
 ###
 
+POST http://localhost:8080/anilist/auth/RatzzFatzz
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJSYXR6ekZhdHp6IiwiaWF0IjoxNzQ5NDk4NTIyLCJleHAiOjE3NDk1MDIxMjJ9.CclOjwUv7lNfRD5jHAIM-PskV2yAO-dgyZ-B0DpO6Bg
+Content-Type: application/json
+
+{
+  "code": "<code>"
+}
+
+###
+
+POST https://anilist.co/api/v2/oauth/token
+Content-Type: application/json
+Accept: application/json
+
+{
+  "grant_type": "authorization_code",
+  "client_id": "<client_code>",
+  "client_secret": "<client_secret>",
+  "redirect_uri": "http://localhost:3001/auth/anilist",
+  "code": "<code>>"
+}
+
+###
+
 GRAPHQL https://graphql.anilist.co
 
 query userExists($name: String) {

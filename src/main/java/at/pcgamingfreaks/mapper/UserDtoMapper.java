@@ -1,14 +1,15 @@
 package at.pcgamingfreaks.mapper;
 
+import at.pcgamingfreaks.model.auth.User;
 import at.pcgamingfreaks.model.dto.UserDTO;
-import at.pcgamingfreaks.model.anilist.AniListUser;
 
 
 public class UserDtoMapper {
-    public static UserDTO map(AniListUser user) {
+    public static UserDTO map(User user) {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
-        dto.setUsername(user.getName());
+        dto.setUsername(user.getUsername());
+        dto.setAniListConnected(user.getAnilistConnection() != null);
         return dto;
     }
 }
