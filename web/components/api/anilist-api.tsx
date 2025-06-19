@@ -1,5 +1,3 @@
-"use client"
-
 import type {RatingItem} from "@/model/types";
 import {API_URL} from "@/components/global-config";
 

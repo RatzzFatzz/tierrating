@@ -4,7 +4,7 @@ import {useAuth} from "@/contexts/AuthContext";
 import TierListPage from "@/components/tier-list-page";
 import {fetchWithApi} from "@/components/api/anilist-api";
 
-export default function AniListTierListPage({username, type}: {username: string, type: string}) {
+export default function AniListTierListPage({username, type, title}: {username: string, type: string, title: string}) {
     const [ratingItems, setRatingItems] = useState<RatingItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -30,6 +30,7 @@ export default function AniListTierListPage({username, type}: {username: string,
         fetchRatingItems();
     }, [token, username, type, logout]);
 
+
     return (
         <>
             {isLoading ? (
@@ -41,7 +42,7 @@ export default function AniListTierListPage({username, type}: {username: string,
                     <div className="text-destructive">{error}</div>
                 </div>
             ) : (
-                <TierListPage itemList={ratingItems} title={"AniList Anime Tier List"} />
+                <TierListPage itemList={ratingItems} title={title} />
             )}
         </>
     );

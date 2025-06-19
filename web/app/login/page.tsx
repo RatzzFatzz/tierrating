@@ -22,7 +22,7 @@ export default function LoginPage() {
     const signupSuccess = searchParams.get('signup') === 'success'
 
     useEffect(() => {
-        console.log(`${user} - ${isAuthenticated}`)
+        console.debug(`${user} - ${isAuthenticated}`)
         if (isAuthenticated && !isLoading) {
             router.push(`/user/${user}`)
         }

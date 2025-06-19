@@ -78,15 +78,13 @@ export default function Profile({params}) {
                 }
             }).then(res => res.json())
             .then(data => setUserConnections(data))
-            .catch((error) => console.log(error))
+            .catch((error) => console.error(error))
         }
 
     }, [username, isLoading, isAuthenticated, token]);
 
     // Helper function to determine if a section should be rendered
     const shouldRenderSection = (section, connections) => {
-        console.log(section)
-        console.log(connections)
         if (!connections) return false;
         return connections[section.connectedKey] === false;
     }

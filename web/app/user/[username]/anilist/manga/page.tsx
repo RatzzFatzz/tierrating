@@ -10,7 +10,7 @@ export default function AniListManga({params}) {
 
     return (
         <ProtectedRoute>
-            <AniListTierListPage username={username} type={"manga"} />
+            <AniListTierListPage username={username} type={"manga"} title={"AniList Manga Tier List"}/>
         </ProtectedRoute>
     );
 }
