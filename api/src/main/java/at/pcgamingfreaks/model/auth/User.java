@@ -38,6 +38,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private AniListConnection anilistConnection;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
