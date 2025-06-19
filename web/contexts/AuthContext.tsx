@@ -26,7 +26,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const checkAuth= () => {
             const storedToken = localStorage.getItem("authToken")
             const storedUsername = localStorage.getItem("username")
-            console.log(`${storedUsername} - ${storedToken}`)
             if (storedToken && storedUsername) {
                 setToken(storedToken)
                 setUser(storedUsername)

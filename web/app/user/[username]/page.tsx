@@ -3,59 +3,108 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
-import React from "react";
+import React, { useState, useEffect } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {useAuth} from "@/contexts/AuthContext";
+import {API_URL} from "@/components/global-config";
 
 export default function Profile({params}) {
-    // This would typically come from a database or CMS
-    const username = React.use(params).username.toString();
+    const username: string = React.use(params).username.toString();
+    const [userConnections, setUserConnections] = useState(null);
+    const {token, isLoading, isAuthenticated} = useAuth();
+
+    // Predefined profile structure
     const profile = {
         name: username,
         avatar: "/placeholder.svg?height=100&width=100",
         bio: "Customizable placeholder text",
-        // Ungrouped links (displayed at the top)
         links: [
-            // {
-            //     title: "Dashboard",
-            //     path: "/dashboard",
-            //     color: "bg-pink-500 hover:bg-pink-600",
-            // },
+            {
+                title: "Connect AniList",
+                path: "/auth/anilist",
+                color: "bg-blue-600 hover:bg-blue-700",
+                connectedKey: 'aniListConnected'
+            },
+            {
+                title: "Connect Trakt",
+                path: "/auth/trakt",
+                color: "bg-red-600 hover:bg-red-700",
+                connectedKey: 'traktConnected'
+            },
         ],
-        // Grouped links
         groups: [
             {
                 title: "AniList",
+                connectedKey: 'aniListConnected',
                 links: [
                     {
                         title: "Anime",
-                        path: "/user/"+ username + "/anilist/anime",
+                        path: `/user/${username}/anilist/anime`,
                         color: "bg-blue-600 hover:bg-blue-700",
                     },
                     {
                         title: "Manga",
-                        path: "/user/"+ username + "/anilist/manga",
+                        path: `/user/${username}/anilist/manga`,
                         color: "bg-blue-500 hover:bg-blue-600",
                     },
                 ],
             },
             {
                 title: "Trakt",
+                connectedKey: 'traktConnected',
                 links: [
                     {
                         title: "Series",
-                        path: "/user/"+ username + "/trakt/series",
+                        path: `/user/${username}/trakt/series`,
                         color: "bg-red-600 hover:bg-red-700",
                     },
                     {
                         title: "Movies",
-                        path: "/user/"+ username + "/trakt/movies",
+                        path: `/user/${username}/trakt/movies`,
                         color: "bg-red-500 hover:bg-red-600",
                     },
                 ],
             },
         ],
     }
+
+    useEffect(() => {
+        if (!isLoading && isAuthenticated) {
+            fetch(`${API_URL}/user/${username}`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            }).then(res => res.json())
+            .then(data => setUserConnections(data))
+            .catch((error) => console.log(error))
+        }
+
+    }, [username, isLoading, isAuthenticated, token]);
+
+    // Helper function to determine if a section should be rendered
+    const shouldRenderSection = (section, connections) => {
+        console.log(section)
+        console.log(connections)
+        if (!connections) return false;
+        return connections[section.connectedKey] === false;
+    }
+
+    const shouldRenderGroup = (group, connections) => {
+        if (!connections) return false;
+        return connections[group.connectedKey] === true;
+    }
+
+    // Render nothing until connections are loaded
+    if (!userConnections || isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-pulse text-muted-foreground">Loading...</div>
+            </div>
+        )
+    }
+
     return (
         <ProtectedRoute>
             <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -72,43 +121,44 @@ export default function Profile({params}) {
                     </CardHeader>
                     <CardContent className="space-y-6">
                         {/* Ungrouped Links Section */}
-                        {profile.links.length > 0 && (
-                            <div className="space-y-3">
-                                {profile.links.map((link, index) => (
-                                    <Link key={index} href={link.path} className="block w-full">
-                                        <Button
-                                            variant="default"
-                                            className={`w-full justify-center ${link.color} text-white font-bold`}
-                                        >
-                                            {link.title}
-                                        </Button>
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
+                        {profile.links
+                            .filter(link => shouldRenderSection(link, userConnections))
+                            .map((link, index) => (
+                                <Link key={index} href={link.path} className="block w-full">
+                                    <Button
+                                        variant="default"
+                                        className={`w-full justify-center ${link.color} text-white font-bold`}
+                                    >
+                                        {link.title}
+                                    </Button>
+                                </Link>
+                            ))
+                        }
+
                         {/* Grouped Links Section */}
-                        {profile.groups.map((group, groupIndex) => (
-                            <div key={groupIndex}>
-                                {/* Group Title */}
-                                <div className="mb-3">
-                                    <h2 className="text-lg font-semibold">{group.title}</h2>
-                                    <Separator className="mt-1" />
+                        {profile.groups
+                            .filter(group => shouldRenderGroup(group, userConnections))
+                            .map((group, groupIndex) => (
+                                <div key={groupIndex}>
+                                    <div className="mb-3">
+                                        <h2 className="text-lg font-semibold">{group.title}</h2>
+                                        <Separator className="mt-1" />
+                                    </div>
+                                    <div className="space-y-3 mt-4">
+                                        {group.links.map((link, linkIndex) => (
+                                            <Link key={linkIndex} href={link.path} className="block w-full">
+                                                <Button
+                                                    variant="default"
+                                                    className={`w-full justify-center ${link.color} text-white font-bold`}
+                                                >
+                                                    {link.title}
+                                                </Button>
+                                            </Link>
+                                        ))}
+                                    </div>
                                 </div>
-                                {/* Group Links */}
-                                <div className="space-y-3 mt-4">
-                                    {group.links.map((link, linkIndex) => (
-                                        <Link key={linkIndex} href={link.path} className="block w-full">
-                                            <Button
-                                                variant="default"
-                                                className={`w-full justify-center ${link.color} text-white font-bold`}
-                                            >
-                                                {link.title}
-                                            </Button>
-                                        </Link>
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
+                            ))
+                        }
                     </CardContent>
                 </Card>
             </div>
