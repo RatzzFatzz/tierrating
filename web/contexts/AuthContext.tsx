@@ -2,12 +2,14 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react"
 import { useRouter } from "next/navigation"
+import {extractJwtData} from "@/components/jwt-decoder";
 
 interface AuthContextType {
     token: string | null
     user: string | null
     isLoading: boolean
     isAuthenticated: boolean
+    isExpired: boolean
     login: (token: string, user: string) => void
     logout: () => void
 }
@@ -19,17 +21,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<string | null>(null)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
+    const [isExpired, setIsExpired] = useState(false)
     const router = useRouter()
 
     // Load token from localStorage on initial render
     useEffect(() => {
         const checkAuth= () => {
             const storedToken = localStorage.getItem("authToken")
-            const storedUsername = localStorage.getItem("username")
-            if (storedToken && storedUsername) {
-                setToken(storedToken)
-                setUser(storedUsername)
-                setIsAuthenticated(true)
+            if (storedToken) {
+                const decodedJwt = extractJwtData(storedToken);
+                if (decodedJwt) {
+                    setToken(storedToken)
+                    setUser(decodedJwt.username)
+                    setIsExpired(decodedJwt.isExpired)
+                    if (!isExpired) setIsAuthenticated(true)
+                }
             }
             setIsLoading(false);
         }
