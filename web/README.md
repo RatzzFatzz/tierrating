@@ -2,8 +2,8 @@
 
 A simple application to fetch ratings from third-party providers like AniList and organize them in tier lists. Later on, with the ability to sync changes back to the data provider.
 
-![TierRating Server Build](https://github.com/yourusername/tierrating/workflows/release-build/badge.svg)
-![TierRating UI Build](https://github.com/yourusername/tierrating-ui/workflows/release-build/badge.svg)
+![TierRating Server Build](https://github.com/RatzzFatzz/tierrating/workflows/release-build/badge.svg)
+![TierRating UI Build](https://github.com/RatzzFatzz/tierrating-ui/workflows/release-build/badge.svg)
 
 ## Overview
 
