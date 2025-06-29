@@ -17,7 +17,7 @@ export default function Profile({params}) {
     // Predefined profile structure
     const profile = {
         name: username,
-        avatar: "/placeholder.svg?height=100&width=100",
+        avatar: "/avatar.svg?height=100&width=100",
         bio: "Customizable placeholder text",
         links: [
             {
@@ -109,7 +109,7 @@ export default function Profile({params}) {
                 <Card className="w-full max-w-md border-border/40 bg-card/60 backdrop-blur-sm">
                     <CardHeader className="flex flex-col items-center text-center space-y-4">
                         <Avatar className="h-24 w-24 border-2 border-border shadow-md">
-                            <AvatarImage src={profile.avatar || "/placeholder.svg"} alt={profile.name} />
+                            <AvatarImage src={profile.avatar || "/avatar.svg"} alt={profile.name} />
                             <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div>
