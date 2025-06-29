@@ -3,6 +3,7 @@ import {Geist, Geist_Mono, Inter} from "next/font/google";
 import "./globals.css";
 import {AuthProvider} from "@/contexts/AuthContext";
 import NavBar from "@/components/navbar";
+import {ThemeProvider} from "@/components/theme-provider";
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,17 +24,19 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     return (
-        <html lang="en" className="dark">
+        <html lang="en" suppressHydrationWarning>
             <body className={inter.className}>
-                <AuthProvider>
-                    <div className="min-h-screen flex flex-col">
-                        <NavBar />
-                        <main className="flex-grow">
-                            <div className="pt-14"></div>
-                            {children}
-                        </main>
-                    </div>
-                </AuthProvider>
+                <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+                    <AuthProvider>
+                        <div className="min-h-screen flex flex-col">
+                            <NavBar />
+                            <main className="flex-grow">
+                                <div className="pt-14"></div>
+                                {children}
+                            </main>
+                        </div>
+                    </AuthProvider>
+                </ThemeProvider>
             </body>
         </html>
     )
