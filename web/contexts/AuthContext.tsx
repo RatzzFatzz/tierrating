@@ -28,15 +28,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         const checkAuth= () => {
             const storedToken = localStorage.getItem("authToken")
-            if (storedToken) {
-                const decodedJwt = extractJwtData(storedToken);
-                if (decodedJwt) {
-                    setToken(storedToken)
-                    setUser(decodedJwt.username)
-                    setIsExpired(decodedJwt.isExpired)
-                    if (!isExpired) setIsAuthenticated(true)
-                }
+            if (!storedToken) {
+                logout()
+                return;
             }
+
+            const decodedJwt = extractJwtData(storedToken);
+            if (!decodedJwt || decodedJwt.isExpired) {
+                logout()
+                return;
+            }
+
+            setToken(storedToken)
+            setUser(decodedJwt.username)
+            setIsExpired(decodedJwt.isExpired)
+            setIsAuthenticated(true)
             setIsLoading(false);
         }
         checkAuth()
@@ -44,7 +50,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const login = (newToken: string, username: string) => {
         localStorage.setItem("authToken", newToken)
-        localStorage.setItem("username", username)
         setToken(newToken)
         setUser(username)
         setIsAuthenticated(true)
@@ -52,7 +57,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const logout = () => {
         localStorage.removeItem("authToken")
-        localStorage.removeItem("username")
         setToken(null)
         setUser(null)
         setIsAuthenticated(false)
@@ -60,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <AuthContext.Provider value={{ token, user, isAuthenticated, isLoading, login, logout }}>
+        <AuthContext.Provider value={{ token, user, isAuthenticated, isLoading, isExpired, login, logout }}>
             {children}
         </AuthContext.Provider>
     )
