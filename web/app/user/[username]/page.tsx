@@ -12,7 +12,7 @@ import {API_URL} from "@/components/global-config";
 export default function Profile({params}) {
     const username: string = React.use(params).username.toString();
     const [userConnections, setUserConnections] = useState(null);
-    const {token, isLoading, isAuthenticated} = useAuth();
+    const {token, isLoading, isAuthenticated, user} = useAuth();
 
     // Predefined profile structure
     const profile = {
@@ -85,7 +85,7 @@ export default function Profile({params}) {
 
     // Helper function to determine if a section should be rendered
     const shouldRenderSection = (section, connections) => {
-        if (!connections) return false;
+        if (!connections || user != username) return false;
         return connections[section.connectedKey] === false;
     }
 
