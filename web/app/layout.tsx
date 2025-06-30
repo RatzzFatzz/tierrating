@@ -31,7 +31,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         <div className="min-h-screen flex flex-col">
                             <NavBar />
                             <main className="flex-grow">
-                                <div className="pt-14"></div>
+                                <div className="pt-24"></div>
                                 {children}
                             </main>
                         </div>

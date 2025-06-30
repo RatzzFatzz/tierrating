@@ -41,7 +41,7 @@ export const TierContainer = memo(function TierContainer({ tier, label, color, i
     })
     drop(ref)
     return (
-        <div className="flex mb-2 rounded-md overflow-hidden border border-border/40">
+        <div className="grid grid-cols-[auto_1fr] rounded-md overflow-hidden border border-border/60">
             <div className={`${color} flex items-center justify-center w-16 self-stretch text-white font-bold text-xl`}>
                 {label}
             </div>

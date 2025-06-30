@@ -6,13 +6,13 @@ import { Separator } from "@/components/ui/separator"
 import React, { useState, useEffect } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import {useAuth} from "@/contexts/AuthContext";
-import {API_URL} from "@/components/global-config";
+import { useAuth } from "@/contexts/AuthContext";
+import { API_URL } from "@/components/global-config";
 
 export default function Profile({params}) {
-    const username: string = React.use(params).username.toString();
+    const username = React.use(params).username.toString();
     const [userConnections, setUserConnections] = useState(null);
-    const {token, isLoading, isAuthenticated, user} = useAuth();
+    const { token, isLoading, isAuthenticated, user } = useAuth();
 
     // Predefined profile structure
     const profile = {
@@ -77,10 +77,9 @@ export default function Profile({params}) {
                     "Authorization": `Bearer ${token}`
                 }
             }).then(res => res.json())
-            .then(data => setUserConnections(data))
-            .catch((error) => console.error(error))
+                .then(data => setUserConnections(data))
+                .catch((error) => console.error(error))
         }
-
     }, [username, isLoading, isAuthenticated, token]);
 
     // Helper function to determine if a section should be rendered
@@ -105,19 +104,19 @@ export default function Profile({params}) {
 
     return (
         <ProtectedRoute>
-            <div className="flex min-h-screen items-center justify-center bg-background px-4">
-                <Card className="w-full max-w-md border-border/40 bg-card/60 backdrop-blur-sm">
-                    <CardHeader className="flex flex-col items-center text-center space-y-4">
-                        <Avatar className="h-24 w-24 border-2 border-border shadow-md">
+            <div className="flex items-center justify-center px-4">
+                <Card className="w-full max-w-md border-border/60 bg-background/80 backdrop-blur-md shadow-lg rounded-xl">
+                    <CardHeader className="flex flex-col items-center text-center space-y-4 pt-8">
+                        <Avatar className="h-24 w-24 border-2 border-border/50 shadow-md">
                             <AvatarImage src={profile.avatar || "/avatar.svg"} alt={profile.name} />
                             <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div>
                             <CardTitle className="text-2xl font-bold">{profile.name}</CardTitle>
-                            <p className="text-muted-foreground mt-1 ">{profile.bio}</p>
+                            <p className="text-muted-foreground mt-1">{profile.bio}</p>
                         </div>
                     </CardHeader>
-                    <CardContent className="space-y-6">
+                    <CardContent className="space-y-6 pb-8">
                         {/* Ungrouped Links Section */}
                         {profile.links
                             .filter(link => shouldRenderSection(link, userConnections))
@@ -125,14 +124,13 @@ export default function Profile({params}) {
                                 <Link key={index} href={link.path} className="block w-full">
                                     <Button
                                         variant="default"
-                                        className={`w-full justify-center ${link.color} text-white font-bold`}
+                                        className={`w-full justify-center rounded-full transition-all duration-200 ${link.color} text-white font-medium`}
                                     >
                                         {link.title}
                                     </Button>
                                 </Link>
                             ))
                         }
-
                         {/* Grouped Links Section */}
                         {profile.groups
                             .filter(group => shouldRenderGroup(group, userConnections))
@@ -147,7 +145,7 @@ export default function Profile({params}) {
                                             <Link key={linkIndex} href={link.path} className="block w-full">
                                                 <Button
                                                     variant="default"
-                                                    className={`w-full justify-center ${link.color} text-white font-bold`}
+                                                    className={`w-full justify-center rounded-full transition-all duration-200 ${link.color} text-white font-medium`}
                                                 >
                                                     {link.title}
                                                 </Button>
