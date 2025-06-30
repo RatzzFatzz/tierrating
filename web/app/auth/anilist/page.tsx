@@ -4,7 +4,7 @@ import {useRouter, useSearchParams} from "next/navigation";
 import {useAuth} from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import React, {useEffect} from "react";
-import {API_URL} from "@/components/global-config";
+import {authorize} from "@/components/api/anilist-api";
 
 export default function AuthAniList() {
     const searchParams = useSearchParams()
@@ -14,14 +14,7 @@ export default function AuthAniList() {
     useEffect(() => {
         if (searchParams.has("code")) {
             const code = searchParams.get("code")
-            fetch(`${API_URL}/anilist/auth/${user}`, {
-                method: 'POST',
-                headers: {
-                    "Authorization": "Bearer " + token,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({code})
-            }).then(res => res.json())
+            authorize(user, token, code)
             .then(data => {
                 if (data.message) {
                     return Promise.reject(data.message)

@@ -1,14 +1,15 @@
 "use client"
 
 import Link from "next/link"
-import React, { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { EyeIcon, EyeOffIcon } from "lucide-react"
-import { useAuth } from "@/contexts/AuthContext";
+import React, {useEffect, useState} from "react"
+import {useRouter} from "next/navigation"
+import {Button} from "@/components/ui/button"
+import {Input} from "@/components/ui/input"
+import {Label} from "@/components/ui/label"
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
+import {EyeIcon, EyeOffIcon} from "lucide-react"
+import {useAuth} from "@/contexts/AuthContext";
+import {submitSignup} from "@/components/api/user-api";
 
 export default function SignupPage() {
     const [showPassword, setShowPassword] = useState(false)
@@ -25,9 +26,8 @@ export default function SignupPage() {
     }>({})
 
     const router = useRouter()
-    const { isAuthenticated, user, isLoading: authLoading } = useAuth()
+    const {isAuthenticated, user, isLoading: authLoading} = useAuth()
 
-    // Redirect to dashboard if already authenticated
     useEffect(() => {
         if (isAuthenticated && !authLoading) {
             router.push(`/user/${user}`)
@@ -79,54 +79,34 @@ export default function SignupPage() {
         setIsLoading(true)
         setErrors({})
 
-        try {
-            const response = await fetch('http://localhost:8080/auth/signup', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, email, password }),
+        submitSignup(username, email, password)
+            .then(data => {
+                if (!data.signupSuccess) {
+                    const newErrors: {
+                        username?: string;
+                        email?: string;
+                        general?: string;
+                    } = {}
+
+                    if (data.usernameTaken) newErrors.username = "Username is already taken";
+                    if (data.emailTaken) newErrors.email = "Email is already registered";
+                    if (!data.usernameTaken && !data.emailTaken && !data.signupSuccess) newErrors.general = "Signup failed. Please try again."
+
+                    setErrors(newErrors)
+                    return
+                }
+
+                router.push('/login?signup=success')
             })
-
-            const data = await response.json()
-
-            if (!response.ok || !data.signupSuccess) {
-                // Handle specific error cases
-                const newErrors: {
-                    username?: string;
-                    email?: string;
-                    general?: string;
-                } = {}
-
-                if (data.usernameTaken) {
-                    newErrors.username = "Username is already taken"
-                }
-
-                if (data.emailTaken) {
-                    newErrors.email = "Email is already registered"
-                }
-
-                if (!data.usernameTaken && !data.emailTaken && !data.signupSuccess) {
-                    newErrors.general = "Signup failed. Please try again."
-                }
-
-                setErrors(newErrors)
-                return
-            }
-
-            // Signup successful
-            router.push('/login?signup=success')
-        } catch (error) {
-            console.error('Signup error:', error)
-            setErrors({
-                general: "An unexpected error occurred. Please try again."
+            .catch(error => {
+                console.error('Signup error:', error)
+                setErrors({
+                    general: "An unexpected error occurred. Please try again."
+                })
             })
-        } finally {
-            setIsLoading(false)
-        }
+            .finally(() => setIsLoading(false))
     }
 
-    // Don't show signup form if checking authentication or already authenticated
     if (authLoading || isAuthenticated) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -200,13 +180,13 @@ export default function SignupPage() {
                                     onClick={() => setShowPassword(!showPassword)}
                                 >
                                     {showPassword ? (
-                                        <EyeOffIcon className="h-4 w-4" />
+                                        <EyeOffIcon className="h-4 w-4"/>
                                     ) : (
-                                        <EyeIcon className="h-4 w-4" />
+                                        <EyeIcon className="h-4 w-4"/>
                                     )}
                                     <span className="sr-only">
-                    {showPassword ? "Hide password" : "Show password"}
-                  </span>
+                                        {showPassword ? "Hide password" : "Show password"}
+                                    </span>
                                 </Button>
                             </div>
                         </div>
@@ -226,8 +206,7 @@ export default function SignupPage() {
                             )}
                         </div>
                     </CardContent>
-
-                    <CardFooter className="flex flex-col space-y-4">
+                    <CardFooter className="flex flex-col space-y-4 pt-4">
                         <Button
                             type="submit"
                             className="w-full"
@@ -236,12 +215,11 @@ export default function SignupPage() {
                             {isLoading ? "Creating account..." : "Create account"}
                         </Button>
                         <div className="text-center text-sm">
-                            Already have an account?{" "}
                             <Link
                                 href="/login"
                                 className="text-primary hover:underline"
                             >
-                                Sign in
+                                Already have an account? Sign in
                             </Link>
                         </div>
                     </CardFooter>

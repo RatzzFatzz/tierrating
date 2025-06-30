@@ -7,12 +7,12 @@ import React, { useState, useEffect } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/contexts/AuthContext";
-import { API_URL } from "@/components/global-config";
+import {fetchUser} from "@/components/api/user-api";
 
 export default function Profile({params}) {
     const username = React.use(params).username.toString();
     const [userConnections, setUserConnections] = useState(null);
-    const { token, isLoading, isAuthenticated, user } = useAuth();
+    const { token, isLoading, isAuthenticated, user, logout } = useAuth();
 
     // Predefined profile structure
     const profile = {
@@ -71,16 +71,11 @@ export default function Profile({params}) {
 
     useEffect(() => {
         if (!isLoading && isAuthenticated) {
-            fetch(`${API_URL}/user/${username}`, {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
-            }).then(res => res.json())
+            fetchUser(token, username, logout)
                 .then(data => setUserConnections(data))
                 .catch((error) => console.error(error))
         }
-    }, [username, isLoading, isAuthenticated, token]);
+    }, [username, isLoading, isAuthenticated, token, logout]);
 
     // Helper function to determine if a section should be rendered
     const shouldRenderSection = (section, connections) => {

@@ -10,7 +10,7 @@ interface AuthContextType {
     isLoading: boolean
     isAuthenticated: boolean
     isExpired: boolean
-    login: (token: string, user: string) => void
+    login: (token: string) => void
     logout: () => void
 }
 
@@ -48,10 +48,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         checkAuth()
     }, [])
 
-    const login = (newToken: string, username: string) => {
+    const login = (newToken: string) => {
         localStorage.setItem("authToken", newToken)
         setToken(newToken)
-        setUser(username)
+        setUser(extractJwtData(newToken).username)
         setIsAuthenticated(true)
     }
 

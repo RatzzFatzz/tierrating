@@ -41,4 +41,20 @@ export const fetchWithApi = async (token: string, username: string, type: string
     }
 }
 
+export const authorize = async(username: string, token: string, code: string)=> {
+    const response = await fetch(`${API_URL}/anilist/auth/${username}`, {
+        method: 'POST',
+        headers: {
+            "Authorization": "Bearer " + token,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({code})
+    })
+
+    if (!response.ok) {
+        return new Error('Could not authorize with AniList');
+    }
+
+    return await response.json();
+}
 

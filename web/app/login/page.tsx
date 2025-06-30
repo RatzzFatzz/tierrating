@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { EyeIcon, EyeOffIcon } from "lucide-react"
 import {useAuth} from "@/contexts/AuthContext";
+import {requestLogin} from "@/components/api/user-api";
 
 export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false)
@@ -33,30 +34,13 @@ export default function LoginPage() {
         setIsLoading(true)
         setErrorMessage("")
 
-        try {
-            const response = await fetch('http://localhost:8080/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, password }),
+        requestLogin(username, password)
+            .then(data => login(data.token))
+            .catch(error => {
+                console.error('Login error:', error)
+                setErrorMessage(error instanceof Error ? error.message : 'Login failed. Please try again.')
             })
-
-            if (!response.ok) {
-                throw new Error('Invalid credentials')
-            }
-
-            const data = await response.json()
-
-            login(data.token, username)
-
-            router.push(`/user/${username}`)
-        } catch (error) {
-            console.error('Login error:', error)
-            setErrorMessage(error instanceof Error ? error.message : 'Login failed. Please try again.')
-        } finally {
-            setIsLoading(false)
-        }
+            .finally(() => setIsLoading(false))
     }
 
     if (isLoading || isAuthenticated) {
@@ -135,7 +119,7 @@ export default function LoginPage() {
                             </div>
                         </div>
                     </CardContent>
-                    <CardFooter className="flex flex-col space-y-4">
+                    <CardFooter className="flex flex-col space-y-4 pt-4">
                         <Button
                             type="submit"
                             className="w-full"
