@@ -1,10 +1,10 @@
 spring:
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/tierrating
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/tierrating
     driver-class-name: org.postgresql.Driver
-    username: tierrating
-    password: testingPW
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
