@@ -1,21 +1,12 @@
 import type { Metadata } from "next";
-import {Geist, Geist_Mono, Inter} from "next/font/google";
+import {Inter} from "next/font/google";
 import "./globals.css";
 import {AuthProvider} from "@/contexts/AuthContext";
 import NavBar from "@/components/navbar";
 import {ThemeProvider} from "@/components/theme-provider";
+import Starfield from "react-starfield";
 
 const inter = Inter({ subsets: ['latin'] })
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Tier Rating",
@@ -27,6 +18,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <html lang="en" suppressHydrationWarning>
             <body className={inter.className}>
                 <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+                    <Starfield
+                        starCount={500}
+                        starColor={[255, 255, 255]}
+                        speedFactor={0.05}
+                        backgroundColor="black"
+                    />
                     <AuthProvider>
                         <div className="min-h-screen flex flex-col">
                             <NavBar />

@@ -3,7 +3,6 @@ import { jwtDecode } from 'jwt-decode';
 interface JwtPayload {
     sub?: string;
     exp?: number;
-    [key: string]: any;
 }
 
 /**

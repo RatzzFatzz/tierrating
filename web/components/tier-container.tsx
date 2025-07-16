@@ -14,11 +14,14 @@ interface TierContainerProps {
 
 export const TierContainer = memo(function TierContainer({ tier, label, color, items, moveItem }: TierContainerProps) {
     const ref = useRef<HTMLDivElement>(null)
+
+    // @ts-expect-error TODO
     const [{ isOver }, drop] = useDrop({
         accept: "RATING_ITEM",
         collect: (monitor) => ({
             isOver: monitor.isOver(),
         }),
+        // @ts-expect-error TODO
         drop(item: DragItem, monitor) {
             // If dropped directly on the container (not on an item)
             if (!monitor.didDrop() && ref.current) {
@@ -27,7 +30,8 @@ export const TierContainer = memo(function TierContainer({ tier, label, color, i
                 return { moved: true }
             }
         },
-        hover(item: DragItem, monitor) {
+        // @ts-expect-error TODO
+        hover(item: DragItem) {
             if (!ref.current || item.tier === tier) {
                 return
             }

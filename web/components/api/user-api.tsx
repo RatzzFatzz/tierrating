@@ -1,6 +1,6 @@
 import {API_URL} from "@/components/global-config";
 
-export const fetchUser = async (token: string, username: string, logout: () => void) => {
+export const fetchUser = async (token: string | null, username: string, logout: () => void) => {
     if (!token) {
         throw new Error("No authentication token")
     }

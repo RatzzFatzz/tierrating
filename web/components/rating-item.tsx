@@ -20,11 +20,13 @@ export const RatingItemComponent = memo(function RatingItemComponent({ item, ind
             isDragging: monitor.isDragging(),
         }),
     })
+    // @ts-expect-error TODO
     const [{ isOver }, drop] = useDrop({
         accept: "RATING_ITEM",
         collect: (monitor) => ({
             isOver: monitor.isOver(),
         }),
+        // @ts-expect-error TODO
         hover(dragItem: DragItem, monitor) {
             if (!ref.current) {
                 return

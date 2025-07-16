@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import {useEffect, useState} from "react"
+import {Suspense, useEffect, useState} from "react"
 import {useRouter, useSearchParams} from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,6 +11,21 @@ import { EyeIcon, EyeOffIcon } from "lucide-react"
 import {useAuth} from "@/contexts/AuthContext";
 import {requestLogin} from "@/components/api/user-api";
 
+function SuccessMessage() {
+    const searchParams = useSearchParams()
+    const signupSuccess = searchParams.get('signup') === 'success'
+
+    return (
+        <div>
+            {signupSuccess && (
+                <div className="bg-green-500/15 text-green-500 text-sm p-3 rounded-md">
+                    Account created successfully! You can now log in.
+                </div>
+            )}
+        </div>
+    )
+}
+
 export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
@@ -19,8 +34,6 @@ export default function LoginPage() {
     const [errorMessage, setErrorMessage] = useState("")
     const router = useRouter()
     const { login, isAuthenticated, user} = useAuth();
-    const searchParams = useSearchParams()
-    const signupSuccess = searchParams.get('signup') === 'success'
 
     useEffect(() => {
         console.debug(`${user} - ${isAuthenticated}`)
@@ -62,11 +75,9 @@ export default function LoginPage() {
                 </CardHeader>
                 <form onSubmit={handleSubmit}>
                     <CardContent className="space-y-4">
-                        {signupSuccess && (
-                            <div className="bg-green-500/15 text-green-500 text-sm p-3 rounded-md">
-                                Account created successfully! You can now log in.
-                            </div>
-                        )}
+                        <Suspense>
+                            <SuccessMessage />
+                        </Suspense>
                         {errorMessage && (
                             <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md">
                                 {errorMessage}
@@ -132,7 +143,7 @@ export default function LoginPage() {
                                 href="/signup"
                                 className="text-primary hover:underline"
                             >
-                                Don't have an account? Sign up
+                                Don&apos;t have an account? Sign up
                             </Link>
                         </div>
                     </CardFooter>

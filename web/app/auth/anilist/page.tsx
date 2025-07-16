@@ -6,6 +6,8 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import React, {useEffect} from "react";
 import {authorize} from "@/components/api/anilist-api";
 
+export const dynamic = 'force-dynamic'
+
 export default function AuthAniList() {
     const searchParams = useSearchParams()
     const router = useRouter()

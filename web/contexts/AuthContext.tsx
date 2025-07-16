@@ -51,7 +51,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const login = (newToken: string) => {
         localStorage.setItem("authToken", newToken)
         setToken(newToken)
-        setUser(extractJwtData(newToken).username)
+        const extracted = extractJwtData(newToken);
+        if (extracted) setUser(extracted.username)
         setIsAuthenticated(true)
     }
 

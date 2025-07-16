@@ -6,11 +6,12 @@ services:
     restart: unless-stopped
     ports:
       - 8080
+    depends_on: db
     environment:
       DB_HOST: db
       DB_PORT: 5432
       DB_USERNAME: tierrating
-      DB_PASSWORD: tierratingPW
+      DB_PASSWORD: testingPW
 
   ui:
     image: ghcr.io/ratzzfatzz/tierrating-ui:latest

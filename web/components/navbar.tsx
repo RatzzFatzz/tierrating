@@ -12,7 +12,7 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 export default function NavBar() {
     const { logout, isAuthenticated, user } = useAuth()
     const pathname = usePathname()
-    const { theme, setTheme } = useTheme()
+    const { setTheme } = useTheme()
     const [scrolled, setScrolled] = useState(false)
 
     // Add scroll event listener to detect when page is scrolled

@@ -1,12 +1,12 @@
 "use client"
 
 import ProtectedRoute from "@/components/ProtectedRoute";
-import {use} from "react";
 import AniListTierListPage from "@/components/tier-list/anilist-tier-list-page";
+import {useParams} from "next/navigation";
 
-export default function AniListManga({params}) {
-    const resolvedParams = use(params);
-    const username: string = resolvedParams.username;
+export default function AniListManga() {
+    const params = useParams<{username: string}>();
+    const username: string = params.username;
 
     return (
         <ProtectedRoute>

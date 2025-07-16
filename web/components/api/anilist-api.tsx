@@ -41,7 +41,11 @@ export const fetchWithApi = async (token: string, username: string, type: string
     }
 }
 
-export const authorize = async(username: string, token: string, code: string)=> {
+export const authorize = async(username: string | null, token: string | null, code: string | null)=> {
+    if (!username && !token && !code) {
+        return new Error("Invalid username, token or code")
+    }
+
     const response = await fetch(`${API_URL}/anilist/auth/${username}`, {
         method: 'POST',
         headers: {
