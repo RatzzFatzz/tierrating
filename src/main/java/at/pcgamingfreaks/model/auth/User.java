@@ -38,6 +38,8 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    private String bio;
+
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private AniListConnection anilistConnection;
 

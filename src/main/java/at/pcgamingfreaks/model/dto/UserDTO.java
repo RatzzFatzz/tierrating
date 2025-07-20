@@ -7,7 +7,10 @@ import lombok.Setter;
 @Setter
 public class UserDTO {
     private long id;
+
     private String username;
+    private String bio;
+
     private boolean isAniListConnected;
     private boolean isTraktConnected;
 }

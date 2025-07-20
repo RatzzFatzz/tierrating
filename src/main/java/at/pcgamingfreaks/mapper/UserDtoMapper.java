@@ -9,6 +9,7 @@ public class UserDtoMapper {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
+        dto.setBio(user.getBio() == null ? "" : user.getBio());
         dto.setAniListConnected(user.getAnilistConnection() != null);
         return dto;
     }
