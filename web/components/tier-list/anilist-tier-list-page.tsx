@@ -3,6 +3,7 @@ import type {RatingItem} from "@/model/types";
 import {useAuth} from "@/contexts/AuthContext";
 import TierListPage from "@/components/tier-list-page";
 import {fetchWithApi} from "@/components/api/anilist-api";
+import LoadingPage from "@/components/loading-page";
 
 export default function AniListTierListPage({username, type, title}: {username: string, type: string, title: string}) {
     const [ratingItems, setRatingItems] = useState<RatingItem[]>([]);
@@ -34,9 +35,7 @@ export default function AniListTierListPage({username, type, title}: {username: 
     return (
         <>
             {isLoading ? (
-                <div className="flex items-center justify-center min-h-screen">
-                    <div className="animate-pulse text-muted-foreground">Loading...</div>
-                </div>
+                <LoadingPage />
             ) : error ? (
                 <div className="flex justify-center items-center min-h-screen">
                     <div className="text-destructive">{error}</div>

@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { EyeIcon, EyeOffIcon } from "lucide-react"
 import {useAuth} from "@/contexts/AuthContext";
 import {requestLogin} from "@/components/api/user-api";
+import LoadingPage from "@/components/loading-page";
 
 function SuccessMessage() {
     const searchParams = useSearchParams()
@@ -58,9 +59,7 @@ export default function LoginPage() {
 
     if (isLoading || isAuthenticated) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-pulse text-muted-foreground">Loading...</div>
-            </div>
+            <LoadingPage />
         )
     }
 

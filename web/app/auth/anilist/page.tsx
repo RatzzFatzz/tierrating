@@ -5,6 +5,7 @@ import {useAuth} from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import React, {useEffect} from "react";
 import {authorize} from "@/components/api/anilist-api";
+import LoadingPage from "@/components/loading-page";
 
 export const dynamic = 'force-dynamic'
 
@@ -31,9 +32,7 @@ export default function AuthAniList() {
 
     return (
         <ProtectedRoute>
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-pulse text-muted-foreground">Loading...</div>
-            </div>
+            <LoadingPage />
         </ProtectedRoute>
     );
 }

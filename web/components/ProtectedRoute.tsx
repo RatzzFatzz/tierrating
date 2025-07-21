@@ -3,6 +3,7 @@
 import {useRouter} from "next/navigation"
 import {useEffect} from "react"
 import {useAuth} from "@/contexts/AuthContext";
+import LoadingPage from "@/components/loading-page";
 
 export default function ProtectedRoute({children}: { children: React.ReactNode }) {
     const {isAuthenticated, isLoading, isExpired} = useAuth()
@@ -17,9 +18,7 @@ export default function ProtectedRoute({children}: { children: React.ReactNode }
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-pulse text-muted-foreground">Loading...</div>
-            </div>
+            <LoadingPage />
         )
     }
 
