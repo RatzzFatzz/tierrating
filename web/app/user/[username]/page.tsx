@@ -27,7 +27,10 @@ function ProviderLoginButton({index, title, path, color}: {index: number, title:
 
 function ProviderGroupButton({index, groupTitle, groupEntries}: { index: number, groupTitle: string, groupEntries: {title: string, path: string, color: string}[]}) {
     return (
-        <div key={index}>
+        <div key={index} className={cn(
+            "w-full max-w-md rounded-2xl p-5",
+            "bg-inherit backdrop-blur-md border border-border/100 shadow-lg",
+        )}>
             <div className="mb-3">
                 <h2 className="text-lg font-semibold">{groupTitle}</h2>
                 <Separator className="mt-1" />
@@ -69,7 +72,7 @@ export default function Profile() {
         <ProtectedRoute>
             <div className="flex items-center justify-center px-4 pt-20">
                 <Card className={cn(
-                    "w-full max-w-md rounded-2xl p-6",
+                    "w-full max-w-md rounded-2xl p-4 pt-6 pb-6 z-50",
                     "bg-background/80 backdrop-blur-md border border-border/100 shadow-lg",
                     "transition-all duration-200 ease-in-out"
                 )}>
