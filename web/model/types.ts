@@ -17,3 +17,11 @@ export interface User {
     id: number
     name: string
 }
+
+export interface Tier {
+    id: string;
+    name: string;
+    score: number;
+    adjustedScore: number;
+    color: string;
+}
