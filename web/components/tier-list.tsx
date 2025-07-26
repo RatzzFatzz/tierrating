@@ -1,30 +1,60 @@
 "use client"
 
-import type React from "react"
+import React, {useEffect, useState} from "react"
 
 import { DndProvider } from "react-dnd"
 import { HTML5Backend } from "react-dnd-html5-backend"
 import { TierContainer } from "./tier-container"
-import type { RatingItem } from "@/model/types"
+import {RatingItem, Tier} from "@/model/types"
 import { memo } from "react"
+import {useAuth} from "@/contexts/AuthContext";
+import {fetchTiers} from "@/components/api/tier-api";
+import TierContainerSkeleton from "@/components/loading-skeletons/tier-container-skeleton";
 
 interface TierListProps {
     items: RatingItem[]
     setItems: React.Dispatch<React.SetStateAction<RatingItem[]>>
 }
 
-const tiers = [
-    { id: "s", label: "S", color: "bg-red-500" },
-    { id: "a", label: "A", color: "bg-orange-500" },
-    { id: "b", label: "B", color: "bg-yellow-500" },
-    { id: "c", label: "C", color: "bg-green-500" },
-    { id: "d", label: "D", color: "bg-blue-500" },
-    { id: "f", label: "F", color: "bg-purple-500" },
-    { id: "unassigned", label: "", color: "bg-gray-300" },
-]
+const TierMapper = (tiers: Tier[], items: RatingItem[]) => {
+    // TODO validate that this sorting is really necessary
+    items.sort((a, b) => b.score - a.score);
+    tiers.sort((a, b) => b.score - a.score);
+
+    let itemsIndex = 0;
+    let tiersIndex = 0;
+
+    while (itemsIndex < items.length && tiersIndex < tiers.length) {
+        if (items[itemsIndex].score >= tiers[tiersIndex].score) {
+            items[itemsIndex].tier = tiers[tiersIndex].name;
+            itemsIndex++;
+        } else {
+            tiersIndex++;
+        }
+    }
+}
 
 export const TierList = memo(function TierList({ items, setItems }: TierListProps) {
+    const [tiers, setTiers] = useState<Tier[]>([]);
+    const [queryRunning, setQueryRunning] = useState(true);
+    const { user, token, isLoading, isAuthenticated, logout } = useAuth();
+    const username = "RatzzFatzz";
+
+    useEffect(() => {
+        if (!isLoading && isAuthenticated) {
+            fetchTiers(token, username, "anilist", "anime", logout)
+                .then((data: Tier[]) => data.sort((a, b) => b.score - a.score))
+                .then(data => {
+                    setTiers(data)
+                    TierMapper(data, items)
+                })
+                .catch((error) => console.error(error))
+                .finally(() => setQueryRunning(false));
+        }
+    }, [username, items, isLoading, isAuthenticated, token, logout]);
+
     const moveItem = (dragIndex: number, hoverIndex: number, sourceTier: string, targetTier: string) => {
+        console.debug(dragIndex, hoverIndex, sourceTier, targetTier);
         setItems((prevItems) => {
             // Create a new array to avoid mutating the state directly
             const newItems = [...prevItems]
@@ -84,16 +114,19 @@ export const TierList = memo(function TierList({ items, setItems }: TierListProp
     return (
         <DndProvider backend={HTML5Backend}>
             <div className="grid grid-cols-1 gap-2">
-                {tiers.map((tier) => (
+                {queryRunning ? (
+                    <TierContainerSkeleton/>
+                ) : (
+                tiers.map((tier) => (
                     <TierContainer
-                        key={tier.id}
-                        tier={tier.id}
-                        label={tier.label}
+                        key={tier.name}
+                        tier={tier.name}
+                        label={tier.name}
                         color={tier.color}
-                        items={items.filter((item) => item.tier === tier.id)}
+                        items={items.filter((item) => item.tier === tier.name)}
                         moveItem={moveItem}
                     />
-                ))}
+                )))}
             </div>
         </DndProvider>
     )
