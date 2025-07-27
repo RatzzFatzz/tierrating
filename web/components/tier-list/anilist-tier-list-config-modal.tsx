@@ -17,9 +17,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Tier } from "@/model/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchTiers } from "@/components/api/tier-api";
-import { Skeleton } from "@/components/ui/skeleton"; // Make sure you have this component from shadcn
+import { Skeleton } from "@/components/ui/skeleton";
 
-// Define the tier interface
 interface AniListTierListConfigModalProps {
     initialTiers?: Tier[];
     onSave?: (tiers: Tier[]) => void;
@@ -42,19 +41,25 @@ export default function AniListTierListConfigModal({
                                                    }: AniListTierListConfigModalProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [tiers, setTiers] = useState<Tier[]>([]);
-    const [queryRunning, setQueryRunning] = useState(true);
+    const [queryRunning, setQueryRunning] = useState(false);
     const { user, token, isLoading, isAuthenticated, logout } = useAuth();
     const username = "RatzzFatzz";
+    const dataFetched = useRef(false);
 
+    // Only fetch data when the modal is opened
     useEffect(() => {
-        if (!isLoading && isAuthenticated) {
+        if (isOpen && !dataFetched.current && !isLoading && isAuthenticated) {
+            setQueryRunning(true);
             fetchTiers(token, username, "anilist", "anime", logout)
                 .then((data: Tier[]) => data.sort((a, b) => b.score - a.score))
-                .then(data => setTiers(data))
+                .then(data => {
+                    setTiers(data);
+                    dataFetched.current = true;
+                })
                 .catch((error) => console.error(error))
                 .finally(() => setQueryRunning(false));
         }
-    }, [username, isLoading, isAuthenticated, token, logout]);
+    }, [isOpen, isLoading, isAuthenticated, token, username, logout]);
 
     // Sort tiers whenever they change
     useEffect(() => {
@@ -115,10 +120,23 @@ export default function AniListTierListConfigModal({
 
     const handleOpenChange = (open: boolean) => {
         setIsOpen(open);
-        // Reset to initial tiers if dialog is closed without saving
-        if (!open && initialTiers.length > 0) {
-            setTiers(initialTiers);
+
+        // If opening the dialog, reset the data fetched flag if it was previously closed
+        if (open && !isOpen) {
+            dataFetched.current = false;
         }
+
+        // Reset to initial tiers if dialog is closed without saving
+        if (!open) {
+            if (initialTiers.length > 0) {
+                setTiers(initialTiers);
+            }
+        }
+    };
+
+    // Trigger the dialog to open
+    const handleTriggerClick = () => {
+        setIsOpen(true);
     };
 
     // Helper function to format and validate number inputs
@@ -142,18 +160,12 @@ export default function AniListTierListConfigModal({
                 key={`skeleton-${index}`}
                 className="grid grid-cols-[60px_1fr_100px_120px_40px] gap-4 items-center"
             >
-                <div>
-                    <Skeleton className="h-9 w-full" />
-                </div>
-                <div>
-                    <Skeleton className="h-9 w-full" />
-                </div>
-                <div>
-                    <Skeleton className="h-9 w-full" />
-                </div>
-                <div>
-                    <Skeleton className="h-9 w-full" />
-                </div>
+                {Array(4).fill(0).map((_) => (
+                    // eslint-disable-next-line react/jsx-key
+                    <div>
+                        <Skeleton className="h-9 w-full" />
+                    </div>
+                ))}
                 <div>
                     <Skeleton className="h-9 w-9" />
                 </div>
@@ -163,7 +175,7 @@ export default function AniListTierListConfigModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-            <DialogTrigger className="p-1.5" onClick={() => setIsOpen(true)}>
+            <DialogTrigger className="p-1.5" onClick={handleTriggerClick}>
                 <Wrench />
             </DialogTrigger>
             <DialogContent className="sm:max-w-[650px] max-h-[80vh] overflow-y-auto">
