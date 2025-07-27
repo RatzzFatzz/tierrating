@@ -17,10 +17,7 @@ interface TierListProps {
 }
 
 const TierMapper = (tiers: Tier[], items: RatingItem[]) => {
-    // TODO validate that this sorting is really necessary
-    items.sort((a, b) => b.score - a.score);
-    tiers.sort((a, b) => b.score - a.score);
-
+    // Proper order (sorted descending by score) is assured by the server
     let itemsIndex = 0;
     let tiersIndex = 0;
 
@@ -37,6 +34,7 @@ const TierMapper = (tiers: Tier[], items: RatingItem[]) => {
 export const TierList = memo(function TierList({ items, setItems }: TierListProps) {
     const [tiers, setTiers] = useState<Tier[]>([]);
     const [queryRunning, setQueryRunning] = useState(true);
+    const [mappingCompleted, setMappingCompleted] = useState(false);
     const { user, token, isLoading, isAuthenticated, logout } = useAuth();
     const username = "RatzzFatzz";
 
@@ -44,14 +42,18 @@ export const TierList = memo(function TierList({ items, setItems }: TierListProp
         if (!isLoading && isAuthenticated) {
             fetchTiers(token, username, "anilist", "anime", logout)
                 .then((data: Tier[]) => data.sort((a, b) => b.score - a.score))
-                .then(data => {
-                    setTiers(data)
-                    TierMapper(data, items)
-                })
+                .then(data => setTiers(data))
                 .catch((error) => console.error(error))
                 .finally(() => setQueryRunning(false));
         }
-    }, [username, items, isLoading, isAuthenticated, token, logout]);
+    }, [username, isLoading, isAuthenticated, token, logout]);
+
+    useEffect(() => {
+        if (!queryRunning && !mappingCompleted) {
+            TierMapper(tiers, items)
+            setMappingCompleted(true)
+        }
+    }, [tiers, items, queryRunning, mappingCompleted])
 
     const moveItem = (dragIndex: number, hoverIndex: number, sourceTier: string, targetTier: string) => {
         console.debug(dragIndex, hoverIndex, sourceTier, targetTier);
