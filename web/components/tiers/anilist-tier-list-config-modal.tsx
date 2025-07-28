@@ -18,6 +18,7 @@ import { Tier } from "@/model/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchTiers } from "@/components/api/tier-api";
 import { Skeleton } from "@/components/ui/skeleton";
+import {getDefaultTiers} from "@/model/defaults";
 
 interface AniListTierListConfigModalProps {
     initialTiers?: Tier[];
@@ -51,9 +52,8 @@ export default function AniListTierListConfigModal({
         if (isOpen && !dataFetched.current && !isLoading && isAuthenticated) {
             setQueryRunning(true);
             fetchTiers(token, username, "anilist", "anime", logout)
-                .then((data: Tier[]) => data.sort((a, b) => b.score - a.score))
-                .then(data => {
-                    setTiers(data);
+                .then((data: Tier[]) => {
+                    setTiers(data && data.length > 0 ? data : getDefaultTiers());
                     dataFetched.current = true;
                 })
                 .catch((error) => console.error(error))
@@ -160,7 +160,7 @@ export default function AniListTierListConfigModal({
                 key={`skeleton-${index}`}
                 className="grid grid-cols-[60px_1fr_100px_120px_40px] gap-4 items-center"
             >
-                {Array(4).fill(0).map((_) => (
+                {Array(4).fill(0).map(() => (
                     // eslint-disable-next-line react/jsx-key
                     <div>
                         <Skeleton className="h-9 w-full" />

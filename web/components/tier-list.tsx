@@ -10,6 +10,7 @@ import { memo } from "react"
 import {useAuth} from "@/contexts/AuthContext";
 import {fetchTiers} from "@/components/api/tier-api";
 import TierContainerSkeleton from "@/components/loading-skeletons/tier-container-skeleton";
+import {getDefaultTiers} from "@/model/defaults";
 
 interface TierListProps {
     items: RatingItem[]
@@ -41,8 +42,7 @@ export const TierList = memo(function TierList({ items, setItems }: TierListProp
     useEffect(() => {
         if (!isLoading && isAuthenticated) {
             fetchTiers(token, username, "anilist", "anime", logout)
-                .then((data: Tier[]) => data.sort((a, b) => b.score - a.score))
-                .then(data => setTiers(data))
+                .then((data: Tier[]) => setTiers(data && data.length > 0 ? data : getDefaultTiers()))
                 .catch((error) => console.error(error))
                 .finally(() => setQueryRunning(false));
         }

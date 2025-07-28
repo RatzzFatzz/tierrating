@@ -11,7 +11,7 @@ import {useParams} from "next/navigation";
 import LoadingPage from "@/components/loading-page";
 import {cn} from "@/lib/utils"
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
-import AniListTierListConfigModal from "@/components/tier-list/anilist-tier-list-config-modal";
+import AniListTierListConfigModal from "@/components/tiers/anilist-tier-list-config-modal";
 
 function ProviderLoginButton({index, title, path, color}: {
     index: number,
