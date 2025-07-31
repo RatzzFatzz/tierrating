@@ -160,9 +160,9 @@ export default function AniListTierListConfigModal({
                 key={`skeleton-${index}`}
                 className="grid grid-cols-[60px_1fr_100px_120px_40px] gap-4 items-center"
             >
-                {Array(4).fill(0).map(() => (
+                {Array(4).fill(0).map((_, index2) => (
                     // eslint-disable-next-line react/jsx-key
-                    <div>
+                    <div key={`skeleton-${index}-${index2}`}>
                         <Skeleton className="h-9 w-full" />
                     </div>
                 ))}
@@ -185,11 +185,11 @@ export default function AniListTierListConfigModal({
                         Configure which score should be assigned to which tier. Also set a score value and color for each tier,
                         which will be set when dropping an element to that tier.
                         These changes will be sent back to the corresponding service provider.
-                        <p className="mt-1 font-medium text-sm flex items-center">
-                            <ArrowUpDown className="h-3 w-3 mr-1" />
-                            Tiers are automatically sorted by score in descending order.
-                        </p>
                     </DialogDescription>
+                    <p className="mt-1 font-medium text-sm flex items-center">
+                        <ArrowUpDown className="h-3 w-3 mr-1" />
+                        Tiers are automatically sorted by score in descending order.
+                    </p>
                 </DialogHeader>
                 <div className="space-y-6 py-4">
                     <div className="grid grid-cols-[60px_1fr_100px_120px_40px] gap-4 items-center font-medium text-sm">
