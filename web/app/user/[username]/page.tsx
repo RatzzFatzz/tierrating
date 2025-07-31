@@ -90,7 +90,7 @@ export default function Profile() {
 
     return (
         <ProtectedRoute>
-            <div className="flex items-center justify-center px-4 pt-20">
+            <div className="flex min-h-screen -mt-24 items-center justify-center">
                 <Card className={cn(
                     "w-full max-w-md rounded-2xl p-4 pt-6 pb-6 z-50",
                     "bg-background/80 backdrop-blur-md border border-border/100 shadow-lg",

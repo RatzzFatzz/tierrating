@@ -27,8 +27,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <AuthProvider>
                         <div className="min-h-screen flex flex-col">
                             <NavBar />
-                            <main className="flex-grow">
-                                <div className="pt-24"></div>
+                            <main className="flex-grow pt-24">
                                 {children}
                             </main>
                         </div>
