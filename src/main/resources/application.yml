@@ -1,0 +1,27 @@
+spring:
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/tierrating
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+
+  sql:
+    init:
+      mode: always
+
+security:
+  jwt:
+    secret-key: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b
+    expiration-time: 3600000
+
+services:
+  anilist:
+    client:
+      key:
+      secret:

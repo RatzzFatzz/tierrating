@@ -1,16 +1,16 @@
 package at.pcgamingfreaks.mapper;
 
-import at.pcgamingfreaks.model.UserDTO;
-import at.pcgamingfreaks.model.anilist.AniListUser;
-import lombok.Getter;
-import lombok.Setter;
+import at.pcgamingfreaks.model.auth.User;
+import at.pcgamingfreaks.model.dto.UserDTO;
 
 
 public class UserDtoMapper {
-    public static UserDTO map(AniListUser user) {
+    public static UserDTO map(User user) {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
-        dto.setUsername(user.getName());
+        dto.setUsername(user.getUsername());
+        dto.setBio(user.getBio() == null ? "" : user.getBio());
+        dto.setAniListConnected(user.getAnilistConnection() != null);
         return dto;
     }
 }
