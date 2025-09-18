@@ -26,7 +26,7 @@ wget https://github.com/RatzzFatzz/tierrating-ui/blob/main/docker-compose.yml
 ```shell
 docker compose up -d
 ```
-3. Access the application at http://localhost:3001
+3. Access the application at http://localhost:3000
 
 ## Development
 

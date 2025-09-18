@@ -12,6 +12,8 @@ import LoadingPage from "@/components/loading-page";
 import {cn} from "@/lib/utils"
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import AniListTierListConfigModal from "@/components/tiers/anilist-tier-list-config-modal";
+import {updateTiers} from "@/components/api/tier-api";
+import {Tier} from "@/model/types";
 
 function ProviderLoginButton({index, title, path, color}: {
     index: number,
@@ -31,11 +33,13 @@ function ProviderLoginButton({index, title, path, color}: {
     )
 }
 
-function ProviderGroupButton({index, configAllowed, groupTitle, groupEntries}: {
+function ProviderGroupButton({index, configAllowed, groupTitle, groupEntries, token, logout}: {
     index: number,
     configAllowed: boolean,
     groupTitle: string,
-    groupEntries: { title: string, path: string, color: string }[]
+    groupEntries: { title: string, path: string, color: string }[],
+    token: string | null,
+    logout: () => void;
 }) {
     return (
         <div key={index} className={cn(
@@ -61,7 +65,7 @@ function ProviderGroupButton({index, configAllowed, groupTitle, groupEntries}: {
                             </Button>
                         </Link>
                         {configAllowed && <div className={`rounded-r-full transition-all duration-200 ${entry.color} text-white font-medium`}>
-                            <AniListTierListConfigModal/>
+                            <AniListTierListConfigModal onSave={(tiers: Tier[]) => updateTiers(token, 'anilist', 'anime', tiers, () => logout())}/>
                         </div>}
                     </div>
                 ))}
@@ -130,7 +134,7 @@ export default function Profile() {
                                                             path: `/user/${username}/anilist/manga`,
                                                             color: "bg-blue-500 hover:bg-blue-600"
                                                         },
-                                                    ]}/>}
+                                                    ]} logout={logout} token={token}/>}
                         {userConnections['traktConnected']
                             && <ProviderGroupButton index={1} configAllowed={isConfigAllowed} groupTitle={"Trakt"}
                                                     groupEntries={[
@@ -144,7 +148,7 @@ export default function Profile() {
                                                             path: `/user/${username}/trakt/movies`,
                                                             color: "bg-red-500 hover:bg-red-600"
                                                         },
-                                                    ]}/>}
+                                                    ]} logout={logout} token={token}/>}
                     </CardContent>
                 </Card>
             </div>

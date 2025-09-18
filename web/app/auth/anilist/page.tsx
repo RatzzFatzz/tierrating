@@ -26,7 +26,7 @@ export default function AuthAniList() {
                 console.error(err);
             }).finally(() => router.push(`/user/${user}`))
         } else {
-            router.push("https://anilist.co/api/v2/oauth/authorize?client_id=27404&redirect_uri=http://localhost:3001/auth/anilist&response_type=code")
+            router.push("https://anilist.co/api/v2/oauth/authorize?client_id=27404&redirect_uri=http://localhost:3000/auth/anilist&response_type=code")
         }
     }, [user, token, router, searchParams])
 

@@ -22,11 +22,11 @@ import {getDefaultTiers} from "@/model/defaults";
 
 interface AniListTierListConfigModalProps {
     initialTiers?: Tier[];
-    onSave?: (tiers: Tier[]) => void;
+    onSave: (tiers: Tier[]) => void;
 }
 
 // Default tier colors
-const DEFAULT_COLORS = [
+export const DEFAULT_COLORS = [
     "#FF7F7F", // S - Red
     "#FFBF7F", // A - Orange
     "#FFFF7F", // B - Yellow
@@ -38,7 +38,7 @@ const DEFAULT_COLORS = [
 
 export default function AniListTierListConfigModal({
                                                        initialTiers = [],
-                                                       onSave = () => {},
+                                                       onSave,
                                                    }: AniListTierListConfigModalProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [tiers, setTiers] = useState<Tier[]>([]);

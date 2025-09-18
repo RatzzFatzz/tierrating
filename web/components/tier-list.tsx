@@ -121,7 +121,7 @@ export const TierList = memo(function TierList({ items, setItems }: TierListProp
                 ) : (
                 tiers.map((tier) => (
                     <TierContainer
-                        key={tier.name}
+                        key={tier.id}
                         tier={tier.name}
                         label={tier.name}
                         color={tier.color}
