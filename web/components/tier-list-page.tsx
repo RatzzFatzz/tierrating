@@ -1,16 +1,12 @@
 "use client"
 
-import type {RatingItem} from "@/model/types";
-import {useState} from "react";
 import {TierList} from "@/components/tier-list";
 
-export default function TierListPage({itemList, title, service, type}: {itemList: RatingItem[], title: string, service: string, type: string}) {
-    const [items, setItems] = useState<RatingItem[]>(itemList);
-
+export default function TierListPage({title, provider}: {title: string, provider: string}) {
     return (
         <div className="max-w-[1514px] w-full mx-auto content-center px-4">
             <h1 className="text-3xl font-bold mb-6">{title}</h1>
-            <TierList items={items} setItems={setItems} service={service} type={type}/>
+            <TierList providerName={provider}/>
         </div>
     )
 }

@@ -1,12 +1,12 @@
 "use client"
-import type { DragItem, RatingItem } from "@/model/types"
+import type { DragItem, TierlistEntry } from "@/model/types"
 import Image from "next/image"
 import { memo, useRef } from "react"
 import { useDrag, useDrop } from "react-dnd"
 import { cn } from "@/lib/utils"
 
 interface RatingItemProps {
-    item: RatingItem
+    item: TierlistEntry
     index: number
     moveItem: (dragIndex: number, hoverIndex: number, sourceTier: string, targetTier: string) => void
 }

@@ -1,4 +1,4 @@
-export interface RatingItem {
+export interface TierlistEntry {
     id: string
     score: number
     title: string

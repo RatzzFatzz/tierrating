@@ -1,5 +1,5 @@
 "use client"
-import type { DragItem, RatingItem } from "@/model/types"
+import type { DragItem, TierlistEntry } from "@/model/types"
 import { memo, useRef } from "react"
 import { useDrop } from "react-dnd"
 import { RatingItemComponent } from "./rating-item"
@@ -8,7 +8,7 @@ interface TierContainerProps {
     tier: string
     label: string
     color: string
-    items: RatingItem[]
+    items: TierlistEntry[]
     moveItem: (dragIndex: number, hoverIndex: number, sourceTier: string, targetTier: string) => void
 }
 

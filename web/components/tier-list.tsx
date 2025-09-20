@@ -5,21 +5,15 @@ import React, {useEffect, useState} from "react"
 import {DndProvider} from "react-dnd"
 import {HTML5Backend} from "react-dnd-html5-backend"
 import {TierContainer} from "./tier-container"
-import {RatingItem, Tier} from "@/model/types"
+import {TierlistEntry, Tier} from "@/model/types"
 import {memo} from "react"
 import {useAuth} from "@/contexts/AuthContext";
-import {fetchTiers} from "@/components/api/tier-api";
-import TierContainerSkeleton from "@/components/loading-skeletons/tier-container-skeleton";
+import {TierContainerSkeleton, TierlistEntrySkeleton} from "@/components/loading-skeletons/tier-container-skeleton";
 import {getDefaultTiers} from "@/model/defaults";
+import {getProviderByName} from "@/components/data-providers/data-provider";
+import {notFound, useParams} from "next/navigation";
 
-interface TierListProps {
-    items: RatingItem[];
-    setItems: React.Dispatch<React.SetStateAction<RatingItem[]>>;
-    service: string;
-    type: string;
-}
-
-const TierMapper = (tiers: Tier[], items: RatingItem[]) => {
+const TierMapper = (tiers: Tier[], items: TierlistEntry[]) => {
     // Proper order (sorted descending by score) is assured by the server
     let itemsIndex = 0;
     let tiersIndex = 0;
@@ -34,31 +28,51 @@ const TierMapper = (tiers: Tier[], items: RatingItem[]) => {
     }
 }
 
-export const TierList = memo(function TierList({items, setItems, service, type}: TierListProps,) {
+export const TierList = memo(function TierList({providerName}: {providerName: string},) {
     const [tiers, setTiers] = useState<Tier[]>([]);
-    const [queryRunning, setQueryRunning] = useState(true);
-    const [mappingCompleted, setMappingCompleted] = useState(false);
+    const [data, setData] = useState<TierlistEntry[]>([]);
+
     const {token, isLoading, isAuthenticated, logout} = useAuth();
+    const params = useParams<{username: string}>();
+    const username: string = params.username;
+
+    const [tierlistQueryRunning, setTierlistQueryRunning] = useState(true);
+    const [dataQueryRunning, setDataQueryRunning] = useState(true);
+    const [mappingCompleted, setMappingCompleted] = useState(false);
+
+    const provider = getProviderByName(providerName);
+    if (!provider) {
+        notFound();
+    }
 
     useEffect(() => {
-        if (!isLoading && isAuthenticated) {
-            fetchTiers(token, service, type, logout)
+        if (!isLoading && isAuthenticated && provider) {
+            provider.fetchTierlist(token, username, logout)
                 .then((data: Tier[]) => setTiers(data && data.length > 0 ? data : getDefaultTiers()))
                 .catch((error) => console.error(error))
-                .finally(() => setQueryRunning(false));
+                .finally(() => setTierlistQueryRunning(false));
         }
-    }, [isLoading, isAuthenticated, token, logout]);
+    }, [isLoading, isAuthenticated, provider, token, username, logout]);
 
     useEffect(() => {
-        if (!queryRunning && !mappingCompleted) {
-            TierMapper(tiers, items)
+        if (!isLoading && isAuthenticated && provider) {
+            provider.fetchData(token, username, logout)
+                .then((data: TierlistEntry[]) => setData(data))
+                .catch((error) => console.error(error))
+                .finally(() => setDataQueryRunning(false));
+        }
+    }, [isLoading, isAuthenticated, provider, token, username, logout]);
+
+    useEffect(() => {
+        if (!tierlistQueryRunning && !dataQueryRunning && !mappingCompleted) {
+            TierMapper(tiers, data)
             setMappingCompleted(true)
         }
-    }, [tiers, items, queryRunning, mappingCompleted])
+    }, [tiers, data, tierlistQueryRunning, dataQueryRunning, mappingCompleted])
 
     const moveItem = (dragIndex: number, hoverIndex: number, sourceTier: string, targetTier: string) => {
         console.debug(dragIndex, hoverIndex, sourceTier, targetTier);
-        setItems((prevItems) => {
+        setData((prevItems) => {
             // Create a new array to avoid mutating the state directly
             const newItems = [...prevItems]
 
@@ -117,19 +131,22 @@ export const TierList = memo(function TierList({items, setItems, service, type}:
     return (
         <DndProvider backend={HTML5Backend}>
             <div className="grid grid-cols-1 gap-2">
-                {queryRunning ? (
+                {tierlistQueryRunning ? (
                     <TierContainerSkeleton/>
                 ) : (
                     tiers.map((tier) => (
-                        <TierContainer
-                            key={tier.id}
-                            tier={tier.name}
-                            label={tier.name}
-                            color={tier.color}
-                            items={items.filter((item) => item.tier === tier.name)}
-                            moveItem={moveItem}
-                        />
-                    )))}
+                        dataQueryRunning ? (
+                            <TierlistEntrySkeleton key={tier.id} color={tier.color} label={tier.name}/>
+                        ) : (
+                            <TierContainer
+                                key={tier.id}
+                                tier={tier.name}
+                                label={tier.name}
+                                color={tier.color}
+                                items={data.filter((item) => item.tier === tier.name)}
+                                moveItem={moveItem}
+                            />
+                    ))))}
             </div>
         </DndProvider>
     )
