@@ -2,19 +2,21 @@
 
 import React, {useEffect, useState} from "react"
 
-import { DndProvider } from "react-dnd"
-import { HTML5Backend } from "react-dnd-html5-backend"
-import { TierContainer } from "./tier-container"
+import {DndProvider} from "react-dnd"
+import {HTML5Backend} from "react-dnd-html5-backend"
+import {TierContainer} from "./tier-container"
 import {RatingItem, Tier} from "@/model/types"
-import { memo } from "react"
+import {memo} from "react"
 import {useAuth} from "@/contexts/AuthContext";
 import {fetchTiers} from "@/components/api/tier-api";
 import TierContainerSkeleton from "@/components/loading-skeletons/tier-container-skeleton";
 import {getDefaultTiers} from "@/model/defaults";
 
 interface TierListProps {
-    items: RatingItem[]
-    setItems: React.Dispatch<React.SetStateAction<RatingItem[]>>
+    items: RatingItem[];
+    setItems: React.Dispatch<React.SetStateAction<RatingItem[]>>;
+    service: string;
+    type: string;
 }
 
 const TierMapper = (tiers: Tier[], items: RatingItem[]) => {
@@ -32,21 +34,20 @@ const TierMapper = (tiers: Tier[], items: RatingItem[]) => {
     }
 }
 
-export const TierList = memo(function TierList({ items, setItems }: TierListProps) {
+export const TierList = memo(function TierList({items, setItems, service, type}: TierListProps,) {
     const [tiers, setTiers] = useState<Tier[]>([]);
     const [queryRunning, setQueryRunning] = useState(true);
     const [mappingCompleted, setMappingCompleted] = useState(false);
-    const { user, token, isLoading, isAuthenticated, logout } = useAuth();
-    const username = "RatzzFatzz";
+    const {token, isLoading, isAuthenticated, logout} = useAuth();
 
     useEffect(() => {
         if (!isLoading && isAuthenticated) {
-            fetchTiers(token, username, "anilist", "anime", logout)
+            fetchTiers(token, service, type, logout)
                 .then((data: Tier[]) => setTiers(data && data.length > 0 ? data : getDefaultTiers()))
                 .catch((error) => console.error(error))
                 .finally(() => setQueryRunning(false));
         }
-    }, [username, isLoading, isAuthenticated, token, logout]);
+    }, [isLoading, isAuthenticated, token, logout]);
 
     useEffect(() => {
         if (!queryRunning && !mappingCompleted) {
@@ -70,7 +71,7 @@ export const TierList = memo(function TierList({ items, setItems }: TierListProp
             if (draggedItemIndex === -1) return prevItems
 
             // Get the dragged item
-            const draggedItem = { ...newItems[draggedItemIndex] }
+            const draggedItem = {...newItems[draggedItemIndex]}
 
             // Remove the dragged item from the array
             newItems.splice(draggedItemIndex, 1)
@@ -119,16 +120,16 @@ export const TierList = memo(function TierList({ items, setItems }: TierListProp
                 {queryRunning ? (
                     <TierContainerSkeleton/>
                 ) : (
-                tiers.map((tier) => (
-                    <TierContainer
-                        key={tier.id}
-                        tier={tier.name}
-                        label={tier.name}
-                        color={tier.color}
-                        items={items.filter((item) => item.tier === tier.name)}
-                        moveItem={moveItem}
-                    />
-                )))}
+                    tiers.map((tier) => (
+                        <TierContainer
+                            key={tier.id}
+                            tier={tier.name}
+                            label={tier.name}
+                            color={tier.color}
+                            items={items.filter((item) => item.tier === tier.name)}
+                            moveItem={moveItem}
+                        />
+                    )))}
             </div>
         </DndProvider>
     )

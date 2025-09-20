@@ -41,7 +41,7 @@ export default function AniListTierListPage({username, type, title}: {username: 
                     <div className="text-destructive">{error}</div>
                 </div>
             ) : (
-                <TierListPage itemList={ratingItems} title={title} />
+                <TierListPage itemList={ratingItems} title={title} service={"anilist"} type={type} />
             )}
         </>
     );

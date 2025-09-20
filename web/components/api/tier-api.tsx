@@ -2,8 +2,13 @@ import {API_URL} from "@/components/global-config";
 import {Tier} from "@/model/types";
 import {extractJwtData} from "@/components/jwt-decoder";
 
-export const fetchTiers = async (token: string | null, username: string, service: string, type: string, logout: () => void) => {
+export const fetchTiers = async (token: string | null, service: string, type: string, logout: () => void) => {
     if (!token) {
+        throw new Error("No authentication token")
+    }
+
+    const jwtData = extractJwtData(token);
+    if (!jwtData) {
         throw new Error("No authentication token")
     }
     const headers = {
@@ -11,7 +16,7 @@ export const fetchTiers = async (token: string | null, username: string, service
         "Authorization": `Bearer ${token}`,
     }
     try {
-        const response = await fetch(`${API_URL}/tiers/${username}/${service}/${type}`, {headers});
+        const response = await fetch(`${API_URL}/tiers/${jwtData.username}/${service}/${type.toLowerCase()}`, {headers});
 
         if (response.status === 401 || response.status === 403) {
             logout();
@@ -26,7 +31,6 @@ export const fetchTiers = async (token: string | null, username: string, service
             throw new Error(`API error: ${response.status}`);
         }
 
-        console.info(response)
         return await response.json();
     } catch (error) {
         console.error("API request failed: ", error)
@@ -43,8 +47,6 @@ export const updateTiers =  async (token: string | null, service: string, type: 
         throw new Error("No authentication token")
     }
     try {
-        console.info("saving")
-        console.info(tiers)
         const response = await fetch(`${API_URL}/tiers/${jwtData.username}/${service}/${type}`, {
             method: 'POST',
             headers: {
@@ -55,7 +57,7 @@ export const updateTiers =  async (token: string | null, service: string, type: 
         })
 
         if (response.status === 401 || response.status === 403) {
-            // logout();
+            logout();
             throw new Error("Session expired");
         }
 

@@ -65,7 +65,7 @@ function ProviderGroupButton({index, configAllowed, groupTitle, groupEntries, to
                             </Button>
                         </Link>
                         {configAllowed && <div className={`rounded-r-full transition-all duration-200 ${entry.color} text-white font-medium`}>
-                            <AniListTierListConfigModal onSave={(tiers: Tier[]) => updateTiers(token, 'anilist', 'anime', tiers, () => logout())}/>
+                            <AniListTierListConfigModal type={entry.title} onSave={(tiers: Tier[]) => updateTiers(token, 'anilist', entry.title, tiers, () => logout())}/>
                         </div>}
                     </div>
                 ))}
