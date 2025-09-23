@@ -73,6 +73,10 @@ export default function AniListTierListConfigModal({
         }
     }, [tiers]);
 
+    const restoreDefaults = () => {
+        setTiers(getDefaultTiers());
+    }
+
     const addTier = () => {
         if (!tiers) return;
 
@@ -319,6 +323,9 @@ export default function AniListTierListConfigModal({
                     </Button>
                 </div>
                 <DialogFooter className="flex gap-2">
+                    <Button variant="secondary" onClick={restoreDefaults} className="mr-auto">
+                        Restore defaults
+                    </Button>
                     <Button variant="outline" onClick={() => setIsOpen(false)}>
                         Cancel
                     </Button>
