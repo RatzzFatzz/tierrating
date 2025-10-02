@@ -14,7 +14,7 @@ import LoadingPage from "@/components/loading-page";
 
 export default function SignupPage() {
     const [showPassword, setShowPassword] = useState(false)
-    const [isLoading, setIsLoading] = useState(false)
+    const [isSubmitLoading, setIsSubmitLoading] = useState(false)
     const [username, setUsername] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -27,13 +27,13 @@ export default function SignupPage() {
     }>({})
 
     const router = useRouter()
-    const {isAuthenticated, user, isLoading: authLoading} = useAuth()
+    const {isAuthenticated, user, isLoading} = useAuth()
 
     useEffect(() => {
-        if (isAuthenticated && !authLoading) {
+        if (!isLoading && isAuthenticated) {
             router.push(`/user/${user}`)
         }
-    }, [isAuthenticated, user, authLoading, router])
+    }, [isAuthenticated, user, isLoading, router])
 
     const validateForm = () => {
         const newErrors: {
@@ -77,7 +77,7 @@ export default function SignupPage() {
             return
         }
 
-        setIsLoading(true)
+        setIsSubmitLoading(true)
         setErrors({})
 
         submitSignup(username, email, password)
@@ -105,10 +105,11 @@ export default function SignupPage() {
                     general: "An unexpected error occurred. Please try again."
                 })
             })
-            .finally(() => setIsLoading(false))
+            .finally(() => setIsSubmitLoading(false))
     }
 
-    if (authLoading || isAuthenticated) {
+    console.debug(`auth-loading: ${isLoading}, isAuthenticated: ${isAuthenticated}`)
+    if (isLoading || isAuthenticated) {
         return (
             <LoadingPage />
         )
@@ -209,9 +210,9 @@ export default function SignupPage() {
                         <Button
                             type="submit"
                             className="w-full"
-                            disabled={isLoading}
+                            disabled={isSubmitLoading}
                         >
-                            {isLoading ? "Creating account..." : "Create account"}
+                            {isSubmitLoading ? "Creating account..." : "Create account"}
                         </Button>
                         <div className="text-center text-sm">
                             <Link

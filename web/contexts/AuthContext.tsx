@@ -30,12 +30,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const storedToken = localStorage.getItem("authToken")
             if (!storedToken) {
                 logout()
+                setIsLoading(false);
                 return;
             }
 
             const decodedJwt = extractJwtData(storedToken);
             if (!decodedJwt || decodedJwt.isExpired) {
                 logout()
+                setIsLoading(false);
                 return;
             }
 
