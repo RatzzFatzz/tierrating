@@ -18,10 +18,9 @@ export function ProtectedRoute({children}: { children: React.ReactNode }) {
         }
     }, [user, isAuthenticated, isLoading, isExpired, router, currentPath])
 
-    if (isLoading || !isAuthenticated) {
-        return (
-            <LoadingPage />
-        )
+    if (isLoading || !isAuthenticated
+        || (!isLoading && (!isAuthenticated || isExpired))) {
+        return <LoadingPage />
     }
 
     return <>{children}</>
@@ -36,14 +35,13 @@ export function AnonymousAllowedRoute({children}: {children: React.ReactNode}) {
         console.debug(`User ${user} isAuthenticated: ${isAuthenticated}; isLoading ${isLoading}; isExpired: ${isExpired}`);
         if (!isLoading && isAuthenticated && (currentPath == "/login" || currentPath == "/signup")) {
             router.push(`/user/${user}`)
-            console.debug(`Redirected from /$login to /user/${user}`)
+            console.debug(`Redirected from /login to /user/${user}`)
         }
     }, [user, isAuthenticated, isLoading, isExpired, router, currentPath])
 
-    if (isLoading) {
-        return (
-            <LoadingPage />
-        )
+    if (isLoading
+        || (!isLoading && isAuthenticated && (currentPath == "/login" || currentPath == "/signup")) ) {
+        return <LoadingPage/>
     }
 
     return <>{children}</>
