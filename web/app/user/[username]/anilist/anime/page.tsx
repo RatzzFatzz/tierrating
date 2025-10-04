@@ -1,6 +1,6 @@
 "use client"
 
-import ProtectedRoute from "@/components/ProtectedRoute";
+import {ProtectedRoute} from "@/components/route-accessibility";
 import TierListPage from "@/components/tier-list-page";
 
 export default function AniListAnime() {

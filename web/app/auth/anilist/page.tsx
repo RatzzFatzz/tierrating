@@ -2,10 +2,10 @@
 
 import {useRouter, useSearchParams} from "next/navigation";
 import {useAuth} from "@/contexts/AuthContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import React, {Suspense, useEffect} from "react";
 import {authorize} from "@/components/api/anilist-api";
 import LoadingPage from "@/components/loading-page";
+import {ProtectedRoute} from "@/components/route-accessibility";
 
 export default function AuthAniList() {
     return (
