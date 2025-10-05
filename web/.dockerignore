@@ -1,0 +1,10 @@
+.next/
+.idea/
+node_modules/
+
+.github/
+
+docker-compose.yml
+dockerfile
+.gitignore
+.dockerignore

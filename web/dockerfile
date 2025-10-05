@@ -1,25 +1,26 @@
-FROM node:latest
+# Stage 1: Build
+FROM node:latest AS builder
 WORKDIR /app
-
-# Copy everything at once
-COPY . .
-
-# Install dependencies
+COPY package*.json ./
 RUN npm install
-
-# Build the app
+COPY . .
 RUN npm run build
 
+# Stage 2: Serve
+FROM node:alpine
+WORKDIR /app
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./package.json
+
 # Set up user
-RUN groupadd -g 1234 tierrating && \
-    useradd -m -u 1234 -g tierrating tierrating
+RUN addgroup -S tierrating && \
+    adduser -S tierrating -G tierrating
 RUN chown -R tierrating:tierrating /app
 USER tierrating
 
-# Create a wrapper script to handle runtime environment variables
-RUN echo '#!/bin/sh\n\
-exec npm start' > /app/start.sh && \
-chmod +x /app/start.sh
+RUN npm install next
 
 EXPOSE 3000
-CMD ["/app/start.sh"]
+
+CMD ["npm", "start"]
