@@ -10,35 +10,31 @@ export const fetchData = async (token: string | null, username: string | null, s
         "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
     }
-    try {
-        const response = await fetch(`${API_URL}/data/${username}/${service}/${type}`, {headers});
+    return fetch(`${API_URL}/data/${username}/${service}/${type}`, {headers})
+        .then(response => {
+            if (response.status === 401 || response.status === 403) {
+                logout();
+                throw new Error("Session expired");
+            }
 
-        if (response.status === 401 || response.status === 403) {
-            logout();
-            throw new Error("Session expired");
-        }
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+            return response.text();
+        }).then(text => {
+            if (!text) {
+                return [];
+            }
 
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-        }
+            const data = JSON.parse(text);
+            const items = Array.isArray(data) ? data : (data.items || []);
 
-        const text = await response.text();
-        if (!text) {
-            return [];
-        }
-
-        const data = JSON.parse(text);
-        const items = Array.isArray(data) ? data : (data.items || []);
-
-        return items.map((item: TierlistEntry) => ({
-            id: item.id.toString(),
-            score: item.score,
-            title: item.title,
-            cover: item.cover,
-            tier: item.tier,
-        }));
-    } catch (error) {
-        console.error("API request failed: ", error)
-        throw error
-    }
+            return items.map((item: TierlistEntry) => ({
+                id: item.id.toString(),
+                score: item.score,
+                title: item.title,
+                cover: item.cover,
+                tier: item.tier,
+            }));
+        });
 }

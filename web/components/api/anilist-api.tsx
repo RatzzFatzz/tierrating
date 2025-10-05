@@ -5,19 +5,19 @@ export const authorize = async(username: string | null, token: string | null, co
         return new Error("Invalid username, token or code")
     }
 
-    const response = await fetch(`${API_URL}/anilist/auth/${username}`, {
+    return fetch(`${API_URL}/anilist/auth/${username}`, {
         method: 'POST',
         headers: {
             "Authorization": "Bearer " + token,
             "Content-Type": "application/json"
         },
         body: JSON.stringify({code})
+    }).then(response => {
+        if (!response.ok) {
+            return new Error('Could not authorize with AniList');
+        }
+
+        return response.json();
     })
-
-    if (!response.ok) {
-        return new Error('Could not authorize with AniList');
-    }
-
-    return await response.json();
 }
 
