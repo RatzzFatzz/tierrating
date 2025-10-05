@@ -28,13 +28,13 @@ export function InputForm() {
                 console.error('Login error:', error)
                 setErrorMessage(error instanceof Error ? error.message : 'Login failed. Please try again.')
             })
-            .finally(() => setIsLoading(false))
+            .finally(() => setIsLoading(false));
     }
 
     return (
         <div>
             {errorMessage && (
-                <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md">
+                <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md mb-4">
                     {errorMessage}
                 </div>
             )}

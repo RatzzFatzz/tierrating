@@ -16,7 +16,7 @@ export default function LoginPage() {
                             Enter your credentials to access your account
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent>
                         <SuccessMessage/>
                         <InputForm />
                     </CardContent>
