@@ -1,5 +1,3 @@
-"use client"
-
 import {ProtectedRoute} from "@/components/route-accessibility";
 import TierListPage from "@/components/tier-list-page";
 

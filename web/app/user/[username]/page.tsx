@@ -90,7 +90,7 @@ export default function Profile() {
     }, [username, isLoading, isAuthenticated, token, logout]);
 
     // Render nothing until connections are loaded
-    if (!userConnections || isLoading) return <LoadingPage/>
+    if (!userConnections) return <LoadingPage/>
 
     return (
         <ProtectedRoute>

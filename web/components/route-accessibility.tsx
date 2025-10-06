@@ -46,3 +46,13 @@ export function AnonymousAllowedRoute({children}: {children: React.ReactNode}) {
 
     return <>{children}</>
 }
+
+export function RestrictedRenderingRoute({children}: {children: React.ReactNode}) {
+    const pathname = usePathname()
+
+    if (pathname === "/login" || pathname === "/signup") {
+        return null
+    }
+
+    return <>{children}</>
+}
