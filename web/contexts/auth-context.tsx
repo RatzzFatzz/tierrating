@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react"
 import { useRouter } from "next/navigation"
-import {extractJwtData} from "@/components/jwt-decoder";
+import {extractJwtData} from "@/components/auth/jwt-decoder";
 
 interface AuthContextType {
     token: string | null

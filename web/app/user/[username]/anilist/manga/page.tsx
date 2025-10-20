@@ -1,5 +1,5 @@
-import {ProtectedRoute} from "@/components/route-accessibility";
-import TierListPage from "@/components/tier-list-page";
+import {ProtectedRoute} from "@/contexts/route-accessibility";
+import TierListPage from "@/components/tierlist/tier-list-page";
 
 export default function AniListManga() {
     return (

@@ -15,7 +15,7 @@ import {Wrench, X, Plus, Palette, ArrowUpDown} from "lucide-react";
 import {HexColorPicker} from "react-colorful";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Tier} from "@/model/types";
-import {useAuth} from "@/contexts/AuthContext";
+import {useAuth} from "@/contexts/auth-context";
 import {fetchTiers} from "@/components/api/tier-api";
 import {Skeleton} from "@/components/ui/skeleton";
 import {getDefaultTiers} from "@/model/defaults";

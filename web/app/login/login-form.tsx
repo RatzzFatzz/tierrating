@@ -6,7 +6,7 @@ import {Button} from "@/components/ui/button"
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import {EyeIcon, EyeOffIcon} from "lucide-react"
-import {useAuth} from "@/contexts/AuthContext";
+import {useAuth} from "@/contexts/auth-context";
 import {requestLogin} from "@/components/api/user-api";
 
 export function InputForm() {

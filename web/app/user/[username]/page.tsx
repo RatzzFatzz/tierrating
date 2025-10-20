@@ -4,8 +4,8 @@ import {Button} from "@/components/ui/button"
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
 import {Separator} from "@/components/ui/separator"
 import React, {useEffect, useState} from "react";
-import {ProtectedRoute} from "@/components/route-accessibility";
-import {useAuth} from "@/contexts/AuthContext";
+import {ProtectedRoute} from "@/contexts/route-accessibility";
+import {useAuth} from "@/contexts/auth-context";
 import {fetchUser} from "@/components/api/user-api";
 import {useParams} from "next/navigation";
 import LoadingPage from "@/components/loading-page";

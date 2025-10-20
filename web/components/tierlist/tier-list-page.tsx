@@ -1,6 +1,4 @@
-"use client"
-
-import {TierList} from "@/components/tier-list";
+import TierList from "@/components/tierlist/tier-list";
 
 export default function TierListPage({title, provider}: {title: string, provider: string}) {
     return (

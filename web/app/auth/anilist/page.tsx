@@ -1,11 +1,11 @@
 "use client"
 
 import {useRouter, useSearchParams} from "next/navigation";
-import {useAuth} from "@/contexts/AuthContext";
+import {useAuth} from "@/contexts/auth-context";
 import React, {Suspense, useEffect} from "react";
 import {authorize} from "@/components/api/anilist-api";
 import LoadingPage from "@/components/loading-page";
-import {ProtectedRoute} from "@/components/route-accessibility";
+import {ProtectedRoute} from "@/contexts/route-accessibility";
 
 export default function AuthAniList() {
     return (
@@ -25,6 +25,7 @@ function Auth() {
     useEffect(() => {
         if (searchParams.has("code")) {
             const code = searchParams.get("code")
+            console.debug(`code: ${code}`)
             authorize(user, token, code)
                 .then(data => {
                     if (data.message) {

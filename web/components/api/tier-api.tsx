@@ -2,7 +2,7 @@
 
 import {API_URL} from "@/components/global-config";
 import {Tier} from "@/model/types";
-import {extractJwtData} from "@/components/jwt-decoder";
+import {extractJwtData} from "@/components/auth/jwt-decoder";
 
 export const fetchTiers = async (token: string | null, service: string, type: string, logout: () => void) => {
     if (!token) {

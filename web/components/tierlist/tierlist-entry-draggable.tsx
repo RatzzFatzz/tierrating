@@ -1,0 +1,38 @@
+import {TierlistEntry} from "@/model/types";
+import {useDraggable} from "@dnd-kit/react";
+import {cn} from "@/lib/utils";
+import Image from "next/image";
+
+export default function TierlistEntryDraggable({entry}: {entry: TierlistEntry}) {
+    const {ref} = useDraggable({
+        id: entry.id
+    });
+
+    return (
+        <div ref={ref}>
+            <TierlistEntryCard entry={entry}/>
+        </div>
+    )
+}
+
+function TierlistEntryCard({entry}: {entry: TierlistEntry}) {
+    return (
+        <div
+            className={cn(
+                "w-20 h-36 bg-card border border-border/40 rounded-md shadow-sm cursor-move flex flex-col items-center justify-center transition-opacity",
+                // isDragging ? "opacity-30" : isOver ? "opacity-70" : "opacity-100",
+            )}
+        >
+            <div className="relative w-full h-full">
+                <Image
+                    src={entry.cover || "/placeholder.svg"}
+                    alt={entry.title}
+                    fill
+                    className="object-cover rounded-t-md"
+                    sizes="80px"
+                />
+            </div>
+            <div className="text-xs line-clamp-2 h-11 w-full text-center p-1 text-foreground bg-card">{entry.title}</div>
+        </div>
+    )
+}

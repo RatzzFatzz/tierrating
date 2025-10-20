@@ -1,3 +1,5 @@
+"use server"
+
 import {API_URL} from "@/components/global-config";
 
 export const authorize = async(username: string | null, token: string | null, code: string | null)=> {

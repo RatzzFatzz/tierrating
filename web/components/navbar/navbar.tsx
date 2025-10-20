@@ -1,9 +1,9 @@
 import Link from "next/link"
 import {cn} from "@/lib/utils"
-import ThemeToggle from "@/components/theme-toggle";
-import LogoutButton from "@/components/logout-button";
-import NavbarLinks from "@/components/navbar-links";
-import {RestrictedRenderingRoute} from "@/components/route-accessibility";
+import ThemeToggle from "@/components/themes/theme-toggle";
+import LogoutButton from "@/components/auth/logout-button";
+import NavbarLinks from "@/components/navbar/navbar-links";
+import {RestrictedRenderingRoute} from "@/contexts/route-accessibility";
 
 export default function NavBar() {
 

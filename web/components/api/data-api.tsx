@@ -1,3 +1,5 @@
+"use server"
+
 import type {TierlistEntry} from "@/model/types";
 import {API_URL} from "@/components/global-config";
 
