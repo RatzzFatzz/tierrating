@@ -44,7 +44,7 @@ function ProviderGroupButton({index, configAllowed, groupTitle, groupEntries, to
     return (
         <div key={index} className={cn(
             "w-full max-w-md rounded-2xl p-5",
-            "bg-inherit backdrop-blur-md border border-border/100 shadow-lg",
+            "bg-inherit backdrop-blur-inherit border border-border/100 shadow-lg",
         )}>
             <div className="mb-3">
                 <h2 className="text-lg font-semibold">{groupTitle}</h2>
@@ -64,8 +64,10 @@ function ProviderGroupButton({index, configAllowed, groupTitle, groupEntries, to
                                 {entry.title}
                             </Button>
                         </Link>
-                        {configAllowed && <div className={`rounded-r-full transition-all duration-200 ${entry.color} text-white font-medium`}>
-                            <AniListTierListConfigModal type={entry.title} onSave={(tiers: Tier[]) => updateTiers(token, 'anilist', entry.title, tiers, () => logout())}/>
+                        {configAllowed && <div
+                            className={`rounded-r-full transition-all duration-200 ${entry.color} text-white font-medium`}>
+                            <AniListTierListConfigModal type={entry.title}
+                                                        onSave={(tiers: Tier[]) => updateTiers(token, 'anilist', entry.title, tiers, () => logout())}/>
                         </div>}
                     </div>
                 ))}
@@ -96,9 +98,8 @@ export default function Profile() {
         <ProtectedRoute>
             <div className="flex min-h-screen -mt-24 items-center justify-center">
                 <Card className={cn(
-                    "w-full max-w-md rounded-2xl p-4 pt-6 pb-6 z-50",
-                    "bg-background/80 backdrop-blur-md border border-border/100 shadow-lg",
-                    "transition-all duration-200 ease-in-out"
+                    "w-full max-w-md",
+                    "bg-card/60 backdrop-blur-sm border border-border/100 shadow-lg",
                 )}>
                     <CardHeader className="flex flex-col items-center text-center space-y-4 pt-4 pb-6">
                         <Avatar className="h-24 w-24 border-2 border-border/50 shadow-md">

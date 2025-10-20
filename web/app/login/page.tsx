@@ -3,13 +3,17 @@ import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} f
 import {AnonymousAllowedRoute} from "@/contexts/route-accessibility";
 import {InputForm} from "@/app/login/login-form";
 import {SuccessMessage} from "@/app/login/login-success-message";
+import {cn} from "@/lib/utils";
 
 export default function LoginPage() {
 
     return (
         <AnonymousAllowedRoute>
             <div className="flex min-h-screen -mt-24 items-center justify-center bg-background px-4">
-                <Card className="w-full max-w-md border-border/40 bg-card/60 backdrop-blur-sm">
+                <Card className={cn(
+                    "w-full max-w-md",
+                    "bg-card/60 backdrop-blur-sm border border-border/100 shadow-lg",
+                )}>
                     <CardHeader className="space-y-1">
                         <CardTitle className="text-2xl font-bold">Login</CardTitle>
                         <CardDescription>
