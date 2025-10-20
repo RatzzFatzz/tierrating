@@ -7,7 +7,7 @@ import {useAuth} from "@/contexts/auth-context";
 import {notFound, useParams} from "next/navigation";
 import {getProviderByName} from "@/components/data-providers/data-provider";
 import {TierContainerSkeleton, TierlistEntrySkeleton} from "@/components/loading-skeletons/tier-container-skeleton";
-import TierContainerDndKit from "@/components/tierlist/tier-container-dndkit";
+import TierContainer from "@/components/tierlist/tier-container";
 import TierlistEntryDraggable from "@/components/tierlist/tierlist-entry-draggable";
 import {DragDropProvider} from "@dnd-kit/react";
 
@@ -104,13 +104,13 @@ export default function TierList({providerName}: {providerName: string}) {
     return (
         <DragDropProvider onDragEnd={onDragEnd}>
             {tiers.map(tier => (
-                <TierContainerDndKit key={tier.id} id={tier.id} label={tier.name} color={tier.color}>
+                <TierContainer key={tier.id} id={tier.id} label={tier.name} color={tier.color}>
                     {data
                         .filter(entry => entry.tier === tier.name)
                         .map(entry => (
                             target ? <TierlistEntryDraggable key={entry.id} entry={entry}/> : `Droppable ${tier.id}`
                         ))}
-                </TierContainerDndKit>
+                </TierContainer>
             ))}
         </DragDropProvider>
     );
