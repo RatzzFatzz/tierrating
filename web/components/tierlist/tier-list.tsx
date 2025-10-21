@@ -84,7 +84,7 @@ export default function TierList({providerName}: {providerName: string}) {
         return tiers.map((tier) => (<TierlistEntrySkeleton key={tier.id} color={tier.color} label={tier.name}/>));
     }
 
-    const onDragEnd = (event) => {
+    const onDragEnd = (event: { canceled: any; operation: { source: any; target: any; }; }) => {
         if (event.canceled) return;
 
         const {source, target} = event.operation;
@@ -97,6 +97,16 @@ export default function TierList({providerName}: {providerName: string}) {
 
         console.debug(`Changing ${matchedEntry.tier} -> ${matchedTier.name} for ${matchedEntry.title}`)
         matchedEntry.tier = matchedTier?.name
+
+        // make execution non-blocking async
+        provider.updateData(matchedEntry.id, matchedTier.adjustedScore, token, username)
+            .then(updateResponse => {
+                if (updateResponse.error) {
+                    // handle error with callback reverting made changes
+                    console.error(updateResponse.message);
+                    return;
+                }
+            })
 
         setTarget(event.operation.source?.id + event.operation.target?.id);
     }

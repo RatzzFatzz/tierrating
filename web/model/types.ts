@@ -14,3 +14,8 @@ export interface Tier {
     adjustedScore: number;
     color: string;
 }
+
+export interface UpdateResponse {
+    error: boolean;
+    message: string;
+}
