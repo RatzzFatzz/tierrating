@@ -84,7 +84,7 @@ export default function TierList({providerName}: {providerName: string}) {
         return tiers.map((tier) => (<TierlistEntrySkeleton key={tier.id} color={tier.color} label={tier.name}/>));
     }
 
-    const onDragEnd = (event: { canceled: any; operation: { source: any; target: any; }; }) => {
+    const onDragEnd = async (event: { canceled: any; operation: { source: any; target: any; }; }) => {
         if (event.canceled) return;
 
         const {source, target} = event.operation;
@@ -95,20 +95,25 @@ export default function TierList({providerName}: {providerName: string}) {
         if (!(matchedEntry?.tier && matchedTier?.name)) return;
         if (matchedEntry.tier === matchedTier.name) return;
 
+        const prevEntryTier = matchedEntry.tier;
+        const prevTier = tiers.find(tier => tier.name === prevEntryTier)
+
         console.debug(`Changing ${matchedEntry.tier} -> ${matchedTier.name} for ${matchedEntry.title}`)
         matchedEntry.tier = matchedTier?.name
-
-        // make execution non-blocking async
-        provider.updateData(matchedEntry.id, matchedTier.adjustedScore, token, username)
-            .then(updateResponse => {
-                if (updateResponse.error) {
-                    // handle error with callback reverting made changes
-                    console.error(updateResponse.message);
-                    return;
-                }
-            })
-
         setTarget(event.operation.source?.id + event.operation.target?.id);
+
+        setTimeout(() => {
+            provider.updateData(matchedEntry.id, matchedTier.adjustedScore, token, username)
+                .then(updateResponse => {
+                    if (updateResponse.error) throw new Error(updateResponse.message);
+                    console.debug("Committed changes to third-party service")
+                })
+                .catch(error => {
+                    console.error(error);
+                    matchedEntry.tier = prevEntryTier;
+                    setTarget(matchedEntry.id + prevTier?.id)
+                })
+        }, 25);
     }
 
     return (
