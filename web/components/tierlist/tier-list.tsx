@@ -34,73 +34,87 @@ const TierMapper = (tiers: Tier[], items: TierlistEntry[]) => {
 
 export default function TierList({providerName}: {providerName: string}) {
     const [tiers, setTiers] = useState<Tier[]>([]);
-    const [data, setData] = useState<TierlistEntry[]>([]);
+    const [entries, setEntries] = useState<TierlistEntry[]>([]);
+    const [tiersById, setTiersById] = useState<Record<string, Tier[]>>();
+    const [tiersByTier, setTiersByTier] = useState<Record<string, Tier[]>>();
+    const [entriesById, setEntriesById] = useState<Record<string, TierlistEntry[]>>();
 
     const {token, isLoading, isAuthenticated, logout} = useAuth();
-    const params = useParams<{username: string}>();
-    const username: string = params.username;
+    const username: string = useParams<{username: string}>().username;
 
-    const [tierlistQueryRunning, setTierlistQueryRunning] = useState(true);
-    const [dataQueryRunning, setDataQueryRunning] = useState(true);
+    const [tiersQueryRunning, setTiersQueryRunning] = useState(true);
+    const [entriesQueryRunning, setEntriesQueryRunning] = useState(true);
     const [mappingCompleted, setMappingCompleted] = useState(false);
 
     const [target, setTarget] = useState("arst");
+    const updateEntry = (entry: TierlistEntry, tier: Tier) => {
+        console.debug(`Changing ${entry.tier} -> ${tier.name} for ${entry.title}`)
+        entry.tier = tier?.name
+        entry.score = tier?.adjustedScore
+        setTarget(entry.id + tier.id);
+    }
 
     const provider = getProviderByName(providerName);
     if (!provider) {
         notFound();
     }
 
+    // fetch tiers
     useEffect(() => {
         if (!isLoading && isAuthenticated && provider) {
             provider.fetchTierlist(token, username, logout)
                 .then((data: Tier[]) => setTiers(data && data.length > 0 ? data : getDefaultTiers()))
                 .catch((error) => console.error(error))
-                .finally(() => setTierlistQueryRunning(false));
+                .finally(() => setTiersQueryRunning(false));
         }
     }, [isLoading, isAuthenticated, provider, token, username, logout]);
 
+    // fetch entries
     useEffect(() => {
         if (!isLoading && isAuthenticated && provider) {
             provider.fetchData(token, username, logout)
-                .then((data: TierlistEntry[]) => setData(data))
+                .then((data: TierlistEntry[]) => setEntries(data))
                 .catch((error) => console.error(error))
-                .finally(() => setDataQueryRunning(false));
+                .finally(() => setEntriesQueryRunning(false));
         }
     }, [isLoading, isAuthenticated, provider, token, username, logout]);
 
+    // perform mapping
     useEffect(() => {
-        if (!tierlistQueryRunning && !dataQueryRunning && !mappingCompleted) {
-            TierMapper(tiers, data)
+        if (!tiersQueryRunning && !entriesQueryRunning && !mappingCompleted) {
+            TierMapper(tiers, entries)
+            setEntriesById(groupBy(entries, entry => entry.id))
+            setTiersById(groupBy(tiers, tier => tier.id))
+            setTiersByTier(groupBy(tiers, tier => tier.name));
             setMappingCompleted(true)
         }
-    }, [tiers, data, tierlistQueryRunning, dataQueryRunning, mappingCompleted])
+    }, [tiers, entries, tiersQueryRunning, entriesQueryRunning, mappingCompleted])
 
-    if (tierlistQueryRunning) {
+    if (tiersQueryRunning) {
         return <TierContainerSkeleton/>
     }
 
-    if (dataQueryRunning) {
+    if (entriesQueryRunning) {
         return tiers.map((tier) => (<TierlistEntrySkeleton key={tier.id} color={tier.color} label={tier.name}/>));
     }
 
     const onDragEnd = async (event: { canceled: any; operation: { source: any; target: any; }; }) => {
         if (event.canceled) return;
 
+        if (!tiersById || !tiersByTier || !entriesById) {
+            console.error("Something went wrong while mapping. Refresh page")
+            return;
+        }
+
         const {source, target} = event.operation;
-        // replace with maps for O(1) access tiers[id: string, tier: Tier], data[data.id: string, data: TierlistEntry], dataByTier[data.tier: string, data: TierlistEntry]
-        const matchedEntry = data.find(entry => entry.id === source.id);
-        const matchedTier = tiers.find(tier => tier.id === target.id);
+        const matchedTier = tiersById[target.id][0];
+        const matchedEntry = entriesById[source.id][0];
+        const currentTier = tiersByTier[matchedEntry.tier][0];
 
         if (!(matchedEntry?.tier && matchedTier?.name)) return;
-        if (matchedEntry.tier === matchedTier.name) return;
+        if (matchedEntry.tier === matchedTier.name) return; // entry already in desired tier
 
-        const prevEntryTier = matchedEntry.tier;
-        const prevTier = tiers.find(tier => tier.name === prevEntryTier)
-
-        console.debug(`Changing ${matchedEntry.tier} -> ${matchedTier.name} for ${matchedEntry.title}`)
-        matchedEntry.tier = matchedTier?.name
-        setTarget(event.operation.source?.id + event.operation.target?.id);
+        updateEntry(matchedEntry, matchedTier);
 
         setTimeout(() => {
             provider.updateData(matchedEntry.id, matchedTier.adjustedScore, token, username)
@@ -110,8 +124,7 @@ export default function TierList({providerName}: {providerName: string}) {
                 })
                 .catch(error => {
                     console.error(error);
-                    matchedEntry.tier = prevEntryTier;
-                    setTarget(matchedEntry.id + prevTier?.id)
+                    updateEntry(matchedEntry, currentTier);
                 })
         }, 25);
     }
@@ -120,7 +133,7 @@ export default function TierList({providerName}: {providerName: string}) {
         <DragDropProvider onDragEnd={onDragEnd}>
             {tiers.map(tier => (
                 <TierContainer key={tier.id} id={tier.id} label={tier.name} color={tier.color}>
-                    {data
+                    {entries
                         .filter(entry => entry.tier === tier.name)
                         .map(entry => (
                             target ? <TierlistEntryDraggable key={entry.id} entry={entry}/> : `Droppable ${tier.id}`
