@@ -1,8 +1,5 @@
 "use client"
-import Link from "next/link"
-import {Button} from "@/components/ui/button"
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
-import {Separator} from "@/components/ui/separator"
 import React, {useEffect, useState} from "react";
 import {ProtectedRoute} from "@/contexts/route-accessibility";
 import {useAuth} from "@/contexts/auth-context";
@@ -11,88 +8,38 @@ import {useParams} from "next/navigation";
 import LoadingPage from "@/components/loading-page";
 import {cn} from "@/lib/utils"
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
-import AniListTierListConfigModal from "@/components/tiers/anilist-tier-list-config-modal";
-import {updateTiers} from "@/components/api/tier-api";
-import {Tier} from "@/model/types";
+import {UserResponse} from "@/model/response-types";
+import ThirdPartyLoginButton from "@/app/user/[username]/ThirdPartyLoginButton";
+import ThirdPartyGroupBox from "@/app/user/[username]/ThirdPartyGroupBox";
 
-function ProviderLoginButton({index, title, path, color}: {
-    index: number,
-    title: string,
-    path: string,
-    color: string
-}) {
-    return (
-        <Link key={index} href={path} className="block w-full">
-            <Button
-                variant="default"
-                className={`w-full justify-center rounded-full transition-all duration-200 text-white font-medium ${color}`}
-            >
-                {title}
-            </Button>
-        </Link>
-    )
-}
-
-function ProviderGroupButton({index, configAllowed, groupTitle, groupEntries, token, logout}: {
-    index: number,
-    configAllowed: boolean,
-    groupTitle: string,
-    groupEntries: { title: string, path: string, color: string }[],
-    token: string | null,
-    logout: () => void;
-}) {
-    return (
-        <div key={index} className={cn(
-            "w-full max-w-md rounded-2xl p-5",
-            "bg-inherit backdrop-blur-inherit border border-border/100 shadow-lg",
-        )}>
-            <div className="mb-3">
-                <h2 className="text-lg font-semibold">{groupTitle}</h2>
-                <Separator className="mt-1"/>
-            </div>
-            <div className="space-y-3 mt-4">
-                {groupEntries.map((entry, index) => (
-                    <div key={index} className="flex gap-0.75">
-                        <Link href={entry.path} className="block w-full">
-                            <Button
-                                variant="default"
-                                className={cn(
-                                    `w-full justify-center rounded-l-full transition-all duration-200 ${entry.color} text-white font-medium`,
-                                    configAllowed ? "" : "rounded-r-full"
-                                )}
-                            >
-                                {entry.title}
-                            </Button>
-                        </Link>
-                        {configAllowed && <div
-                            className={`rounded-r-full transition-all duration-200 ${entry.color} text-white font-medium`}>
-                            <AniListTierListConfigModal type={entry.title}
-                                                        onSave={(tiers: Tier[]) => updateTiers(token, 'anilist', entry.title, tiers, () => logout())}/>
-                        </div>}
-                    </div>
-                ))}
-            </div>
-        </div>
-    )
-}
 
 export default function Profile() {
     const params = useParams<{ username: string }>();
     const username: string = params.username;
-    const [userConnections, setUserConnections] = useState(null);
+    const [userResponse, setUserResponse] = useState<UserResponse>();
     const {user, token, isLoading, isAuthenticated, logout} = useAuth();
     const isConfigAllowed: boolean = username === user;
 
     useEffect(() => {
         if (!isLoading && isAuthenticated) {
-            fetchUser(token, username, logout)
-                .then(data => setUserConnections(data))
+            fetchUser(token, username)
+                .then(response => {
+                    if (response.status === 401 || response.status === 403) {
+                        logout();
+                        throw new Error("Session expired");
+                    }
+
+                    if (response.error) throw new Error(`API error: ${response.status}`);
+                    if (!response.data) throw new Error("Faulty response");
+                    console.log(JSON.stringify(response.data));
+                    setUserResponse(response.data);
+                })
                 .catch((error) => console.error(error))
         }
     }, [username, isLoading, isAuthenticated, token, logout]);
 
     // Render nothing until connections are loaded
-    if (!userConnections) return <LoadingPage/>
+    if (!userResponse) return <LoadingPage/>
 
     return (
         <ProtectedRoute>
@@ -108,48 +55,48 @@ export default function Profile() {
                         </Avatar>
                         <div>
                             <h1 className="text-2xl font-bold">{username}</h1>
-                            <p className="text-muted-foreground mt-1">{userConnections["bio"]}</p>
+                            <p className="text-muted-foreground mt-1">{userResponse["bio"]}</p>
                         </div>
                     </CardHeader>
 
                     <CardContent className="space-y-6 pb-4">
                         {/* Provider Connection Section */}
-                        {isConfigAllowed && !userConnections['aniListConnected']
-                            && <ProviderLoginButton index={0} title={"Connect AniList"} path={"/auth/anilist"}
-                                                    color={"bg-blue-600 hover:bg-blue-700"}/>}
-                        {isConfigAllowed && !userConnections['traktConnected']
-                            && <ProviderLoginButton index={1} title={"Connect Trakt"} path={"/auth/trakt"}
-                                                    color={"bg-red-600 hover:bg-red-700"}/>}
+                        {isConfigAllowed && !userResponse.anilistConnected
+                            && <ThirdPartyLoginButton index={0} title={"Connect AniList"} path={"/auth/anilist"}
+                                                      color={"bg-blue-600 hover:bg-blue-700"}/>}
+                        {isConfigAllowed && !userResponse.traktConnected
+                            && <ThirdPartyLoginButton index={1} title={"Connect Trakt"} path={"/auth/trakt"}
+                                                      color={"bg-red-600 hover:bg-red-700"}/>}
 
                         {/* Group Section */}
-                        {userConnections['aniListConnected']
-                            && <ProviderGroupButton index={0} configAllowed={isConfigAllowed} groupTitle={"AniList"}
-                                                    groupEntries={[
+                        {userResponse.anilistConnected
+                            && <ThirdPartyGroupBox index={0} configAllowed={isConfigAllowed} groupTitle={"AniList"}
+                                                   groupEntries={[
                                                         {
                                                             title: "Anime",
-                                                            path: `/user/${username}/anilist/anime`,
+                                                            path: `/user/${userResponse.username}/anilist/anime`,
                                                             color: "bg-blue-600 hover:bg-blue-700"
                                                         },
                                                         {
                                                             title: "Manga",
-                                                            path: `/user/${username}/anilist/manga`,
+                                                            path: `/user/${userResponse.username}/anilist/manga`,
                                                             color: "bg-blue-500 hover:bg-blue-600"
                                                         },
-                                                    ]} logout={logout} token={token}/>}
-                        {userConnections['traktConnected']
-                            && <ProviderGroupButton index={1} configAllowed={isConfigAllowed} groupTitle={"Trakt"}
-                                                    groupEntries={[
+                                                    ]} logout={logout} token={token} username={userResponse.username}/>}
+                        {userResponse.traktConnected
+                            && <ThirdPartyGroupBox index={1} configAllowed={isConfigAllowed} groupTitle={"Trakt"}
+                                                   groupEntries={[
                                                         {
                                                             title: "Series",
-                                                            path: `/user/${username}/trakt/series`,
+                                                            path: `/user/${userResponse.username}/trakt/series`,
                                                             color: "bg-red-600 hover:bg-red-700"
                                                         },
                                                         {
                                                             title: "Movies",
-                                                            path: `/user/${username}/trakt/movies`,
+                                                            path: `/user/${userResponse.username}/trakt/movies`,
                                                             color: "bg-red-500 hover:bg-red-600"
                                                         },
-                                                    ]} logout={logout} token={token}/>}
+                                                    ]} logout={logout} token={token} username={userResponse.username}/>}
                     </CardContent>
                 </Card>
             </div>

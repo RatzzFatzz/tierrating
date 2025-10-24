@@ -23,9 +23,13 @@ export function InputForm() {
         setErrorMessage("")
 
         requestLogin(username, password)
-            .then(data => login(data.token))
+            .then(response => {
+                if (response.status === 401) throw new Error("Invalid credentials");
+                if (response.error) throw new Error(response.error);
+                if (!response.data) throw new Error("Faulty response")
+                login(response.data.token);
+            })
             .catch(error => {
-                console.error('Login error:', error)
                 setErrorMessage(error instanceof Error ? error.message : 'Login failed. Please try again.')
             })
             .finally(() => setIsLoading(false));

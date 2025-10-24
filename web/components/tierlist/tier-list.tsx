@@ -116,8 +116,11 @@ export default function TierList({providerName}: {providerName: string}) {
 
         updateEntry(matchedEntry, matchedTier);
 
+        // This kinda works for processing changes in the background, but this can only be spawned once.
+        // As soon as a second action is triggered, it is blocked again, until the first one has completed
         setTimeout(() => {
-            provider.updateData(matchedEntry.id, matchedTier.adjustedScore, token, username)
+            console.log(`timeout begin ${matchedEntry.title}`)
+            provider.updateData(matchedEntry.id, matchedTier.adjustedScore, token, username, logout)
                 .then(updateResponse => {
                     if (updateResponse.error) throw new Error(updateResponse.message);
                     console.debug("Committed changes to third-party service")
@@ -126,7 +129,8 @@ export default function TierList({providerName}: {providerName: string}) {
                     console.error(error);
                     updateEntry(matchedEntry, currentTier);
                 })
-        }, 25);
+            console.log(`timeout end ${matchedEntry.title}`)
+        }, 200);
     }
 
     return (

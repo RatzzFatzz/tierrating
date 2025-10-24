@@ -1,25 +1,28 @@
 "use server"
 
 import {API_URL} from "@/components/global-config";
+import {ServerResponse, ThirdPartyAuthResponse} from "@/model/response-types";
 
-export const authorize = async(username: string | null, token: string | null, code: string | null)=> {
+export default async function authorize(username: string | null, token: string | null, code: string | null): Promise<ServerResponse<ThirdPartyAuthResponse>> {
     if (!username && !token && !code) {
-        return new Error("Invalid username, token or code")
+        throw new Error("Invalid username, token or code")
     }
 
-    return fetch(`${API_URL}/anilist/auth/${username}`, {
-        method: 'POST',
-        headers: {
-            "Authorization": "Bearer " + token,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({code})
-    }).then(response => {
-        if (!response.ok) {
-            return new Error('Could not authorize with AniList');
-        }
+    try {
+        const response = await fetch(`${API_URL}/anilist/auth/${username}`, {
+            method: 'POST',
+            headers: {
+                "Authorization": "Bearer " + token,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({code})
+        });
 
-        return response.json();
-    })
+        const data = await response.json().catch(() => null)
+        return {data, status: response.status};
+    } catch (error) {
+        console.error('API proxy error: ', error);
+        return {error: 'Server unavailable', status: 500}
+    }
 }
 

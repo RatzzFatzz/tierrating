@@ -1,19 +1,12 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
+import {zodResolver} from "@hookform/resolvers/zod"
+import {useForm} from "react-hook-form"
+import {z} from "zod"
 
-import { Button } from "@/components/ui/button"
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+import {Button} from "@/components/ui/button"
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
+import {Input} from "@/components/ui/input"
 import {submitSignup} from "@/components/api/user-api";
 import {redirect} from "next/navigation";
 import {useState} from "react";
@@ -48,10 +41,12 @@ export function SignUpForm() {
     function onSubmit(data: z.infer<typeof FormSchema>) {
         setSubmitLoading(true);
         submitSignup(data.username, data.email, data.password)
-            .then(r => {
-                if (r.usernameTaken) throw new Error("Username already taken");
-                if (r.emailTaken) throw new Error("Email already associated with a different account")
-                if (!r.signupSuccess) throw new Error("Signup failed. Please try again");
+            .then(response => {
+                if (response.error) throw new Error(response.error);
+                if (!response.data) throw new Error("Faulty response");
+                if (response.data.usernameTaken) throw new Error("Username already taken");
+                if (response.data.emailTaken) throw new Error("Email already associated with a different account")
+                if (!response.data.signupSuccess) throw new Error("Signup failed. Please try again");
                 setErrorMessage("");
                 redirect("/login?signup=success");
             })
@@ -75,33 +70,33 @@ export function SignUpForm() {
                     <FormField
                         control={form.control}
                         name="username"
-                        render={({ field }) => (
+                        render={({field}) => (
                             <FormItem>
                                 <FormLabel>Username</FormLabel>
                                 <FormControl>
                                     <Input {...field} />
                                 </FormControl>
-                                <FormMessage />
+                                <FormMessage/>
                             </FormItem>
                         )}
                     />
                     <FormField
                         control={form.control}
                         name="email"
-                        render={({ field }) => (
+                        render={({field}) => (
                             <FormItem>
                                 <FormLabel>E-Mail</FormLabel>
                                 <FormControl>
                                     <Input {...field} />
                                 </FormControl>
-                                <FormMessage />
+                                <FormMessage/>
                             </FormItem>
                         )}
                     />
                     <FormField
                         control={form.control}
                         name="password"
-                        render={({ field }) => (
+                        render={({field}) => (
                             <FormItem>
                                 <FormLabel>Password</FormLabel>
                                 <FormControl>
@@ -125,14 +120,14 @@ export function SignUpForm() {
                                         </Button>
                                     </div>
                                 </FormControl>
-                                <FormMessage />
+                                <FormMessage/>
                             </FormItem>
                         )}
                     />
                     <FormField
                         control={form.control}
                         name="confirmPassword"
-                        render={({ field }) => (
+                        render={({field}) => (
                             <FormItem>
                                 <FormLabel>Confirm Password</FormLabel>
                                 <FormControl>
@@ -156,7 +151,7 @@ export function SignUpForm() {
                                         </Button>
                                     </div>
                                 </FormControl>
-                                <FormMessage />
+                                <FormMessage/>
                             </FormItem>
                         )}
                     />

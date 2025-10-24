@@ -3,9 +3,9 @@
 import {useRouter, useSearchParams} from "next/navigation";
 import {useAuth} from "@/contexts/auth-context";
 import React, {Suspense, useEffect} from "react";
-import {authorize} from "@/components/api/anilist-api";
 import LoadingPage from "@/components/loading-page";
 import {ProtectedRoute} from "@/contexts/route-accessibility";
+import authorize from "@/components/api/anilist-api";
 
 export default function AuthAniList() {
     return (
@@ -27,17 +27,23 @@ function Auth() {
             const code = searchParams.get("code")
             console.debug(`code: ${code}`)
             authorize(user, token, code)
-                .then(data => {
-                    if (data.message) {
-                        return Promise.reject(data.message)
+                .then(response => {
+                    if (response.error) throw new Error(response.error);
+                    if (!response.data) throw new Error("Faulty response")
+                    if (response.data.message) {
+                        return Promise.reject(response.data.message)
                     }
-                }).catch(err => {
-                console.error(err);
-            }).finally(() => router.push(`/user/${user}`))
+                })
+                .catch(err => {
+                    console.error(err);
+                })
+                .finally(() => {
+                    router.push(`/user/${user}`)
+                });
         } else {
             router.push("https://anilist.co/api/v2/oauth/authorize?client_id=27404&redirect_uri=http://localhost:3000/auth/anilist&response_type=code")
         }
     }, [user, token, router, searchParams])
 
-    return <LoadingPage />
+    return <LoadingPage/>
 }

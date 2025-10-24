@@ -1,29 +1,32 @@
 "use client";
-import {useState, useRef, useEffect} from "react";
+import {useEffect, useRef, useState} from "react";
 import {
     Dialog,
     DialogContent,
     DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-    DialogFooter,
 } from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
-import {Wrench, X, Plus, Palette, ArrowUpDown} from "lucide-react";
+import {ArrowUpDown, Palette, Plus, Wrench, X} from "lucide-react";
 import {HexColorPicker} from "react-colorful";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Tier} from "@/model/types";
 import {useAuth} from "@/contexts/auth-context";
-import {fetchTiers} from "@/components/api/tier-api";
 import {Skeleton} from "@/components/ui/skeleton";
 import {getDefaultTiers} from "@/model/defaults";
+import {DataProvider, getProviderByName} from "@/components/data-providers/data-provider";
+import {notFound} from "next/navigation";
 
 interface AniListTierListConfigModalProps {
     initialTiers?: Tier[];
     type: string;
     onSave: (tiers: Tier[]) => void;
+    providerName: string;
+    username: string;
 }
 
 // Default tier colors
@@ -41,18 +44,24 @@ export default function AniListTierListConfigModal({
                                                        initialTiers = [],
                                                        type,
                                                        onSave,
+                                                       providerName,
+                                                       username
                                                    }: AniListTierListConfigModalProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [tiers, setTiers] = useState<Tier[]>([]);
     const [queryRunning, setQueryRunning] = useState(false);
     const {token, isLoading, isAuthenticated, logout} = useAuth();
     const dataFetched = useRef(false);
+    const provider: DataProvider | undefined = getProviderByName(providerName.toLowerCase());
+    if (!provider) {
+        notFound();
+    }
 
     // Only fetch data when the modal is opened
     useEffect(() => {
         if (isOpen && !dataFetched.current && !isLoading && isAuthenticated) {
             setQueryRunning(true);
-            fetchTiers(token, "anilist", type, logout)
+            provider.fetchTierlist(token, username, logout)
                 .then((data: Tier[]) => {
                     setTiers(data && data.length > 0 ? data : getDefaultTiers());
                     dataFetched.current = true;
@@ -60,7 +69,7 @@ export default function AniListTierListConfigModal({
                 .catch((error) => console.error(error))
                 .finally(() => setQueryRunning(false));
         }
-    }, [isOpen, isLoading, isAuthenticated, token, type, logout]);
+    }, [isOpen, isLoading, isAuthenticated, token, type, logout, provider, username]);
 
     // Sort tiers whenever they change
     useEffect(() => {
