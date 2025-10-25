@@ -16,7 +16,7 @@ export function assignTiersAndGroupEntriesByTier(tiers: Tier[], items: TierlistE
 
             if (entriesByTier.has(tiers[tiersIndex].id)) {
                 const currentEntries = entriesByTier.get(tiers[tiersIndex].id)!;
-                entriesByTier.set(tiers[tiersIndex].id, [...currentEntries, items[itemsIndex]].sort(sortByName));
+                entriesByTier.set(tiers[tiersIndex].id, [...currentEntries, items[itemsIndex]]);
             }
 
             positionIndex++;
@@ -26,6 +26,8 @@ export function assignTiersAndGroupEntriesByTier(tiers: Tier[], items: TierlistE
             positionIndex = 0;
         }
     }
+
+    entriesByTier.keys().forEach(key => entriesByTier.set(key, entriesByTier.get(key)!.sort(sortByName)))
 
     return entriesByTier;
 }

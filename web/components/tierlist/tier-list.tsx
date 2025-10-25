@@ -66,7 +66,7 @@ export default function TierList({providerName}: {providerName: string}) {
     const onDragEnd = async (event: { canceled: any; operation: { source: any; target: any; }; }) => {
         if (event.canceled) return;
 
-        if (!tiersById || !tiersByName || !entriesById) {
+        if (!entriesByTierId || !tiersById || !tiersByName || !entriesById) {
             console.error("Something went wrong while mapping. Refresh page")
             return;
         }
@@ -125,13 +125,6 @@ export default function TierList({providerName}: {providerName: string}) {
     if (entriesQueryRunning || !mappingCompleted) {
         return tiers.map((tier) => (<TierlistEntrySkeleton key={tier.id} color={tier.color} label={tier.name}/>));
     }
-
-    entriesByTierId.keys().forEach(id => {
-        console.debug(`Tier ${tiersById.get(id)?.name}`)
-        entriesByTierId.get(id)?.forEach(entry => {
-            console.debug(`- ${entry.title} in ${entry.tier.name}`)
-        })
-    })
 
     return (
         <DragDropProvider onDragEnd={onDragEnd}>
