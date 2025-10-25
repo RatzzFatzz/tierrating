@@ -7,10 +7,10 @@ import {useAuth} from "@/contexts/auth-context";
 import {useParams} from "next/navigation";
 import {getProviderByName} from "@/components/data-providers/data-provider";
 import {TierContainerSkeleton, TierlistEntrySkeleton} from "@/components/loading-skeletons/tier-container-skeleton";
-import TierContainer from "@/components/tierlist/tier-container";
 import TierlistEntryDraggable from "@/components/tierlist/tierlist-entry-draggable";
 import {DragDropProvider} from "@dnd-kit/react";
 import {assignTiersAndGroupEntriesByTier, groupBySingle, sortByName} from "@/components/tierlist/tier-mapper";
+import TierContainerDroppable from "@/components/tierlist/tier-container";
 
 
 export default function TierList({providerName}: {providerName: string}) {
@@ -139,11 +139,11 @@ export default function TierList({providerName}: {providerName: string}) {
                 .map(tierId => tiersById.get(tierId))
                 .map(tier => (
                     tier &&
-                    <TierContainer key={tier.id} id={tier.id} label={tier.name} color={tier.color}>
+                    <TierContainerDroppable key={tier.id} id={tier.id} label={tier.name} color={tier.color}>
                         {Array.from(entriesByTierId.get(tier.id)!).map(entry => (
                             <TierlistEntryDraggable key={entry.id} entry={entry}/>
                         ))}
-                    </TierContainer>
+                    </TierContainerDroppable>
                 ))}
         </DragDropProvider>
     );
