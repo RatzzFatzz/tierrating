@@ -3,7 +3,7 @@ export interface TierlistEntry {
     score: number
     title: string
     cover: string
-    tier: string
+    tier: Tier
     index: number
 }
 
