@@ -3,9 +3,10 @@ import {useDraggable} from "@dnd-kit/react";
 import {cn} from "@/lib/utils";
 import Image from "next/image";
 
-export default function TierlistEntryDraggable({entry}: {entry: TierlistEntry}) {
+export function TierlistEntryDraggable({entry}: {entry: TierlistEntry}) {
     const {ref} = useDraggable({
-        id: entry.id
+        id: entry.id,
+        data: entry
     });
 
     return (
@@ -15,7 +16,7 @@ export default function TierlistEntryDraggable({entry}: {entry: TierlistEntry}) 
     )
 }
 
-function TierlistEntryCard({entry}: {entry: TierlistEntry}) {
+export function TierlistEntryCard({entry}: {entry: TierlistEntry}) {
     return (
         <div
             className={cn(

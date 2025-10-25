@@ -8,8 +8,8 @@ import {notFound, useParams} from "next/navigation";
 import {getProviderByName} from "@/components/data-providers/data-provider";
 import {TierContainerSkeleton, TierlistEntrySkeleton} from "@/components/loading-skeletons/tier-container-skeleton";
 import TierContainer from "@/components/tierlist/tier-container";
-import TierlistEntryDraggable from "@/components/tierlist/tierlist-entry-draggable";
-import {DragDropProvider} from "@dnd-kit/react";
+import {TierlistEntryCard, TierlistEntryDraggable} from "@/components/tierlist/tierlist-entry-draggable";
+import {DragDropProvider, DragOverlay} from "@dnd-kit/react";
 
 const groupBy = <T, K extends keyof any>(arr: T[], key: (i: T) => K) =>
     arr.reduce((groups, item) => {
@@ -144,6 +144,11 @@ export default function TierList({providerName}: {providerName: string}) {
                         ))}
                 </TierContainer>
             ))}
+            <DragOverlay>
+                {source  => (
+                    <TierlistEntryCard key={source.id} entry={source.data}/>
+                )}
+            </DragOverlay>
         </DragDropProvider>
     );
 }
