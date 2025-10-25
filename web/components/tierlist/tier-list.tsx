@@ -21,13 +21,17 @@ const TierMapper = (tiers: Tier[], items: TierlistEntry[]) => {
     // Proper order (sorted descending by score) is assured by the server
     let itemsIndex = 0;
     let tiersIndex = 0;
+    let positionIndex = 0;
 
     while (itemsIndex < items.length && tiersIndex < tiers.length) {
         if (items[itemsIndex].score >= tiers[tiersIndex].score) {
             items[itemsIndex].tier = tiers[tiersIndex].name;
+            items[itemsIndex].index = positionIndex;
+            positionIndex++;
             itemsIndex++;
         } else {
             tiersIndex++;
+            positionIndex = 0;
         }
     }
 }
@@ -140,7 +144,7 @@ export default function TierList({providerName}: {providerName: string}) {
                     {entries
                         .filter(entry => entry.tier === tier.name)
                         .map(entry => (
-                            target ? <TierlistEntryDraggable key={entry.id} entry={entry}/> : `Droppable ${tier.id}`
+                            target ? <TierlistEntryDraggable key={entry.id} entry={entry} column={tier.id}/> : `Droppable ${tier.id}`
                         ))}
                 </TierContainer>
             ))}
