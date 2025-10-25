@@ -16,7 +16,7 @@ export function assignTiersAndGroupEntriesByTier(tiers: Tier[], items: TierlistE
 
             if (entriesByTier.has(tiers[tiersIndex].id)) {
                 const currentEntries = entriesByTier.get(tiers[tiersIndex].id)!;
-                entriesByTier.set(tiers[tiersIndex].id, [...currentEntries, items[itemsIndex]]);
+                entriesByTier.set(tiers[tiersIndex].id, [...currentEntries, items[itemsIndex]].sort(sortByName));
             }
 
             positionIndex++;
@@ -34,4 +34,10 @@ export function groupBySingle<T, K>(arr: T[], key: (i: T) => K): Map<K, T> {
     const map = new Map<K, T>();
     arr.forEach(elem => map.set(key(elem), elem));
     return map;
+}
+
+export function sortByName(a: TierlistEntry, b: TierlistEntry) {
+    const textA = a.title.toLowerCase();
+    const textB = b.title.toLowerCase();
+    return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
 }

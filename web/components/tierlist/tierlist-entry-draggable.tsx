@@ -1,19 +1,17 @@
 import {TierlistEntry} from "@/model/types";
 import {cn} from "@/lib/utils";
 import Image from "next/image";
-import {useSortable} from "@dnd-kit/react/sortable";
+import {useDraggable} from "@dnd-kit/react";
 
-export default function TierlistEntryDraggable({entry, column}: {entry: TierlistEntry, column: string}) {
-    const {ref, isDragging} = useSortable({
+export default function TierlistEntryDraggable({entry}: {entry: TierlistEntry}) {
+    const {ref} = useDraggable({
         id: entry.id,
-        index: entry.index,
-        group: column
     });
 
     return (
-        <li ref={ref} data-dragging={isDragging}>
+        <div ref={ref}>
             <TierlistEntryCard entry={entry}/>
-        </li>
+        </div>
     )
 }
 

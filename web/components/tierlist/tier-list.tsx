@@ -10,7 +10,7 @@ import {TierContainerSkeleton, TierlistEntrySkeleton} from "@/components/loading
 import TierContainer from "@/components/tierlist/tier-container";
 import TierlistEntryDraggable from "@/components/tierlist/tierlist-entry-draggable";
 import {DragDropProvider} from "@dnd-kit/react";
-import {assignTiersAndGroupEntriesByTier, groupBySingle} from "@/components/tierlist/tier-mapper";
+import {assignTiersAndGroupEntriesByTier, groupBySingle, sortByName} from "@/components/tierlist/tier-mapper";
 
 
 export default function TierList({providerName}: {providerName: string}) {
@@ -99,21 +99,23 @@ export default function TierList({providerName}: {providerName: string}) {
     }
 
     const updateEntry = (entryToChange: TierlistEntry, targetTier: Tier) => {
-        console.debug(`Changing ${entryToChange.tier} -> ${targetTier.name} for ${entryToChange.title}`)
+        console.debug(`${entryToChange.title}: ${entryToChange.tier.name} -> ${targetTier.name}`)
 
-        // add entryToChange to new tier
-        entriesByTierId.set(targetTier.id, [...entriesByTierId.get(targetTier.id)!, entryToChange])
-        // remove entryToChange from its current tier
-        setEntriesByTierId(prevMap => {
-            const currentEntries = prevMap.get(entryToChange.tier.id)!;
-            const newMap = new Map(prevMap);
-            const updatedEntries = currentEntries.filter(entry => entry.id !== entryToChange.id);
-            newMap.set(entryToChange.tier.id, updatedEntries);
-            return newMap;
-        })
+        const prevTier = entryToChange.tier;
 
         entryToChange.tier = targetTier
         entryToChange.score = targetTier?.adjustedScore
+
+        // add entryToChange to new tier
+        entriesByTierId.set(targetTier.id, [...entriesByTierId.get(targetTier.id)!, entryToChange].sort(sortByName))
+        // remove entryToChange from its current tier
+        setEntriesByTierId(prevMap => {
+            const currentEntries = prevMap.get(prevTier.id)!;
+            const newMap = new Map(prevMap);
+            const updatedEntries = currentEntries.filter(entry => entry.id !== entryToChange.id);
+            newMap.set(prevTier.id, updatedEntries);
+            return newMap;
+        })
     }
 
     if (tiersQueryRunning) {
@@ -124,6 +126,13 @@ export default function TierList({providerName}: {providerName: string}) {
         return tiers.map((tier) => (<TierlistEntrySkeleton key={tier.id} color={tier.color} label={tier.name}/>));
     }
 
+    entriesByTierId.keys().forEach(id => {
+        console.debug(`Tier ${tiersById.get(id)?.name}`)
+        entriesByTierId.get(id)?.forEach(entry => {
+            console.debug(`- ${entry.title} in ${entry.tier.name}`)
+        })
+    })
+
     return (
         <DragDropProvider onDragEnd={onDragEnd}>
             {Array.from(entriesByTierId.keys())
@@ -132,7 +141,7 @@ export default function TierList({providerName}: {providerName: string}) {
                     tier &&
                     <TierContainer key={tier.id} id={tier.id} label={tier.name} color={tier.color}>
                         {Array.from(entriesByTierId.get(tier.id)!).map(entry => (
-                            <TierlistEntryDraggable key={entry.id} entry={entry} column={tier.id}/>
+                            <TierlistEntryDraggable key={entry.id} entry={entry}/>
                         ))}
                     </TierContainer>
                 ))}
