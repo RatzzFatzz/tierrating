@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
-import {ArrowUpDown, Palette, Plus, Wrench, X} from "lucide-react";
+import {ArrowUpDown, Palette, Plus, Settings, X} from "lucide-react";
 import {HexColorPicker} from "react-colorful";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Tier} from "@/model/types";
@@ -189,16 +189,15 @@ export default function AniListTierListConfigModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-            <DialogTrigger className="p-1.5" onClick={handleTriggerClick}>
-                <Wrench/>
+            <DialogTrigger className="p-1.5 cursor-pointer" onClick={handleTriggerClick}>
+                <Settings/>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[650px] max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Configure tier list</DialogTitle>
                     <DialogDescription>
-                        Configure which score should be assigned to which tier. Also set a score value and color for
-                        each tier,
-                        which will be set when dropping an element to that tier.
+                        Configure which <i>score</i> should be assigned to which tier.
+                        When dropping an item into a new tier their score will be set to <i>adjusted score</i>
                         These changes will be sent back to the corresponding service provider.
                     </DialogDescription>
                     <p className="mt-1 font-medium text-sm flex items-center">

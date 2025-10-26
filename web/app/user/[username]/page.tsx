@@ -43,23 +43,24 @@ export default function Profile() {
 
     return (
         <ProtectedRoute>
-            <div className="flex min-h-screen -mt-24 items-center justify-center">
+            <div className="flex min-h-screen -mt-24 items-center justify-center ">
                 <Card className={cn(
-                    "w-full max-w-md",
-                    "bg-card/60 backdrop-blur-sm border border-border/100 shadow-lg",
+                    "min-w-md z-50",
+                    "flex flex-col rounded-2xl",
+                    "bg-background/80 backdrop-blur-sm border border-border/100 shadow-lg",
                 )}>
-                    <CardHeader className="flex flex-col items-center text-center space-y-4 pt-4 pb-6">
+                    <CardHeader className="flex flex-row items-center text-center pb-6">
                         <Avatar className="h-24 w-24 border-2 border-border/50 shadow-md">
-                            <AvatarImage src={"/avatar.svg"} alt={username}/>
+                            {/*<AvatarImage src={"/avatar.svg"} alt={username}/>*/}
                             <AvatarFallback>{username.charAt(0)}</AvatarFallback>
                         </Avatar>
-                        <div>
-                            <h1 className="text-2xl font-bold">{username}</h1>
-                            <p className="text-muted-foreground mt-1">{userResponse["bio"]}</p>
+                        <div className="p-3">
+                            <h1 className="text-2xl font-bold">{userResponse["username"]}</h1>
+                            {/*<p className="text-muted-foreground mt-1">{userResponse["bio"]}</p>*/}
                         </div>
                     </CardHeader>
 
-                    <CardContent className="space-y-6 pb-4">
+                    <CardContent className="space-y-6">
                         {/* Provider Connection Section */}
                         {isConfigAllowed && !userResponse.anilistConnected
                             && <ThirdPartyLoginButton index={0} title={"Connect AniList"} path={"/auth/anilist"}

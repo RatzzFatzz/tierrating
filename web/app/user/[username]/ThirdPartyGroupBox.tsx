@@ -47,7 +47,7 @@ export default function ThirdPartyGroupBox({index, configAllowed, groupTitle, gr
                             <Button
                                 variant="default"
                                 className={cn(
-                                    `w-full justify-center rounded-l-full transition-all duration-200 ${entry.color} text-white font-medium`,
+                                    `cursor-pointer w-full justify-center rounded-l-full transition-all duration-200 ${entry.color} text-white font-medium`,
                                     configAllowed ? "" : "rounded-r-full"
                                 )}
                             >

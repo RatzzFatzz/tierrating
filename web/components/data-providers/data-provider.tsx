@@ -16,6 +16,8 @@ const providers: Record<string, DataProvider> = {
     'anilist-manga': new AnilistMangaProvider(),
 }
 
-export function getProviderByName(name: string) : DataProvider | undefined {
-    return providers[name];
+export function getProviderByName(name: string) : DataProvider {
+    const provider = providers[name];
+    if (!provider) throw new Error(`Invalid provider: ${name}`);
+    return provider;
 }
