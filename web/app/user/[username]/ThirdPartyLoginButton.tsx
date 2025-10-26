@@ -12,7 +12,7 @@ export default function ThirdPartyLoginButton({index, title, path, color}: {
         <Link key={index} href={path} className="block w-full">
             <Button
                 variant="default"
-                className={`w-full justify-center rounded-full transition-all duration-200 text-white font-medium ${color}`}
+                className={`cursor-pointer w-full justify-center rounded-full transition-all duration-200 text-white font-medium ${color}`}
             >
                 {title}
             </Button>
