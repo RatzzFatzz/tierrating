@@ -3,9 +3,10 @@ import {cn} from "@/lib/utils";
 import Image from "next/image";
 import {useDraggable} from "@dnd-kit/react";
 
-export default function TierlistEntryDraggable({entry}: {entry: TierlistEntry}) {
+export function TierlistEntryDraggable({entry}: {entry: TierlistEntry}) {
     const {ref} = useDraggable({
         id: entry.id,
+        data: entry,
     });
 
     return (
