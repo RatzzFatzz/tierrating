@@ -11,7 +11,9 @@ services:
       DB_HOST: db
       DB_PORT: 5432
       DB_USERNAME: tierrating
-      DB_PASSWORD: testingPW
+      DB_PASSWORD: CHANGE_THIS
+      ANILIST_CLIENT_KEY:
+      ANILIST_CLIENT_SECRET:
 
   ui:
     image: ghcr.io/ratzzfatzz/tierrating-ui:latest
@@ -30,4 +32,4 @@ services:
       - ./data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: tierrating
-      POSTGRES_PASSWORD: testingPW
+      POSTGRES_PASSWORD: CHANGE_THIS
