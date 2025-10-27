@@ -8,7 +8,7 @@ import {Button} from "@/components/ui/button"
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
 import {Input} from "@/components/ui/input"
 import {submitSignup} from "@/components/api/user-api";
-import {redirect} from "next/navigation";
+import {redirect, useRouter} from "next/navigation";
 import {useState} from "react";
 import {EyeIcon, EyeOffIcon} from "lucide-react";
 
@@ -27,6 +27,7 @@ export function SignUpForm() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isSubmitLoading, setSubmitLoading] = useState(false)
     const [errorMessage, setErrorMessage] = useState("");
+    const router = useRouter();
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -48,7 +49,7 @@ export function SignUpForm() {
                 if (response.data.emailTaken) throw new Error("Email already associated with a different account")
                 if (!response.data.signupSuccess) throw new Error("Signup failed. Please try again");
                 setErrorMessage("");
-                redirect("/login?signup=success");
+                router.push("/login?signup=success");
             })
             .catch(error => {
                 setErrorMessage(error.message);
