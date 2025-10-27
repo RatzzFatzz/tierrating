@@ -25,7 +25,6 @@ function Auth() {
     useEffect(() => {
         if (searchParams.has("code")) {
             const code = searchParams.get("code")
-            console.debug(`code: ${code}`)
             authorize(user, token, code)
                 .then(response => {
                     if (response.error) throw new Error(response.error);

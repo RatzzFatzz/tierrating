@@ -44,7 +44,6 @@ export abstract class AbstractDataProvider implements DataProvider {
     async updateData(id: string, score: number, token: string | null, username: string, logout: () => void): Promise<UpdateScoreResponse> {
         return updateData(id, score, this.getServiceName(), token, username)
             .then(response => {
-                console.log(response.status)
                 if (response.status === 401 || response.status === 403) {
                     logout()
                     throw new Error("Session expired or unauthorized");

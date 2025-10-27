@@ -84,7 +84,6 @@ export default function TierList({providerName}: {providerName: string}) {
         // This kinda works for processing changes in the background, but this can only be spawned once.
         // As soon as a second action is triggered, it is blocked again, until the first one has completed
         setTimeout(() => {
-            console.log(`timeout begin ${entryToChange.title}`)
             provider.updateData(entryToChange.id, targetTier.adjustedScore, token, username, logout)
                 .then(updateResponse => {
                     if (updateResponse.error) throw new Error(updateResponse.message);
@@ -94,7 +93,6 @@ export default function TierList({providerName}: {providerName: string}) {
                     console.error(error);
                     updateEntry(entryToChange, currentTier!);
                 })
-            console.log(`timeout end ${entryToChange.title}`)
         }, 200);
     }
 
