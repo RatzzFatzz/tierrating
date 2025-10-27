@@ -26,9 +26,10 @@ export function TierlistEntryCard({entry}: {entry: TierlistEntry}) {
         >
             <div className="relative w-full h-full">
                 <Image
-                    src={entry.cover || "/placeholder.svg"}
+                    src={entry.cover}
                     alt={entry.title}
                     fill
+                    unoptimized={true}
                     className="object-cover rounded-t-md"
                     sizes="80px"
                 />
