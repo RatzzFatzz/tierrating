@@ -12,7 +12,7 @@ export default function NavBar() {
             <div className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 py-4 pointer-events-none">
                 <nav className={cn(
                     "flex h-14 w-full max-w-[90%] lg:max-w-[1600px] flex-row items-center px-4 lg:px-6 rounded-2xl",
-                    "bg-background/80 backdrop-blur-sm border border-border/100 shadow-lg",
+                    "bg-card/60 backdrop-blur-sm border border-border/100 shadow-lg",
                     "transition-all duration-200 ease-in-out pointer-events-auto"
                 )}>
                     <Link href="/dashboard" className="inline-flex items-center gap-2 font-semibold">

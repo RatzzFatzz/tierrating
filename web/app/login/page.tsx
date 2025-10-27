@@ -11,7 +11,7 @@ export default function LoginPage() {
         <AnonymousAllowedRoute>
             <div className="flex min-h-screen -mt-24 items-center justify-center bg-background px-4">
                 <Card className={cn(
-                    "w-full max-w-md",
+                    "w-full max-w-md z-50",
                     "bg-card/60 backdrop-blur-sm border border-border/100 shadow-lg",
                 )}>
                     <CardHeader className="space-y-1">

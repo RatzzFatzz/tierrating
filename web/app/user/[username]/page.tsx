@@ -47,7 +47,7 @@ export default function Profile() {
                 <Card className={cn(
                     "min-w-md z-50",
                     "flex flex-col rounded-2xl",
-                    "bg-background/80 backdrop-blur-sm border border-border/100 shadow-lg",
+                    "bg-card/60 backdrop-blur-sm border border-border/100 shadow-lg",
                 )}>
                     <CardHeader className="flex flex-row items-center text-center pb-6">
                         <Avatar className="h-24 w-24 border-2 border-border/50 shadow-md">
