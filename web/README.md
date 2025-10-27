@@ -9,24 +9,14 @@ A simple application to fetch ratings from third-party providers like AniList an
 
 TierRating allows you to:
 - Import your ratings from services like AniList
-- View (and later organize) your content in tier lists
-- (Not yet) Sync rating changes back to the original platform
+- View and organize your content in tier lists
+- Sync rating changes back to the original platform
 
 ## Getting Started
 
 ### Running the Application
 
-1. Create directory and get configuration file
-```shell
-mkdir tierrating
-cd tierrating
-wget https://github.com/RatzzFatzz/tierrating-ui/blob/main/docker-compose.yml
-```
-2. Run the application
-```shell
-docker compose up -d
-```
-3. Access the application at http://localhost:3000
+Checkout the documentation [here.](https://docs.tierrating.de)
 
 ## Development
 
