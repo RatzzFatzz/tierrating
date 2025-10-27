@@ -139,7 +139,8 @@ export default function TierList({providerName}: {providerName: string}) {
                     </TierContainerDroppable>
                 ))}
             <DragOverlay>
-                {source  => (
+                {(source) => (
+                    // @ts-ignore
                     <TierlistEntryCard key={source.id} entry={source.data}/>
                 )}
             </DragOverlay>
