@@ -14,6 +14,7 @@ services:
       DB_PASSWORD: CHANGE_THIS
       ANILIST_CLIENT_KEY:
       ANILIST_CLIENT_SECRET:
+      ANILIST_REDIRECT_URL: http://localhost:3000/auth/anilist
 
   ui:
     image: ghcr.io/ratzzfatzz/tierrating-ui:latest
