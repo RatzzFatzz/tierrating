@@ -3,13 +3,13 @@
 import {API_URL} from "@/components/global-config";
 import {ServerResponse, ThirdPartyAuthResponse} from "@/model/response-types";
 
-export default async function authorize(username: string | null, token: string | null, code: string | null): Promise<ServerResponse<ThirdPartyAuthResponse>> {
+export default async function authorize(service: string, username: string | null, token: string | null, code: string | null): Promise<ServerResponse<ThirdPartyAuthResponse>> {
     if (!username && !token && !code) {
         throw new Error("Invalid username, token or code")
     }
 
     try {
-        const response = await fetch(`${API_URL}/anilist/auth/${username}`, {
+        const response = await fetch(`${API_URL}/${service}/auth/${username}`, {
             method: 'POST',
             headers: {
                 "Authorization": "Bearer " + token,

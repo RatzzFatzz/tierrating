@@ -11,7 +11,7 @@ export default function ThirdPartyGroupBox({index, configAllowed, groupTitle, gr
     index: number,
     configAllowed: boolean,
     groupTitle: string,
-    groupEntries: { title: string, path: string, color: string }[],
+    groupEntries: { title: string, type: string, path: string, color: string }[],
     token: string | null,
     username: string,
     logout: () => void;
@@ -58,7 +58,7 @@ export default function ThirdPartyGroupBox({index, configAllowed, groupTitle, gr
                             className={`rounded-r-full transition-all duration-200 ${entry.color} text-white font-medium`}>
                             <AniListTierListConfigModal type={entry.title}
                                                         onSave={(tiers: Tier[]) => saveTiers(entry.title, tiers)}
-                                                        providerName={`${groupTitle}-${entry.title}`}
+                                                        providerName={`${groupTitle}-${entry.type}`}
                                                         username={username}/>
                         </div>}
                     </div>

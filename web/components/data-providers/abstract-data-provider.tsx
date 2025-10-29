@@ -3,6 +3,7 @@ import {Tier, TierlistEntry} from "@/model/types";
 import {fetchTiers} from "@/components/api/tier-api";
 import {fetchData, updateData} from "@/components/api/data-api";
 import {UpdateScoreResponse} from "@/model/response-types";
+import {getDefaultTiers} from "@/model/defaults";
 
 export abstract class AbstractDataProvider implements DataProvider {
 
@@ -18,6 +19,7 @@ export abstract class AbstractDataProvider implements DataProvider {
                     throw new Error("Session expired");
                 }
 
+                if (response.status === 404) throw new Error("User not found or user doesn't have requested service connected");
                 if (response.error) throw new Error(`API error: ${response.status}`);
                 if (!response.data) throw new Error("Faulty response");
 
@@ -33,7 +35,7 @@ export abstract class AbstractDataProvider implements DataProvider {
                     throw new Error("Session expired");
                 }
 
-                if (response.status === 404) throw new Error("User not found or user doesn't have requested service connected");
+                if (response.status === 404) return getDefaultTiers();
                 if (response.error) throw new Error(`API error status: ${response.status}`);
                 if (!response.data) throw new Error("Faulty response");
 
