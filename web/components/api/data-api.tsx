@@ -24,7 +24,7 @@ export const fetchData = async (token: string | null, username: string, service:
     }
 }
 
-export async function updateData(id: string, score: number, service: string, token: string | null, username: string): Promise<ServerResponse<UpdateScoreResponse>> {
+export async function updateData(id: string, score: number, service: string, type: string, token: string | null, username: string): Promise<ServerResponse<UpdateScoreResponse>> {
     if (!token) throw new Error("No authentication token");
 
     try {
@@ -39,6 +39,7 @@ export async function updateData(id: string, score: number, service: string, tok
                 score: score,
                 username: username,
                 service: service,
+                type: type,
             })
         });
 
