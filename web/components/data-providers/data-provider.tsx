@@ -1,9 +1,10 @@
 import {TierlistEntry, Tier} from "@/model/types";
-import {AnilistAnimeProvider} from "@/components/data-providers/anilist-anime-data-provider";
-import {AnilistMangaProvider} from "@/components/data-providers/anilist-manga-data-provider";
+import {AnilistAnimeProvider} from "@/components/data-providers/anilist/anilist-anime-data-provider";
+import {AnilistMangaProvider} from "@/components/data-providers/anilist/anilist-manga-data-provider";
 import {UpdateScoreResponse} from "@/model/response-types";
-import {TraktMovieDataProvider} from "@/components/data-providers/trakt-movie-data-provider";
-import {TraktTvshowDataProvider} from "@/components/data-providers/trakt-tvshow-data-provider";
+import {TraktMoviesDataProvider} from "@/components/data-providers/trakt/trakt-movies-data-provider";
+import {TraktTvShowsDataProvider} from "@/components/data-providers/trakt/trakt-tv-shows-data-provider";
+import {TraktTvShowsSeasonsDataProvider} from "@/components/data-providers/trakt/trakt-tvshows-seasons-data-provider";
 
 export interface DataProvider {
     getServiceName: () => string;
@@ -16,8 +17,9 @@ export interface DataProvider {
 const providers: Record<string, DataProvider> = {
     'anilist-anime': new AnilistAnimeProvider(),
     'anilist-manga': new AnilistMangaProvider(),
-    'trakt-movies': new TraktMovieDataProvider(),
-    'trakt-tvshows': new TraktTvshowDataProvider(),
+    'trakt-movies': new TraktMoviesDataProvider(),
+    'trakt-tvshows': new TraktTvShowsDataProvider(),
+    'trakt-tvshows-seasons': new TraktTvShowsSeasonsDataProvider(),
 }
 
 export function getProviderByName(name: string) : DataProvider {

@@ -89,18 +89,24 @@ export default function Profile() {
                         {userResponse.traktConnected
                             && <ThirdPartyGroupBox index={1} configAllowed={isConfigAllowed} groupTitle={"Trakt"}
                                                    groupEntries={[
-                                                        {
+                                                       {
+                                                           title: "Movies",
+                                                           type: "movies",
+                                                           path: `/user/${userResponse.username}/trakt/movies`,
+                                                           color: "bg-red-500 hover:bg-red-600"
+                                                       },
+                                                       {
                                                             title: "TV shows",
                                                             type: "tvshows",
                                                             path: `/user/${userResponse.username}/trakt/tvshows`,
                                                             color: "bg-red-600 hover:bg-red-700"
-                                                        },
-                                                        {
-                                                            title: "Movies",
-                                                            type: "movies",
-                                                            path: `/user/${userResponse.username}/trakt/movies`,
-                                                            color: "bg-red-500 hover:bg-red-600"
-                                                        },
+                                                       },
+                                                       {
+                                                           title: "TV shows - Seasons",
+                                                           type: "tvshows-seasons",
+                                                           path: `/user/${userResponse.username}/trakt/tvshows-seasons`,
+                                                           color: "bg-red-600 hover:bg-red-700"
+                                                       },
                                                     ]} logout={logout} token={token} username={userResponse.username}/>}
                     </CardContent>
                 </Card>
