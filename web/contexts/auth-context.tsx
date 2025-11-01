@@ -1,8 +1,9 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react"
-import { useRouter } from "next/navigation"
+import {createContext, ReactNode, useContext, useEffect, useState} from "react"
+import {useRouter} from "next/navigation"
 import {extractJwtData} from "@/components/auth/jwt-decoder";
+import {refreshToken} from "@/components/api/user-api";
 
 interface AuthContextType {
     token: string | null
@@ -10,45 +11,78 @@ interface AuthContextType {
     isLoading: boolean
     isAuthenticated: boolean
     isExpired: boolean
+    expiration: Date | null
     login: (token: string) => void
     logout: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({children}: { children: ReactNode }) {
     const [token, setToken] = useState<string | null>(null)
     const [user, setUser] = useState<string | null>(null)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
-    const [isLoading, setIsLoading] = useState(true)
     const [isExpired, setIsExpired] = useState(false)
+    const [expiration, setExpiration] = useState<Date | null>(null)
     const router = useRouter()
+
+    const [isLoading, setIsLoading] = useState(true)
+    const [isTokenLoading, setIsTokenLoading] = useState(true)
+    const [isTokenRefreshing, setIsTokenRefreshing] = useState(true)
 
     // Load token from localStorage on initial render
     useEffect(() => {
-        const checkAuth= () => {
+        const checkAuth = () => {
             const storedToken = localStorage.getItem("authToken")
             if (!storedToken) {
                 logout()
-                setIsLoading(false);
+                setIsTokenLoading(false);
                 return;
             }
 
             const decodedJwt = extractJwtData(storedToken);
             if (!decodedJwt || decodedJwt.isExpired) {
                 logout()
-                setIsLoading(false);
+                setIsTokenLoading(false);
                 return;
             }
 
             setToken(storedToken)
             setUser(decodedJwt.username)
             setIsExpired(decodedJwt.isExpired)
+            setExpiration(decodedJwt.expiration)
             setIsAuthenticated(true)
-            setIsLoading(false);
+            setIsTokenLoading(false);
         }
         checkAuth()
     }, [])
+
+    useEffect(() => {
+        if (!isTokenLoading && isAuthenticated && !isExpired && expiration) {
+            if (expiration.getTime() < new Date().getTime() + (10 * 60 * 1000)) {
+                refreshToken(token)
+                    .then(response => {
+                        if (response.status === 401) throw new Error("Invalid credentials");
+                        if (response.error) throw new Error(response.error);
+                        if (!response.data) throw new Error("Faulty response")
+                        login(response.data.token);
+                        console.debug("Token refreshed")
+                    })
+                    .catch(error => {
+                        console.debug(error);
+                    });
+            }
+            setIsTokenRefreshing(false);
+        }
+    }, [isTokenLoading, isAuthenticated, isExpired, expiration, token])
+
+    useEffect(() => {
+        if (!isTokenLoading && !isTokenRefreshing) {
+            setIsLoading(false);
+        } else {
+            setIsLoading(true);
+        }
+    }, [isTokenLoading, isTokenRefreshing])
 
     const login = (newToken: string) => {
         localStorage.setItem("authToken", newToken)
@@ -67,7 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <AuthContext.Provider value={{ token, user, isAuthenticated, isLoading, isExpired, login, logout }}>
+        <AuthContext.Provider value={{token, user, isAuthenticated, isLoading, isExpired, expiration, login, logout}}>
             {children}
         </AuthContext.Provider>
     )
