@@ -20,31 +20,29 @@ export default function ThirdPartyButton({service, type, title, username, config
     }
 
     return (
-        <div>
-            <Link href={`/user/${username}/${service}/${type}`}>
-                <Button variant="outline" className="w-full flex items-center justify-between gap-2">
-                    <div className="relative w-5 h-5 flex-shrink-0">
-                        <Image
-                            src={`/icons/${service}.svg`}
-                            alt={`${service} icon`}
-                            fill={true}
-                        />
-                    </div>
-                    <div className="flex-grow text-center">
-                        {title}
-                    </div>
-                    {configAllowed &&
-                        <div className="relative w-5 h-5 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-                            <AniListTierListConfigModal
-                                type={type}
-                                onSave={(tiers: Tier[]) => saveTiers(type, tiers)}
-                                providerName={`${service}-${type}`}
-                                username={username}
-                            />
-                        </div>
-                    }
-                </Button>
+        <Button variant="outline" className="w-full flex items-center justify-between gap-2">
+            <Link href={`/user/${username}/${service}/${type}`} className="w-full flex items-center justify-between gap-2">
+                <div className="relative w-5 h-5 flex-shrink-0">
+                    <Image
+                        src={`/icons/${service}.svg`}
+                        alt={`${service} icon`}
+                        fill={true}
+                    />
+                </div>
+                <div className="flex-grow text-center">
+                    {title}
+                </div>
             </Link>
-        </div>
+            {configAllowed &&
+                <div className="relative w-5 h-5 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                    <AniListTierListConfigModal
+                        type={type}
+                        onSave={(tiers: Tier[]) => saveTiers(type, tiers)}
+                        providerName={`${service}-${type}`}
+                        username={username}
+                    />
+                </div>
+            }
+        </Button>
     )
 }
