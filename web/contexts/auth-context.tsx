@@ -26,9 +26,7 @@ export function AuthProvider({children}: { children: ReactNode }) {
     const [expiration, setExpiration] = useState<Date | null>(null)
     const router = useRouter()
 
-    const [isLoading, setIsLoading] = useState(true)
-    const [isTokenLoading, setIsTokenLoading] = useState(true)
-    const [isTokenRefreshing, setIsTokenRefreshing] = useState(true)
+    const [isLoading, setLoading] = useState(true)
 
     // Load token from localStorage on initial render
     useEffect(() => {
@@ -36,14 +34,14 @@ export function AuthProvider({children}: { children: ReactNode }) {
             const storedToken = localStorage.getItem("authToken")
             if (!storedToken) {
                 logout()
-                setIsTokenLoading(false);
+                setLoading(false);
                 return;
             }
 
             const decodedJwt = extractJwtData(storedToken);
             if (!decodedJwt || decodedJwt.isExpired) {
                 logout()
-                setIsTokenLoading(false);
+                setLoading(false);
                 return;
             }
 
@@ -52,14 +50,8 @@ export function AuthProvider({children}: { children: ReactNode }) {
             setIsExpired(decodedJwt.isExpired)
             setExpiration(decodedJwt.expiration)
             setIsAuthenticated(true)
-            setIsTokenLoading(false);
-        }
-        checkAuth()
-    }, [])
 
-    useEffect(() => {
-        if (!isTokenLoading && isAuthenticated && !isExpired && expiration) {
-            if (expiration.getTime() < new Date().getTime() + (10 * 60 * 1000)) {
+            if (isAuthenticated && !isExpired && expiration && expiration.getTime() < (new Date().getTime() + (5 * 60 * 1000))) {
                 refreshToken(token)
                     .then(response => {
                         if (response.status === 401) throw new Error("Invalid credentials");
@@ -72,17 +64,11 @@ export function AuthProvider({children}: { children: ReactNode }) {
                         console.debug(error);
                     });
             }
-            setIsTokenRefreshing(false);
-        }
-    }, [isTokenLoading, isAuthenticated, isExpired, expiration, token])
 
-    useEffect(() => {
-        if (!isTokenLoading && !isTokenRefreshing) {
-            setIsLoading(false);
-        } else {
-            setIsLoading(true);
+            setLoading(false);
         }
-    }, [isTokenLoading, isTokenRefreshing])
+        checkAuth()
+    }, [])
 
     const login = (newToken: string) => {
         localStorage.setItem("authToken", newToken)
