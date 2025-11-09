@@ -9,7 +9,12 @@ import LoadingPage from "@/components/loading-page";
 export function Auth({service, authUrl}: {service: string, authUrl: string}) {
     const searchParams = useSearchParams()
     const router = useRouter()
+    const host = window.location.protocol + "//" + window.location.host;
     const {user, token} = useAuth()
+
+    authUrl = authUrl.replace("REDIRECT_URL", host);
+    console.info(host)
+    console.info(authUrl)
 
     useEffect(() => {
         if (searchParams.has("code")) {

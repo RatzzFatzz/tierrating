@@ -9,7 +9,7 @@ export default function AuthAniList() {
         <ProtectedRoute>
             <Suspense>
                 <Auth service={"anilist"}
-                      authUrl={"https://anilist.co/api/v2/oauth/authorize?client_id=27404&redirect_uri=http://localhost:3000/auth/anilist&response_type=code"}>
+                      authUrl={"https://anilist.co/api/v2/oauth/authorize?client_id=27404&redirect_uri=REDIRECT_URL/auth/anilist&response_type=code"}>
                 </Auth>
             </Suspense>
         </ProtectedRoute>
