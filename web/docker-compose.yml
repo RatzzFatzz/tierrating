@@ -30,6 +30,8 @@ services:
       - server
     environment:
       API_URL: 'http://server:8080'
+      ANILIST_CLIENT_ID:
+      TRAKT_CLIENT_ID:
 
   db:
     image: postgres
