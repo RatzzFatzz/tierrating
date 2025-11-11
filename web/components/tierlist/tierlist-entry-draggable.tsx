@@ -2,6 +2,7 @@ import {TierlistEntry} from "@/model/types";
 import {cn} from "@/lib/utils";
 import Image from "next/image";
 import {useDraggable} from "@dnd-kit/react";
+import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 
 export function TierlistEntryDraggable({entry}: {entry: TierlistEntry}) {
     const {ref} = useDraggable({
@@ -34,7 +35,16 @@ export function TierlistEntryCard({entry}: {entry: TierlistEntry}) {
                     sizes="80px"
                 />
             </div>
-            <div className="text-xs line-clamp-2 h-11 w-full text-center p-1 text-foreground bg-card">{entry.title}</div>
+            <HoverCard>
+                <HoverCardTrigger asChild>
+                    <div className="text-xs line-clamp-2 h-11 w-full text-center p-1 text-foreground bg-card">
+                        {entry.title}
+                    </div>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-64 p-2">
+                    {entry.title}
+                </HoverCardContent>
+            </HoverCard>
         </div>
     )
 }
