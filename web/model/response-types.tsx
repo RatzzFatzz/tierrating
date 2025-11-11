@@ -14,6 +14,11 @@ export interface SignupResponse {
     signupSuccess: boolean;
 }
 
+export interface ChangePasswordResponse {
+    success: boolean;
+    message: string;
+}
+
 export interface UserResponse {
     id: number;
     username: string;

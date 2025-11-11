@@ -1,6 +1,12 @@
 "use server"
 import {API_URL} from "@/components/global-config";
-import {LoginResponse, ServerResponse, SignupResponse, UserResponse} from "@/model/response-types";
+import {
+    ChangePasswordResponse,
+    LoginResponse,
+    ServerResponse,
+    SignupResponse,
+    UserResponse
+} from "@/model/response-types";
 
 export async function requestLogin(username: string, password: string): Promise<ServerResponse<LoginResponse>> {
     try {
@@ -49,6 +55,27 @@ export async function refreshToken(token: string | null): Promise<ServerResponse
                 "Authorization": `Bearer ${token}`,
             },
             body: JSON.stringify({token}),
+        })
+
+        const data = await response.json().catch(() => null);
+        return {data, status: response.status};
+    } catch (error) {
+        console.error('API proxy error: ', error);
+        return {error: 'Server unavailable', status: 500}
+    }
+}
+
+export async function changePassword(oldPassword: string, newPassword: string, username: string | null, token: string | null): Promise<ServerResponse<ChangePasswordResponse>> {
+    if (!username || !token) throw new Error("Invalid user or authentication token");
+
+    try {
+        const response = await fetch(`${API_URL}/auth/change-password`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+            },
+            body: JSON.stringify({oldPassword, newPassword, username}),
         })
 
         const data = await response.json().catch(() => null);

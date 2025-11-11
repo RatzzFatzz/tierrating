@@ -4,6 +4,7 @@ import ThemeToggle from "@/components/themes/theme-toggle";
 import LogoutButton from "@/components/auth/logout-button";
 import NavbarLinks from "@/components/navbar/navbar-links";
 import {RestrictedRenderingRoute} from "@/contexts/route-accessibility";
+import SettingsButton from "@/components/navbar/settings-button";
 
 export default function NavBar() {
 
@@ -44,7 +45,7 @@ export default function NavBar() {
                         {/*<SearchBar/>*/}
 
                         <ThemeToggle/>
-
+                        <SettingsButton/>
                         <LogoutButton/>
                     </div>
                 </nav>
