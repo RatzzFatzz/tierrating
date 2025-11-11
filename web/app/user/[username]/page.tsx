@@ -45,7 +45,7 @@ export default function Profile() {
         <ProtectedRoute>
             <div className="flex min-h-screen -mt-24 items-center justify-center px-4">
                 <Card className={cn(
-                    "w-full max-w-md z-50",
+                    "w-full max-w-md",
                     "flex flex-col rounded-2xl",
                     "bg-card/60 backdrop-blur-sm border border-border/100 shadow-lg",
                 )}>

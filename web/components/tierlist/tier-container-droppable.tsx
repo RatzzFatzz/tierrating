@@ -11,7 +11,8 @@ export default function TierContainerDroppable({children, id, label, color}: {ch
         <div
             ref={ref}
             // class={isDropTarget ? `ring[${color}` : ""}
-            className={cn("grid grid-cols-[auto_1fr] rounded-md overflow-hidden border border-border/60 mb-1",
+            className={cn("grid grid-cols-[auto_1fr] mb-1",
+                            "overflow-hidden border border-border/60 rounded-2xl bg-card/60 backdrop-blur-sm",
                             isDropTarget ? `ring-2 ring-accent` : "")}
             style={{ minHeight: "80px" }}
         >

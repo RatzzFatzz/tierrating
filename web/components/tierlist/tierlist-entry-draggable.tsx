@@ -20,8 +20,8 @@ export function TierlistEntryCard({entry}: {entry: TierlistEntry}) {
     return (
         <div
             className={cn(
-                "w-20 h-36 bg-card border border-border/40 rounded-md shadow-sm cursor-move flex flex-col items-center justify-center transition-opacity",
-                // isDragging ? "opacity-30" : isOver ? "opacity-70" : "opacity-100",
+                "w-20 h-36 flex flex-col items-center justify-center",
+                "bg-card border border-border/40 rounded-md shadow-sm cursor-move",
             )}
         >
             <div className="relative w-full h-full">

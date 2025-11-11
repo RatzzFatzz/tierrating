@@ -10,7 +10,7 @@ import {TierContainerSkeleton, TierlistEntrySkeleton} from "@/components/loading
 import {TierlistEntryDraggable, TierlistEntryCard} from "@/components/tierlist/tierlist-entry-draggable";
 import {DragDropProvider, DragOverlay} from "@dnd-kit/react";
 import {assignTiersAndGroupEntriesByTier, groupBySingle, sortByName} from "@/components/tierlist/tier-mapper";
-import TierContainerDroppable from "@/components/tierlist/tier-container";
+import TierContainerDroppable from "@/components/tierlist/tier-container-droppable";
 
 
 export default function TierList({providerName}: {providerName: string}) {
