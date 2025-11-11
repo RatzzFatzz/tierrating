@@ -8,7 +8,7 @@ export default function SignupPage() {
 
     return (
         <AnonymousAllowedRoute>
-            <div className="flex min-h-screen -mt-24 items-center justify-center bg-background px-4">
+            <div className="flex min-h-screen -mt-24 items-center justify-center px-4">
                 <Card className="w-full max-w-md border-border/40 bg-card/60 backdrop-blur-sm z-50">
                     <CardHeader className="space-y-1">
                         <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
