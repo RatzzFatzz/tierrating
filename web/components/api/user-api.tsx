@@ -1,7 +1,7 @@
 "use server"
 import {API_URL} from "@/components/global-config";
 import {
-    ChangePasswordResponse,
+    GenericResponse,
     LoginResponse,
     ServerResponse,
     SignupResponse,
@@ -65,7 +65,7 @@ export async function refreshToken(token: string | null): Promise<ServerResponse
     }
 }
 
-export async function changePassword(oldPassword: string, newPassword: string, username: string | null, token: string | null): Promise<ServerResponse<ChangePasswordResponse>> {
+export async function changePassword(oldPassword: string, newPassword: string, username: string | null, token: string | null): Promise<ServerResponse<GenericResponse>> {
     if (!username || !token) throw new Error("Invalid user or authentication token");
 
     try {
@@ -86,7 +86,7 @@ export async function changePassword(oldPassword: string, newPassword: string, u
     }
 }
 
-export async function deleteAccount(username: string | null, token: string | null): Promise<ServerResponse<ChangePasswordResponse>> {
+export async function deleteAccount(username: string | null, token: string | null): Promise<ServerResponse<GenericResponse>> {
     if (!username || !token) throw new Error("Invalid user or authentication token");
 
     try {
@@ -97,6 +97,26 @@ export async function deleteAccount(username: string | null, token: string | nul
                 "Authorization": `Bearer ${token}`,
             },
             body: JSON.stringify({username}),
+        })
+
+        const data = await response.json().catch(() => null);
+        return {data, status: response.status};
+    } catch (error) {
+        console.error('API proxy error: ', error);
+        return {error: 'Server unavailable', status: 500}
+    }
+}
+
+export async function removeConnection(service: string, username: string | null, token: string | null): Promise<ServerResponse<GenericResponse>> {
+    if (!username || !token) throw new Error("Invalid user or authentication token");
+
+    try {
+        const response = await fetch(`${API_URL}/user/${username}/remove/${service}`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+            },
         })
 
         const data = await response.json().catch(() => null);

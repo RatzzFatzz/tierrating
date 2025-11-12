@@ -14,7 +14,7 @@ export interface SignupResponse {
     signupSuccess: boolean;
 }
 
-export interface ChangePasswordResponse {
+export interface GenericResponse {
     success: boolean;
     message: string;
 }
