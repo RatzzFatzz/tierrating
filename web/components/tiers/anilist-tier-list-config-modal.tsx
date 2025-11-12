@@ -189,8 +189,13 @@ export default function AniListTierListConfigModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange} >
-            <DialogTrigger className="p-0 cursor-pointer" onClick={handleTriggerClick}>
-                <Settings className="w-full h-full"/>
+            <DialogTrigger asChild className="p-0 cursor-pointer" onClick={handleTriggerClick}>
+                <Button
+                    variant={"ghost"}
+                    className="w-full h-full"
+                >
+                    <Settings/>
+                </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[650px] max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
