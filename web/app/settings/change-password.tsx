@@ -48,7 +48,6 @@ export default function ChangePassword() {
                 if (!response.data.success) throw new Error(response.data.message);
                 setTimeout(() => logout(), 1000);
                 setErrorMessage("");
-                router.push("/login?signup=success");
             })
             .catch(error => {
                 setErrorMessage(error.message);
