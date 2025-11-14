@@ -14,7 +14,7 @@ export default function NavBar() {
                 <nav className={cn(
                     "flex h-14 w-full max-w-[1600px] flex-row items-center px-4 lg:px-6 rounded-2xl",
                     "bg-card/60 backdrop-blur-sm border border-border/100 shadow-lg",
-                    "transition-all duration-200 ease-in-out pointer-events-auto"
+                    "pointer-events-auto"
                 )}>
                     <Link href="/dashboard" className="inline-flex items-center gap-2 font-semibold">
                         <div className="flex items-center gap-1.5">
@@ -33,9 +33,9 @@ export default function NavBar() {
                                 <path d="M2 20h20"/>
                                 <path d="M5 14h14"/>
                                 <path d="M8 8h8"/>
-                                <path d="M12 4h1"/>
+                                <path d="M11 2h2"/>
                             </svg>
-                            <span className="text-xl font-medium">TierRating</span>
+                            <span className="text-xl font-medium max-sm:hidden">TierRating</span>
                         </div>
                     </Link>
 

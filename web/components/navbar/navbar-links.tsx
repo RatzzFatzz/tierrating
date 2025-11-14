@@ -11,7 +11,7 @@ export default function NavbarLinks() {
     const pathname = usePathname()
 
     return (
-        <div className="flex items-center space-x-1 ml-6 max-sm:hidden">
+        <div className="flex items-center space-x-1 ml-6">
             <Button
                 variant="ghost"
                 asChild
