@@ -4,7 +4,7 @@ import AccountModification from "@/app/settings/account-modification";
 
 export default function Settings() {
     return (
-        <div className={"flex items-start justify-center gap-4 w-full min-w-4/5"}>
+        <div className={"flex flex-wrap items-start justify-center gap-4 w-full min-w-4/5 pl-4 pr-4"}>
             <Card className={"max-w-full w-80"}>
                 <CardHeader>
                     Change Password
