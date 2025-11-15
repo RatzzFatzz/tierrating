@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import {Inter} from "next/font/google";
 import "./globals.css";
-import {AuthProvider} from "@/contexts/auth-context";
+import {AuthProvider} from "@/components/contexts/auth-context";
 import NavBar from "@/components/navbar/navbar";
 import {ThemeProvider} from "@/components/themes/theme-provider";
 import Starfield from "react-starfield";

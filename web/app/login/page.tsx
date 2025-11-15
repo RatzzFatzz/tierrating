@@ -1,6 +1,6 @@
 import Link from "next/link"
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
-import {AnonymousAllowedRoute} from "@/contexts/route-accessibility";
+import {AnonymousAllowedRoute} from "@/components/contexts/route-accessibility";
 import {InputForm} from "@/app/login/login-form";
 import {SuccessMessage} from "@/app/login/login-success-message";
 import {cn} from "@/lib/utils";

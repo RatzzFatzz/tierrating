@@ -1,7 +1,7 @@
 "use server"
 
 import {API_URL} from "@/components/global-config";
-import {ServerResponse, ThirdPartyAuthResponse, ThirdPartyInfoResponse} from "@/model/response-types";
+import {ServerResponse, ThirdPartyAuthResponse, ThirdPartyInfoResponse} from "@/components/model/response-types";
 
 export default async function authorize(service: string, username: string | null, token: string | null, code: string | null): Promise<ServerResponse<ThirdPartyAuthResponse>> {
     if (!username && !token && !code) {

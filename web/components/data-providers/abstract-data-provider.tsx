@@ -1,9 +1,9 @@
 import {DataProvider} from "@/components/data-providers/data-provider";
-import {Tier, TierlistEntry} from "@/model/types";
+import {Tier, TierlistEntry} from "@/components/model/types";
 import {fetchTiers} from "@/components/api/tier-api";
 import {fetchData, updateData} from "@/components/api/data-api";
-import {UpdateScoreResponse} from "@/model/response-types";
-import {getDefaultTiers} from "@/model/defaults";
+import {UpdateScoreResponse} from "@/components/model/response-types";
+import {getDefaultTiers} from "@/components/model/defaults";
 
 export abstract class AbstractDataProvider implements DataProvider {
 

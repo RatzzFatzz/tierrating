@@ -1,10 +1,10 @@
 "use client"
 
 import {useRouter, useSearchParams} from "next/navigation";
-import {useAuth} from "@/contexts/auth-context";
+import {useAuth} from "@/components/contexts/auth-context";
 import React, {useEffect, useRef} from "react";
 import authorize, {info} from "@/components/api/auth-api";
-import LoadingPage from "@/components/loading-page";
+import LoadingPage from "@/components/loading-skeletons/loading-page";
 import {CLIENT_ID_PLACEHOLDER, REDIRECT_URL_PLACEHOLDER} from "@/components/global-config";
 
 export function Auth({service, authUrl}: {service: string, authUrl: string}) {

@@ -1,5 +1,5 @@
 import React, {Suspense} from "react";
-import {ProtectedRoute} from "@/contexts/route-accessibility";
+import {ProtectedRoute} from "@/components/contexts/route-accessibility";
 import {Auth} from "@/app/auth/auth";
 import {CLIENT_ID_PLACEHOLDER, REDIRECT_URL_PLACEHOLDER} from "@/components/global-config";
 

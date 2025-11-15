@@ -2,7 +2,7 @@
 
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Button} from "@/components/ui/button";
-import {useAuth} from "@/contexts/auth-context";
+import {useAuth} from "@/components/contexts/auth-context";
 import {deleteAccount} from "@/components/api/user-api";
 import {useState} from "react";
 

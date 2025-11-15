@@ -1,4 +1,4 @@
-import {TierlistEntry} from "@/model/types";
+import {TierlistEntry} from "@/components/model/types";
 import {cn} from "@/lib/utils";
 import Image from "next/image";
 import {useDraggable} from "@dnd-kit/react";

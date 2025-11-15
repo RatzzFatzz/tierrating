@@ -3,7 +3,7 @@ import {cn} from "@/lib/utils"
 import ThemeToggle from "@/components/themes/theme-toggle";
 import LogoutButton from "@/components/auth/logout-button";
 import NavbarLinks from "@/components/navbar/navbar-links";
-import {RestrictedRenderingRoute} from "@/contexts/route-accessibility";
+import {RestrictedRenderingRoute} from "@/components/contexts/route-accessibility";
 import SettingsButton from "@/components/navbar/settings-button";
 
 export default function NavBar() {

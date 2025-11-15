@@ -1,4 +1,4 @@
-import {Tier, TierlistEntry} from "@/model/types";
+import {Tier, TierlistEntry} from "@/components/model/types";
 
 export function assignTiersAndGroupEntriesByTier(tiers: Tier[], items: TierlistEntry[]): Map<string, TierlistEntry[]> {
     // Proper order (sorted descending by score) is assured by the server

@@ -1,7 +1,7 @@
-import {TierlistEntry, Tier} from "@/model/types";
+import {TierlistEntry, Tier} from "@/components/model/types";
 import {AnilistAnimeProvider} from "@/components/data-providers/anilist/anilist-anime-data-provider";
 import {AnilistMangaProvider} from "@/components/data-providers/anilist/anilist-manga-data-provider";
-import {UpdateScoreResponse} from "@/model/response-types";
+import {UpdateScoreResponse} from "@/components/model/response-types";
 import {TraktMoviesDataProvider} from "@/components/data-providers/trakt/trakt-movies-data-provider";
 import {TraktTvShowsDataProvider} from "@/components/data-providers/trakt/trakt-tv-shows-data-provider";
 import {TraktTvShowsSeasonsDataProvider} from "@/components/data-providers/trakt/trakt-tvshows-seasons-data-provider";

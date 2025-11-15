@@ -1,9 +1,9 @@
 "use client"
 
 import React, {useEffect, useState} from "react";
-import {Tier, TierlistEntry} from "@/model/types";
-import {getDefaultTiers} from "@/model/defaults";
-import {useAuth} from "@/contexts/auth-context";
+import {Tier, TierlistEntry} from "@/components/model/types";
+import {getDefaultTiers} from "@/components/model/defaults";
+import {useAuth} from "@/components/contexts/auth-context";
 import {useParams} from "next/navigation";
 import {getProviderByName} from "@/components/data-providers/data-provider";
 import {TierContainerSkeleton, TierlistEntrySkeleton} from "@/components/loading-skeletons/tier-container-skeleton";

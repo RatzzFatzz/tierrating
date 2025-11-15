@@ -6,7 +6,7 @@ import {
     ServerResponse,
     SignupResponse,
     UserResponse
-} from "@/model/response-types";
+} from "@/components/model/response-types";
 
 export async function requestLogin(username: string, password: string): Promise<ServerResponse<LoginResponse>> {
     try {

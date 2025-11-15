@@ -1,14 +1,14 @@
 "use client"
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
 import React, {useEffect, useState} from "react";
-import {ProtectedRoute} from "@/contexts/route-accessibility";
-import {useAuth} from "@/contexts/auth-context";
+import {ProtectedRoute} from "@/components/contexts/route-accessibility";
+import {useAuth} from "@/components/contexts/auth-context";
 import {fetchUser} from "@/components/api/user-api";
 import {useParams} from "next/navigation";
-import LoadingPage from "@/components/loading-page";
+import LoadingPage from "@/components/loading-skeletons/loading-page";
 import {cn} from "@/lib/utils"
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
-import {UserResponse} from "@/model/response-types";
+import {UserResponse} from "@/components/model/response-types";
 import ThirdPartyLoginButton from "@/app/user/[username]/third-party-login-button";
 import ThirdPartyButton from "@/app/user/[username]/third-party-button";
 

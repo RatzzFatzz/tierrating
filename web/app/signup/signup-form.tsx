@@ -8,7 +8,7 @@ import {Button} from "@/components/ui/button"
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
 import {Input} from "@/components/ui/input"
 import {submitSignup} from "@/components/api/user-api";
-import {redirect, useRouter} from "next/navigation";
+import {useRouter} from "next/navigation";
 import {useState} from "react";
 import {EyeIcon, EyeOffIcon} from "lucide-react";
 

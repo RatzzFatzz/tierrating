@@ -1,4 +1,4 @@
-import {Tier} from "@/model/types"; // Make sure to install this package: npm install uuid
+import {Tier} from "@/components/model/types"; // Make sure to install this package: npm install uuid
 
 export function getDefaultTiers(): Tier[] {
     return [

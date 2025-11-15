@@ -1,4 +1,4 @@
-import {ProtectedRoute} from "@/contexts/route-accessibility";
+import {ProtectedRoute} from "@/components/contexts/route-accessibility";
 import TierListPage from "@/components/tierlist/tier-list-page";
 
 export default function TraktTvShowsSeasons() {

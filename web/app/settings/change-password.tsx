@@ -6,7 +6,7 @@ import {useRouter} from "next/navigation";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {changePassword} from "@/components/api/user-api";
-import {useAuth} from "@/contexts/auth-context";
+import {useAuth} from "@/components/contexts/auth-context";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
