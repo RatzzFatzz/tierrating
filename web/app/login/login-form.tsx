@@ -32,7 +32,9 @@ export function InputForm() {
             .catch(error => {
                 setErrorMessage(error instanceof Error ? error.message : 'Login failed. Please try again.')
             })
-            .finally(() => setIsLoading(false));
+            .finally(() => {
+                setTimeout(() => setIsLoading(false), 1000);
+            });
     }
 
     return (

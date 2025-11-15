@@ -55,7 +55,7 @@ export function SignUpForm() {
                 setErrorMessage(error.message);
             })
             .finally(() => {
-                setSubmitLoading(false);
+                setTimeout(() => setSubmitLoading(false), 1000);
             })
     }
 
