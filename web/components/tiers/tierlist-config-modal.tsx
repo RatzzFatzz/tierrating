@@ -21,12 +21,13 @@ import {getDefaultTiers} from "@/model/defaults";
 import {DataProvider, getProviderByName} from "@/components/data-providers/data-provider";
 import {notFound} from "next/navigation";
 
-interface AniListTierListConfigModalProps {
+interface TierlistConfigModalProps {
     initialTiers?: Tier[];
     type: string;
     onSave: (tiers: Tier[]) => void;
     providerName: string;
     username: string;
+    decimals: string;
 }
 
 // Default tier colors
@@ -40,13 +41,14 @@ export const DEFAULT_COLORS = [
     "#FF7FBF", // F - Pink
 ];
 
-export default function AniListTierListConfigModal({
-                                                       initialTiers = [],
-                                                       type,
-                                                       onSave,
-                                                       providerName,
-                                                       username
-                                                   }: AniListTierListConfigModalProps) {
+export default function TierlistConfigModal({
+                                                initialTiers = [],
+                                                type,
+                                                onSave,
+                                                providerName,
+                                                username,
+                                                decimals
+                                            }: TierlistConfigModalProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [tiers, setTiers] = useState<Tier[]>([]);
     const [queryRunning, setQueryRunning] = useState(false);
@@ -188,7 +190,7 @@ export default function AniListTierListConfigModal({
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={handleOpenChange} >
+        <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild className="p-0 cursor-pointer" onClick={handleTriggerClick}>
                 <Button
                     variant={"ghost"}
@@ -288,7 +290,7 @@ export default function AniListTierListConfigModal({
                                                 formatNumberInput(e.target.value)
                                             )
                                         }
-                                        step="0.01"
+                                        step={decimals}
                                         max="10"
                                         min="0"
                                         placeholder="Score"
@@ -306,7 +308,7 @@ export default function AniListTierListConfigModal({
                                                 formatNumberInput(e.target.value)
                                             )
                                         }
-                                        step="0.01"
+                                        step={decimals}
                                         max="10"
                                         min="0"
                                         placeholder="Adjusted Score"

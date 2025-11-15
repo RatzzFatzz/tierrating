@@ -1,5 +1,5 @@
 import {Button} from "@/components/ui/button";
-import AniListTierListConfigModal from "@/components/tiers/anilist-tier-list-config-modal";
+import TierlistConfigModal from "@/components/tiers/tierlist-config-modal";
 import {Tier} from "@/model/types";
 import React, {useState} from "react";
 import Image from "next/image";
@@ -8,6 +8,12 @@ import Link from "next/link";
 import {X} from "lucide-react";
 import {removeConnection} from "@/components/api/user-api";
 import {useRouter} from "next/navigation";
+
+function getDecimals(service: string): string {
+    if (service === "anilist") return "0.01";
+    if (service === "trakt") return "1.00";
+    return "1.00";
+}
 
 export default function ThirdPartyButton({service, type, title, username, configAllowed, token, logout}: {service: string, type: string, title: string, username: string, configAllowed: boolean, token: string | null, logout: () => void}) {
     const [isRemovingService, setIsRemovingService] = useState(false);
@@ -60,11 +66,12 @@ export default function ThirdPartyButton({service, type, title, username, config
             </Link>
             {configAllowed &&
                 <div className="relative w-5 h-5 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-                    <AniListTierListConfigModal
+                    <TierlistConfigModal
                         type={type}
                         onSave={(tiers: Tier[]) => saveTiers(type, tiers)}
                         providerName={`${service}-${type}`}
                         username={username}
+                        decimals={getDecimals(service)}
                     />
                 </div>
 
