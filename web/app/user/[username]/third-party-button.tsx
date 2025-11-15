@@ -1,5 +1,5 @@
 import {Button} from "@/components/ui/button";
-import TierlistConfigModal from "@/components/tiers/tierlist-config-modal";
+import TierConfigModal from "@/components/tiers/tier-config-modal";
 import {Tier} from "@/model/types";
 import React, {useState} from "react";
 import Image from "next/image";
@@ -66,15 +66,14 @@ export default function ThirdPartyButton({service, type, title, username, config
             </Link>
             {configAllowed &&
                 <div className="relative w-5 h-5 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-                    <TierlistConfigModal
+                    <TierConfigModal
+                        service={service}
                         type={type}
                         onSave={(tiers: Tier[]) => saveTiers(type, tiers)}
-                        providerName={`${service}-${type}`}
                         username={username}
                         decimals={getDecimals(service)}
                     />
                 </div>
-
             }
             {configAllowed &&
                 <div className={"relative w-5 h-5 flex-shrink-0"}>
