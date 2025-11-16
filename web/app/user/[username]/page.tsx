@@ -11,6 +11,7 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {UserResponse} from "@/components/model/response-types";
 import ThirdPartyLoginButton from "@/app/user/[username]/third-party-login-button";
 import ThirdPartyButton from "@/app/user/[username]/third-party-button";
+import {fetchConfiguredServices} from "@/components/api/config-api";
 
 
 export default function Profile() {
@@ -19,6 +20,8 @@ export default function Profile() {
     const [userResponse, setUserResponse] = useState<UserResponse>();
     const {user, token, isLoading, isAuthenticated, logout} = useAuth();
     const isConfigAllowed: boolean = username === user;
+
+    const [configuredServices, setConfiguredServices] = useState<string[]>();
 
     useEffect(() => {
         if (!isLoading && isAuthenticated) {
@@ -31,15 +34,30 @@ export default function Profile() {
 
                     if (response.error) throw new Error(`API error: ${response.status}`);
                     if (!response.data) throw new Error("Faulty response");
-                    console.log(JSON.stringify(response.data));
                     setUserResponse(response.data);
                 })
                 .catch((error) => console.error(error))
         }
     }, [username, isLoading, isAuthenticated, token, logout]);
 
-    // Render nothing until connections are loaded
-    if (!userResponse) return <LoadingPage/>
+    useEffect(() => {
+        if (!isLoading && isAuthenticated) {
+            fetchConfiguredServices(token)
+                .then(response => {
+                    if (response.status === 401 || response.status === 403) {
+                        logout();
+                        throw new Error("Session expired");
+                    }
+
+                    if (response.error) throw new Error(`API error: ${response.status}`);
+                    if (!response.data) throw new Error("Faulty response");
+                    setConfiguredServices(response.data);
+                })
+                .catch((error) => console.error(error))
+        }
+    }, [isAuthenticated, isLoading, logout, token])
+
+    if (!userResponse || !configuredServices) return <LoadingPage/>
 
     return (
         <ProtectedRoute>
@@ -61,13 +79,12 @@ export default function Profile() {
                     </CardHeader>
 
                     <CardContent className="space-y-4">
-                        {/* Provider Connection Section */}
-                        {isConfigAllowed && !userResponse.anilistConnected
-                            && <ThirdPartyLoginButton index={0} title={"Connect AniList"} path={"/auth/anilist"}
-                                                      color={"bg-blue-600 hover:bg-blue-700"} service="anilist"/>}
-                        {isConfigAllowed && !userResponse.traktConnected
-                            && <ThirdPartyLoginButton index={1} title={"Connect Trakt"} path={"/auth/trakt"}
-                                                      color={"bg-red-600 hover:bg-red-700"} service="trakt"/>}
+                        <div className="grid columns-1 gap-4">
+                            {isConfigAllowed && configuredServices.find(service => service == "anilist") && !userResponse.anilistConnected
+                                && <ThirdPartyLoginButton index={0} title={"Connect AniList"} path={"/auth/anilist"} color={"bg-blue-600 hover:bg-blue-700"} service="anilist"/>}
+                            {isConfigAllowed && configuredServices.find(service => service == "trakt") && !userResponse.traktConnected
+                                && <ThirdPartyLoginButton index={1} title={"Connect Trakt"} path={"/auth/trakt"} color={"bg-red-600 hover:bg-red-700"} service="trakt"/>}
+                        </div>
 
                         <div className="grid columns-1 gap-4">
                             {userResponse.anilistConnected && <ThirdPartyButton service={"anilist"} type={"anime"} title={"Anime"} username={userResponse.username} configAllowed={isConfigAllowed} token={token} logout={logout}/>}
