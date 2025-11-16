@@ -2,9 +2,10 @@ import {useDroppable} from "@dnd-kit/react";
 import React from "react";
 import {cn} from "@/lib/utils";
 
-export default function TierContainerDroppable({children, id, label, color}: {children: React.ReactNode, id: string, label: string, color: string}) {
+export default function TierContainerDroppable({children, id, label, color, disabled}: {children: React.ReactNode, id: string, label: string, color: string, disabled: boolean}) {
     const {ref, isDropTarget} = useDroppable({
-        id
+        id: id,
+        disabled: disabled
     });
 
     return (

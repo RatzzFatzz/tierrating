@@ -22,8 +22,9 @@ export default function TierList({providerName}: {providerName: string}) {
     const [tiersById, setTiersById] = useState<Map<string, Tier>>(new Map());
     const [tiersByName, setTiersByName] = useState<Map<string, Tier>>(new Map());
 
-    const {token, isLoading, isAuthenticated, logout} = useAuth();
+    const {user, token, isLoading, isAuthenticated, logout} = useAuth();
     const username: string = useParams<{username: string}>().username;
+    const dndDisabled: boolean = user != username;
 
     const [tiersQueryRunning, setTiersQueryRunning] = useState(true);
     const [entriesQueryRunning, setEntriesQueryRunning] = useState(true);
@@ -130,9 +131,9 @@ export default function TierList({providerName}: {providerName: string}) {
                 .map(tierId => tiersById.get(tierId))
                 .map(tier => (
                     tier &&
-                    <TierContainerDroppable key={tier.id} id={tier.id} label={tier.name} color={tier.color}>
+                    <TierContainerDroppable key={tier.id} id={tier.id} label={tier.name} color={tier.color} disabled={dndDisabled}>
                         {Array.from(entriesByTierId.get(tier.id)!).map(entry => (
-                            <TierlistEntryDraggable key={entry.id} entry={entry}/>
+                            <TierlistEntryDraggable key={entry.id} entry={entry} disabled={dndDisabled}/>
                         ))}
                     </TierContainerDroppable>
                 ))}

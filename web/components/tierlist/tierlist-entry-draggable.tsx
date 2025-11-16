@@ -4,10 +4,11 @@ import Image from "next/image";
 import {useDraggable} from "@dnd-kit/react";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 
-export function TierlistEntryDraggable({entry}: {entry: TierlistEntry}) {
+export function TierlistEntryDraggable({entry, disabled}: {entry: TierlistEntry, disabled: boolean}) {
     const {ref} = useDraggable({
         id: entry.id,
         data: entry,
+        disabled: disabled
     });
 
     return (
