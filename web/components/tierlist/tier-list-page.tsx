@@ -1,10 +1,12 @@
 import TierList from "@/components/tierlist/tier-list";
+import TmdbDisclaimer from "@/components/disclaimer/tmdb-disclaimer";
 
 export default function TierListPage({title, provider}: {title: string, provider: string}) {
     return (
         <div className="max-w-[1514px] w-full mx-auto content-center px-4">
             <h1 className="text-3xl font-bold mb-6">{title}</h1>
             <TierList providerName={provider}/>
+            {provider.startsWith("trakt") && <TmdbDisclaimer/>}
         </div>
     )
 }
