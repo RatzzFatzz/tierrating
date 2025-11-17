@@ -38,7 +38,7 @@ export function TierlistEntryCard({entry}: {entry: TierlistEntry}) {
             </div>
             <HoverCard>
                 <HoverCardTrigger asChild>
-                    <div className="text-xs line-clamp-2 h-11 w-full text-center p-1 text-foreground bg-card">
+                    <div className="text-xs line-clamp-2 h-11 w-full text-center p-1 text-foreground">
                         {entry.title}
                     </div>
                 </HoverCardTrigger>
