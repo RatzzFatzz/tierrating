@@ -74,7 +74,7 @@ export function getDefaultTiers(): Tier[] {
         },
         {
             id: crypto.randomUUID(),
-            name: "Unassigned",
+            name: "-",
             score: 0.0,
             adjustedScore: 0.0,
             color: "#E6E6FF"
