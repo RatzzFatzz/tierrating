@@ -11,19 +11,18 @@ export default function TierContainerDroppable({children, id, label, color, disa
     return (
         <div
             ref={ref}
-            // class={isDropTarget ? `ring[${color}` : ""}
             className={cn("grid grid-cols-[auto_1fr] mb-1",
                             "overflow-hidden border border-border/60 rounded-2xl bg-card/60 backdrop-blur-sm",
                             isDropTarget ? `ring-2 ring-accent` : "")}
             style={{ minHeight: "80px" }}
         >
             <div
-                className={"flex items-center justify-center w-16 self-stretch text-white font-bold text-xl"}
+                className={"flex items-center justify-center w-16 text-shadow-white font-bold text-xl line-clamp-1 truncate"}
                 style={{ backgroundColor: `${color}`}}
             >
                 {label}
             </div>
-            <div className={"flex-1 min-h-16 bg-background/50 p-2 flex flex-wrap gap-2 transition-colors"}>
+            <div className={"min-h-16 bg-background/50 p-2 flex flex-wrap gap-2"}>
                 {children}
             </div>
         </div>
