@@ -163,7 +163,7 @@ export default function TierConfigModal({initialTiers = [], service, type, onSav
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild className="p-0 cursor-pointer" onClick={handleOpenTrigger}>
-                <Button variant={"ghost"} className="w-full h-full">
+                <Button variant={"outline"}>
                     <Settings/>
                 </Button>
             </DialogTrigger>

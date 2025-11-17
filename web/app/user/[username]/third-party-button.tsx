@@ -8,6 +8,7 @@ import Link from "next/link";
 import {X} from "lucide-react";
 import {removeConnection} from "@/components/api/user-api";
 import {useRouter} from "next/navigation";
+import {ButtonGroup} from "@/components/ui/button-group";
 
 function getDecimals(service: string): string {
     if (service === "anilist") return "0.01";
@@ -51,43 +52,43 @@ export default function ThirdPartyButton({service, type, title, username, config
     }
 
     return (
-        <Button variant="outline" className="w-full flex items-center justify-between gap-2 pl-2 pr-2">
-            <Link href={`/user/${username}/${service}/${type}`} className="w-full flex items-center justify-between gap-2">
-                <div className="relative w-5 h-5 flex-shrink-0">
-                    <Image
-                        src={`/icons/${service}.svg`}
-                        alt={`${service} icon`}
-                        fill={true}
-                    />
-                </div>
-                <div className="flex-grow text-center">
-                    {title}
-                </div>
-            </Link>
+        <ButtonGroup className={"w-full flex"}>
+            <Button variant="outline" className={"grow"}>
+                <Link href={`/user/${username}/${service}/${type}`} className="w-full flex items-center">
+                    <div className="relative w-5 h-5 flex-shrink-0">
+                        <Image
+                            src={`/icons/${service}.svg`}
+                            alt={`${service} icon`}
+                            fill={true}
+                        />
+                    </div>
+                    <div className="flex-grow text-center">
+                        {title}
+                    </div>
+                </Link>
+            </Button>
+
             {configAllowed &&
-                <div className="relative w-5 h-5 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-                    <TierConfigModal
-                        service={service}
-                        type={type}
-                        onSave={(tiers: Tier[]) => saveTiers(type, tiers)}
-                        username={username}
-                        decimals={getDecimals(service)}
-                    />
-                </div>
+                <TierConfigModal
+                    service={service}
+                    type={type}
+                    onSave={(tiers: Tier[]) => saveTiers(type, tiers)}
+                    username={username}
+                    decimals={getDecimals(service)}
+                />
             }
+
             {configAllowed &&
-                <div className={"relative w-5 h-5 flex-shrink-0"}>
-                    <Button
-                        type={"submit"}
-                        variant={"ghost"}
-                        className={"w-full h-full"}
-                        onClick={removeService}
-                        disabled={isRemovingService}
-                    >
-                        <X></X>
-                    </Button>
-                </div>
+                <Button
+                    type={"submit"}
+                    variant={"outline"}
+                    // className={"w-full h-full"}
+                    onClick={removeService}
+                    disabled={isRemovingService}
+                >
+                    <X></X>
+                </Button>
             }
-        </Button>
+        </ButtonGroup>
     )
 }
