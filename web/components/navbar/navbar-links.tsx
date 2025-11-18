@@ -12,16 +12,16 @@ export default function NavbarLinks() {
 
     return (
         <div className="flex items-center space-x-1 ml-6">
-            <Button
-                variant="ghost"
-                asChild
-                className={cn(
-                    "px-3 text-sm font-medium",
-                    pathname === "/dashboard" ? "text-foreground" : "text-muted-foreground"
-                )}
-            >
-                <Link href="/dashboard">Home</Link>
-            </Button>
+            {/*<Button*/}
+            {/*    variant="ghost"*/}
+            {/*    asChild*/}
+            {/*    className={cn(*/}
+            {/*        "px-3 text-sm font-medium",*/}
+            {/*        pathname === "/dashboard" ? "text-foreground" : "text-muted-foreground"*/}
+            {/*    )}*/}
+            {/*>*/}
+            {/*    <Link href="/dashboard">Home</Link>*/}
+            {/*</Button>*/}
 
             <Button
                 variant="ghost"

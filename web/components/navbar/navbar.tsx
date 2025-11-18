@@ -16,7 +16,7 @@ export default function NavBar() {
                     "bg-card/60 backdrop-blur-sm border border-border/100 shadow-lg",
                     "pointer-events-auto"
                 )}>
-                    <Link href="/dashboard" className="inline-flex items-center gap-2 font-semibold">
+                    <Link href="/user" className="inline-flex items-center gap-2 font-semibold">
                         <div className="flex items-center gap-1.5">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
