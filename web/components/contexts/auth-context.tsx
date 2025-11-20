@@ -51,8 +51,8 @@ export function AuthProvider({children}: { children: ReactNode }) {
             setExpiration(decodedJwt.expiration)
             setIsAuthenticated(true)
 
-            if (isAuthenticated && !isExpired && expiration && expiration.getTime() < (new Date().getTime() + (5 * 60 * 1000))) {
-                refreshToken(token)
+            if (!decodedJwt.isExpired && decodedJwt.expiration && decodedJwt.expiration.getTime() - new Date().getTime() - (15 * 60 * 1000) <= 0) {
+                refreshToken(storedToken)
                     .then(response => {
                         if (response.status === 401) throw new Error("Invalid credentials");
                         if (response.error) throw new Error(response.error);
