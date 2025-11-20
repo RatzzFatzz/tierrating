@@ -14,16 +14,16 @@ export default function ThirdPartyLoginButton({index, title, path, color, servic
         <Link key={index} href={path} className="block w-full">
             <Button
                 variant="outline"
-                className={`cursor-pointer w-full justify-center rounded-full`}
+                className={`cursor-pointer w-full rounded-full`}
             >
-                <div className="relative w-5 h-5 flex-shrink-0">
+                <div className="relative w-5 h-5 mr-auto">
                     <Image
                         src={`/icons/${service}.svg`}
                         alt={`${service} icon`}
                         fill={true}
                     />
                 </div>
-                <div className="flex-grow text-center">
+                <div className="text-center absolute">
                     {title}
                 </div>
             </Button>

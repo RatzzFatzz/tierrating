@@ -79,7 +79,7 @@ export default function Profile() {
                     </CardHeader>
 
                     <CardContent className="space-y-4">
-                        <div className="grid columns-1 gap-4">
+                        <div className="grid columns-1 gap-4 pb-4">
                             {isConfigAllowed && configuredServices.find(service => service == "anilist") && !userResponse.anilistConnected
                                 && <ThirdPartyLoginButton index={0} title={"Connect AniList"} path={"/auth/anilist"} color={"bg-blue-600 hover:bg-blue-700"} service="anilist"/>}
                             {isConfigAllowed && configuredServices.find(service => service == "trakt") && !userResponse.traktConnected
