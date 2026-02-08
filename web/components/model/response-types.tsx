@@ -4,6 +4,10 @@ export interface ServerResponse<T> {
     data?: T;
 }
 
+export interface GenericErrorResponse {
+    message: string;
+}
+
 export interface LoginResponse {
     token: string;
 }
@@ -14,11 +18,6 @@ export interface SignupResponse {
     signupSuccess: boolean;
 }
 
-export interface GenericResponse {
-    success: boolean;
-    message: string;
-}
-
 export interface UserResponse {
     id: number;
     username: string;
@@ -26,11 +25,6 @@ export interface UserResponse {
 
     anilistConnected: boolean;
     traktConnected: boolean;
-}
-
-export interface UpdateScoreResponse {
-    error: boolean;
-    message: string;
 }
 
 export interface ThirdPartyAuthResponse {

@@ -1,7 +1,6 @@
 import {TierlistEntry, Tier} from "@/components/model/types";
 import {AnilistAnimeProvider} from "@/components/data-providers/anilist/anilist-anime-data-provider";
 import {AnilistMangaProvider} from "@/components/data-providers/anilist/anilist-manga-data-provider";
-import {UpdateScoreResponse} from "@/components/model/response-types";
 import {TraktMoviesDataProvider} from "@/components/data-providers/trakt/trakt-movies-data-provider";
 import {TraktTvShowsDataProvider} from "@/components/data-providers/trakt/trakt-tv-shows-data-provider";
 import {TraktTvShowsSeasonsDataProvider} from "@/components/data-providers/trakt/trakt-tvshows-seasons-data-provider";
@@ -11,7 +10,7 @@ export interface DataProvider {
     getTypeName: () => string;
     fetchData: (token: string | null, username: string, logout: () => void) => Promise<TierlistEntry[]>
     fetchTierlist: (token: string | null, username: string, logout: () => void) => Promise<Tier[]>
-    updateData: (id: string, rating: number, token: string | null, username: string, logout: () => void) => Promise<UpdateScoreResponse>
+    updateData: (id: string, rating: number, token: string | null, username: string, logout: () => void) => Promise<void>
 }
 
 const providers: Record<string, DataProvider> = {

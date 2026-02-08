@@ -1,7 +1,7 @@
 "use server"
 
 import {API_URL} from "@/components/global-config";
-import {ServerResponse, UpdateScoreResponse} from "@/components/model/response-types";
+import {GenericErrorResponse, ServerResponse} from "@/components/model/response-types";
 import {TierlistEntry} from "@/components/model/types";
 
 export const fetchData = async (token: string | null, username: string, service: string, type: string): Promise<ServerResponse<TierlistEntry[]>> => {
@@ -24,7 +24,7 @@ export const fetchData = async (token: string | null, username: string, service:
     }
 }
 
-export async function updateData(id: string, score: number, service: string, type: string, token: string | null, username: string): Promise<ServerResponse<UpdateScoreResponse>> {
+export async function updateData(id: string, score: number, service: string, type: string, token: string | null, username: string): Promise<ServerResponse<GenericErrorResponse>> {
     if (!token) throw new Error("No authentication token");
 
     try {

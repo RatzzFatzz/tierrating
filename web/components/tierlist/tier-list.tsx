@@ -86,8 +86,7 @@ export default function TierList({providerName}: {providerName: string}) {
         // As soon as a second action is triggered, it is blocked again, until the first one has completed
         setTimeout(() => {
             provider.updateData(entryToChange.id, targetTier.adjustedScore, token, username, logout)
-                .then(updateResponse => {
-                    if (updateResponse.error) throw new Error(updateResponse.message);
+                .then(() => {
                     console.debug("Committed changes to third-party service")
                 })
                 .catch(error => {

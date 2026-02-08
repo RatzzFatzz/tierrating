@@ -1,7 +1,7 @@
 "use server"
 import {API_URL} from "@/components/global-config";
 import {
-    GenericResponse,
+    GenericErrorResponse,
     LoginResponse,
     ServerResponse,
     SignupResponse,
@@ -14,6 +14,7 @@ export async function requestLogin(username: string, password: string): Promise<
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
             body: JSON.stringify({username, password}),
         });
@@ -65,7 +66,7 @@ export async function refreshToken(token: string | null): Promise<ServerResponse
     }
 }
 
-export async function changePassword(oldPassword: string, newPassword: string, username: string | null, token: string | null): Promise<ServerResponse<GenericResponse>> {
+export async function changePassword(oldPassword: string, newPassword: string, username: string | null, token: string | null): Promise<ServerResponse<GenericErrorResponse>> {
     if (!username || !token) throw new Error("Invalid user or authentication token");
 
     try {
@@ -86,7 +87,7 @@ export async function changePassword(oldPassword: string, newPassword: string, u
     }
 }
 
-export async function deleteAccount(username: string | null, token: string | null): Promise<ServerResponse<GenericResponse>> {
+export async function deleteAccount(username: string | null, token: string | null): Promise<ServerResponse<GenericErrorResponse>> {
     if (!username || !token) throw new Error("Invalid user or authentication token");
 
     try {
@@ -107,7 +108,7 @@ export async function deleteAccount(username: string | null, token: string | nul
     }
 }
 
-export async function removeConnection(service: string, username: string | null, token: string | null): Promise<ServerResponse<GenericResponse>> {
+export async function removeConnection(service: string, username: string | null, token: string | null): Promise<ServerResponse<GenericErrorResponse>> {
     if (!username || !token) throw new Error("Invalid user or authentication token");
 
     try {
