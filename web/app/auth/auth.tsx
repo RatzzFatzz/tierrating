@@ -20,8 +20,7 @@ export function Auth({service, authUrl}: {service: string, authUrl: string}) {
             authorize(service, user, token, code)
                 .then(response => {
                     if (response.error) throw new Error(response.error);
-                    if (!response.data) throw new Error("Faulty response")
-                    if (response.data.message) {
+                    if (response.data) {
                         return Promise.reject(response.data.message)
                     }
                 })
