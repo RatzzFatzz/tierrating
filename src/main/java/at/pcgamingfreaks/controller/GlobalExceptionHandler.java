@@ -39,6 +39,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ThirdPartyAuthenticationException.class)
     public ResponseEntity<ErrorResponseDTO> handleThirdPartyAuthenticationException(ThirdPartyAuthenticationException ex) {
-        return ResponseEntity.internalServerError().body(new ErrorResponseDTO(""));
+        log.warn(ex.getMessage(), ex);
+        return ResponseEntity.internalServerError().body(new ErrorResponseDTO(ex.getMessage()));
     }
 }
