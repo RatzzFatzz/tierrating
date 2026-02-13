@@ -167,7 +167,7 @@ export default function TierConfigModal({initialTiers = [], service, type, onSav
                     <Settings/>
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[650px] max-h-[80vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[650px] max-h-[80vh]">
                 <DialogHeader>
                     <DialogTitle>Configure tier list</DialogTitle>
                     <DialogDescription>
@@ -181,115 +181,114 @@ export default function TierConfigModal({initialTiers = [], service, type, onSav
                     </p>
                 </DialogHeader>
                 <div className="space-y-6 py-4">
-                    <div className="grid grid-cols-[60px_1fr_100px_120px_40px] gap-4 items-center font-medium text-sm">
-                        <div>Color</div>
-                        <div>Tier Name</div>
-                        <div>Score</div>
-                        <div>Adjusted Score</div>
-                        <div></div>
+                    <div className="">
+                        <div className="grid grid-cols-[60px_minmax(120px,_1fr)_100px_120px_40px] gap-4 items-center font-medium text-sm pb-2 overflow-x-visible">
+                            <div>Color</div>
+                            <div>Tier Name</div>
+                            <div>Score</div>
+                            <div>Adjusted Score</div>
+                            <div></div>
+                        </div>
+                        <div className="max-h-[41vh] pr-1 overflow-y-auto overflow-x-hidden">
+                            {queryRunning ? (
+                                <TierConfigTableSkeleton/>
+                            ) : (
+                                tiers && tiers.map((tier) => (
+                                    <div
+                                        key={tier.id}
+                                        className="grid grid-cols-[60px_minmax(120px,_1fr)_100px_120px_40px] gap-4 h-10 items-center"
+                                    >
+                                        <div>
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        className="h-9 w-full p-1 flex justify-between items-center"
+                                                    >
+                                                        <div
+                                                            className="h-6 w-6 rounded-sm"
+                                                            style={{backgroundColor: tier.color}}
+                                                        />
+                                                        <Palette className="h-4 w-4"/>
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-auto p-3" align="start">
+                                                    <div className="space-y-3">
+                                                        <HexColorPicker
+                                                            color={tier.color}
+                                                            onChange={(color) => updateTier(tier.id, "color", color)}
+                                                        />
+                                                        <Input
+                                                            value={tier.color}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value;
+                                                                if (value.startsWith('#') || value === '') {
+                                                                    updateTier(tier.id, "color", value);
+                                                                }
+                                                            }}
+                                                            onBlur={(e) => {
+                                                                if (!isValidHex(e.target.value)) {
+                                                                    updateTier(tier.id, "color", tier.color || "#000000");
+                                                                }
+                                                            }}
+                                                            className="h-8 mt-2"
+                                                            placeholder="#RRGGBB"
+                                                        />
+                                                    </div>
+                                                </PopoverContent>
+                                            </Popover>
+                                        </div>
+                                        <div>
+                                            <Input
+                                                value={tier.name}
+                                                onChange={(e) => updateTier(tier.id, "name", e.target.value)}
+                                                placeholder="Tier name"
+                                            />
+                                        </div>
+                                        <div>
+                                            <Input
+                                                type="number"
+                                                value={tier.score}
+                                                onChange={(e) =>
+                                                    updateTier(
+                                                        tier.id,
+                                                        "score",
+                                                        formatNumberInput(e.target.value)
+                                                    )
+                                                }
+                                                step={decimals}
+                                                max="10"
+                                                min="0"
+                                                placeholder="Score"
+                                            />
+                                        </div>
+                                        <div>
+                                            <Input
+                                                type="number"
+                                                value={tier.adjustedScore}
+                                                onChange={(e) =>
+                                                    updateTier(tier.id, "adjustedScore", formatNumberInput(e.target.value))
+                                                }
+                                                step={decimals}
+                                                max="10"
+                                                min="0"
+                                                placeholder="Adjusted Score"
+                                            />
+                                        </div>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => removeTier(tier.id)}
+                                            disabled={tiers.length <= 1}
+                                            className="w-9 hover:bg-red-100 dark:hover:bg-red-800/30 transition-colors"
+                                        >
+                                            <X className="h-4 w-4"/>
+                                        </Button>
+                                    </div>
+                                ))
+                            )}
+                        </div>
                     </div>
-
-                    {queryRunning ? (
-                        <TierConfigTableSkeleton/>
-                    ) : (
-                        tiers && tiers.map((tier) => (
-                            <div
-                                key={tier.id}
-                                className="grid grid-cols-[60px_1fr_100px_120px_40px] gap-4 items-center"
-                            >
-                                <div>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                className="h-9 w-full p-1 flex justify-between items-center"
-                                            >
-                                                <div
-                                                    className="h-6 w-6 rounded-sm"
-                                                    style={{backgroundColor: tier.color}}
-                                                />
-                                                <Palette className="h-4 w-4"/>
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-3" align="start">
-                                            <div className="space-y-3">
-                                                <HexColorPicker
-                                                    color={tier.color}
-                                                    onChange={(color) => updateTier(tier.id, "color", color)}
-                                                />
-                                                <Input
-                                                    value={tier.color}
-                                                    onChange={(e) => {
-                                                        const value = e.target.value;
-                                                        if (value.startsWith('#') || value === '') {
-                                                            updateTier(tier.id, "color", value);
-                                                        }
-                                                    }}
-                                                    onBlur={(e) => {
-                                                        if (!isValidHex(e.target.value)) {
-                                                            updateTier(tier.id, "color", tier.color || "#000000");
-                                                        }
-                                                    }}
-                                                    className="h-8 mt-2"
-                                                    placeholder="#RRGGBB"
-                                                />
-                                            </div>
-                                        </PopoverContent>
-                                    </Popover>
-                                </div>
-                                <div>
-                                    <Input
-                                        value={tier.name}
-                                        onChange={(e) => updateTier(tier.id, "name", e.target.value)}
-                                        placeholder="Tier name"
-                                        className="h-9"
-                                    />
-                                </div>
-                                <div>
-                                    <Input
-                                        type="number"
-                                        value={tier.score}
-                                        onChange={(e) =>
-                                            updateTier(
-                                                tier.id,
-                                                "score",
-                                                formatNumberInput(e.target.value)
-                                            )
-                                        }
-                                        step={decimals}
-                                        max="10"
-                                        min="0"
-                                        placeholder="Score"
-                                        className="h-9"
-                                    />
-                                </div>
-                                <div>
-                                    <Input
-                                        type="number"
-                                        value={tier.adjustedScore}
-                                        onChange={(e) =>
-                                            updateTier(tier.id, "adjustedScore", formatNumberInput(e.target.value))
-                                        }
-                                        step={decimals}
-                                        max="10"
-                                        min="0"
-                                        placeholder="Adjusted Score"
-                                        className="h-9"
-                                    />
-                                </div>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => removeTier(tier.id)}
-                                    disabled={tiers.length <= 1}
-                                    className="h-9 w-9 hover:bg-red-100 dark:hover:bg-red-800/30 transition-colors"
-                                >
-                                    <X className="h-4 w-4"/>
-                                </Button>
-                            </div>
-                        ))
-                    )}
-
                     <Button
                         variant="outline"
                         className="w-full flex items-center gap-2 h-9"
