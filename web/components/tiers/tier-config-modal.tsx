@@ -167,13 +167,12 @@ export default function TierConfigModal({initialTiers = [], service, type, onSav
                     <Settings/>
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[650px] max-h-[80vh]">
+            <DialogContent className="sm:max-w-[650px] max-h-[90vh]">
                 <DialogHeader>
                     <DialogTitle>Configure tier list</DialogTitle>
                     <DialogDescription>
                         Configure which <i>score</i> should be assigned to which tier.
                         When dropping an item into a new tier their score will be set to <i>adjusted score</i>.
-                        These changes will be sent back to the corresponding service provider.
                     </DialogDescription>
                     <p className="mt-1 font-medium text-sm flex items-center">
                         <ArrowUpDown className="h-3 w-3 mr-1"/>
@@ -181,15 +180,16 @@ export default function TierConfigModal({initialTiers = [], service, type, onSav
                     </p>
                 </DialogHeader>
                 <div className="space-y-6 py-4">
-                    <div className="">
-                        <div className="grid grid-cols-[60px_minmax(120px,_1fr)_100px_120px_40px] gap-4 items-center font-medium text-sm pb-2 overflow-x-visible">
-                            <div>Color</div>
-                            <div>Tier Name</div>
-                            <div>Score</div>
-                            <div>Adjusted Score</div>
-                            <div></div>
-                        </div>
-                        <div className="max-h-[41vh] pr-1 overflow-y-auto overflow-x-hidden">
+                    <div className="sm:max-w-fit max-w-[calc(100vw-5rem)] overflow-x-auto">
+                        <div className="min-w-fit">
+                            <div className="grid grid-cols-[60px_minmax(120px,_1fr)_100px_120px_40px] gap-4 items-center font-medium text-sm pb-2">
+                                <div>Color</div>
+                                <div>Tier Name</div>
+                                <div>Score</div>
+                                <div>Adjusted Score</div>
+                                <div></div>
+                            </div>
+                            <div className="max-h-[41vh] pr-1 overflow-y-auto">
                             {queryRunning ? (
                                 <TierConfigTableSkeleton/>
                             ) : (
@@ -287,6 +287,7 @@ export default function TierConfigModal({initialTiers = [], service, type, onSav
                                     </div>
                                 ))
                             )}
+                        </div>
                         </div>
                     </div>
                     <Button
