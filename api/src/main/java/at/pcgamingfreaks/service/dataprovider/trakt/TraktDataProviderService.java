@@ -33,14 +33,12 @@ public abstract class TraktDataProviderService implements DataProviderService {
     }
 
     @Override
-    public List<ListEntryDTO> fetchData(String username, ContentType type) {
+    public List<ListEntryDTO> fetchData(String username) {
         if (!thirdPartyConfig.getTrakt().isValid()) throw new RuntimeException("Trakt config is invalid");
         long duration = System.currentTimeMillis();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
         try {
-            return fetch(user)
-                    .sorted(Comparator.comparing(ListEntryDTO::getScore).reversed())
-                    .toList();
+            return fetch(user).toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {

@@ -9,5 +9,5 @@ import java.util.List;
 public interface DataProviderService {
     ThirdPartyService getService();
     ContentType getContentType();
-    List<ListEntryDTO> fetchData(String username, ContentType type);
+    List<ListEntryDTO> fetchData(String username);
 }
