@@ -9,6 +9,7 @@ import at.pcgamingfreaks.model.dto.ThirdPartyAuthRequestDTO;
 import at.pcgamingfreaks.model.dto.ThirdPartyInfoResponseDTO;
 import at.pcgamingfreaks.model.exceptions.ThirdPartyAuthenticationException;
 import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
+import at.pcgamingfreaks.model.repo.ThirdPartyConnectionRepository;
 import at.pcgamingfreaks.model.repo.UserRepository;
 import at.pcgamingfreaks.model.util.JwtPayload;
 import at.pcgamingfreaks.service.AnilistAuthService;
@@ -32,6 +33,7 @@ import java.util.Base64;
 @RequiredArgsConstructor
 public class AniListController implements ThirdPartyController {
     private final UserRepository userRepository;
+    private final ThirdPartyConnectionRepository thirdPartyConnectionRepository;
     private final ObjectMapper objectMapper;
     private final ThirdPartyConfig thirdPartyConfig;
     private final AnilistAuthService anilistAuthService;
@@ -60,8 +62,8 @@ public class AniListController implements ThirdPartyController {
             connection.setRefreshToken(tokenResponse.getRefreshToken());
             connection.setExpiresOn(LocalDateTime.now().plusSeconds(tokenResponse.getExpiresIn()));
             connection.setThirdPartyUserId(String.valueOf(extractUserIdFrom(connection.getAccessToken())));
-            user.getConnections().put(ThirdPartyService.ANILIST, connection);
-            userRepository.save(user);
+            connection.setUser(user);
+            thirdPartyConnectionRepository.save(connection);
         } catch (Exception e) {
             throw new ThirdPartyAuthenticationException(e);
         }

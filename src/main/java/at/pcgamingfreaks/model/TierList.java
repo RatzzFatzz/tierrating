@@ -12,7 +12,7 @@ import java.util.UUID;
 @Setter
 @Entity(name = "tierlists")
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "user.id", "service", "type"})
+        @UniqueConstraint(columnNames = { "user_id", "service", "type"})
 })
 public class TierList {
     @Id
