@@ -16,10 +16,6 @@ import java.util.UUID;
 @Entity(name = "tiers")
 public class Tier {
 
-    public Tier(String color, String name, double score, double adjustedScore) {
-        this(null, color, name, score, adjustedScore);
-    }
-
     public Tier(UUID id, String color, String name, double score, double adjustedScore) {
         this.id = id;
         this.color = color;

@@ -7,8 +7,9 @@ import at.pcgamingfreaks.model.auth.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
+import java.util.UUID;
 
-public interface TierListsRepository extends JpaRepository<TierList, Long> {
+public interface TierListsRepository extends JpaRepository<TierList, UUID> {
 
     Optional<TierList> findByUserAndServiceAndType(User user, ThirdPartyService service, ContentType type);
 }

@@ -48,7 +48,7 @@ public class AniListController implements ThirdPartyController {
         if (!thirdPartyConfig.getAnilist().isValid()) throw new ThirdPartyUnconfiguredException(ThirdPartyService.ANILIST);
 
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
-        if (user.getAnilistConnection() != null) throw new ThirdPartyAuthenticationException("Already authenticated");
+        if (user.getConnections().get(ThirdPartyService.ANILIST) != null) throw new ThirdPartyAuthenticationException("Already authenticated");
 
         try {
 
@@ -59,8 +59,8 @@ public class AniListController implements ThirdPartyController {
             connection.setAccessToken(tokenResponse.getAccessToken());
             connection.setRefreshToken(tokenResponse.getRefreshToken());
             connection.setExpiresOn(LocalDateTime.now().plusSeconds(tokenResponse.getExpiresIn()));
-            connection.setThirdpartyUserId(String.valueOf(extractUserIdFrom(connection.getAccessToken())));
-            user.setAnilistConnection(connection);
+            connection.setThirdPartyUserId(String.valueOf(extractUserIdFrom(connection.getAccessToken())));
+            user.getConnections().put(ThirdPartyService.ANILIST, connection);
             userRepository.save(user);
         } catch (Exception e) {
             throw new ThirdPartyAuthenticationException(e);

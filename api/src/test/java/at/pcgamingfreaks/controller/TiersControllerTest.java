@@ -104,7 +104,7 @@ class TiersControllerTest {
     public void setTierListExisting(List<Tier> immutableExistingTiers, List<TierDTO> changedTiers, List<Tier> expectedTiers, List<Tier> expectedRemovedTiers) {
         User user = new User();
         user.setUsername("test");
-        user.setAnilistConnection(new ThirdPartyConnection());
+        user.getConnections().put(ThirdPartyService.ANILIST, new ThirdPartyConnection());
         when(userRepository.findByUsername(any())).thenReturn(Optional.of(user));
 
         List<Tier> existingTiers = new ArrayList<>(immutableExistingTiers);

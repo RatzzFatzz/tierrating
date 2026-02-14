@@ -71,7 +71,7 @@ public abstract class AnilistDataProviderService implements DataProviderService 
         do {
             page = HttpGraphQlClient.create(WebClient.create(ANILIST_API_URL))
                     .document(query)
-                    .variable("userId", user.getAnilistConnection().getThirdpartyUserId())
+                    .variable("userId", user.getConnections().get(ThirdPartyService.ANILIST).getThirdPartyUserId())
                     .variable("type", type.name())
                     .variable("status", "COMPLETED")
                     .variable("page", currentPage++)

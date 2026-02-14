@@ -6,21 +6,25 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "user_id", "service"})
+        @UniqueConstraint(columnNames = { "third_party_user_id", "service"})
 })
 public class ThirdPartyConnection {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private User user;
 
     @Enumerated(EnumType.STRING)
     private ThirdPartyService service;
-    private String thirdpartyUserId;
+    private String thirdPartyUserId;
 
     private LocalDateTime expiresOn;
     @Column(length = 2047)

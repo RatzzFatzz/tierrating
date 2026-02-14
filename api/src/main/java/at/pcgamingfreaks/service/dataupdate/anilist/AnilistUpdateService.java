@@ -33,7 +33,7 @@ public abstract class AnilistUpdateService implements DataUpdateService {
     public void updateData(long id, double score, User user) {
         HttpGraphQlClient.create(WebClient.create(ANILIST_API_URL))
                 .mutate()
-                .header("Authorization", user.getAnilistConnection().getAccessToken())
+                .header("Authorization", user.getConnections().get(ThirdPartyService.ANILIST).getAccessToken())
                 .build()
                 .document(ANILIST_UPDATE_QUERY)
                 .variable("mediaId", id)

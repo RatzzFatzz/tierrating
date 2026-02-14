@@ -2,6 +2,7 @@ package at.pcgamingfreaks.service.dataupdate.trakt;
 
 import at.pcgamingfreaks.config.ThirdPartyConfig;
 import at.pcgamingfreaks.model.ContentType;
+import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.auth.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ public class TraktTvShowsSeasonsUpdateService extends TraktUpdateService{
         String body = "{\"seasons\":[{\"ids\":{\"trakt\":" + id + "},\"rating\":" + (int) score + "}]}";
         RestClient.builder()
                 .baseUrl("https://api.trakt.tv")
-                .defaultHeader("Authorization", user.getTraktConnection().getAccessToken())
+                .defaultHeader("Authorization", user.getConnections().get(ThirdPartyService.TRAKT).getAccessToken())
                 .build()
                 .post()
                 .uri("/sync/ratings")

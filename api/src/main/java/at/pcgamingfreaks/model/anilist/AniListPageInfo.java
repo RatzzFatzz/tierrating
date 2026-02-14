@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Page {
+public class AniListPageInfo {
     private boolean hasNextPage;
     private int currentPage;
     private int perPage;

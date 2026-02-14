@@ -3,11 +3,11 @@ package at.pcgamingfreaks.service.dataprovider.trakt;
 import at.pcgamingfreaks.config.ThirdPartyConfig;
 import at.pcgamingfreaks.mapper.ListEntryDtoMapper;
 import at.pcgamingfreaks.model.ContentType;
+import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.auth.User;
 import at.pcgamingfreaks.model.dto.ListEntryDTO;
 import at.pcgamingfreaks.model.repo.UserRepository;
 import com.uwetrottmann.trakt5.TraktV2;
-import com.uwetrottmann.trakt5.entities.BaseShow;
 import com.uwetrottmann.trakt5.entities.RatedSeason;
 import com.uwetrottmann.trakt5.entities.UserSlug;
 import com.uwetrottmann.trakt5.enums.Extended;
@@ -38,7 +38,7 @@ public class TraktTvShowSeasonsDataProvider extends TraktDataProviderService{
                 thirdPartyConfig.getTrakt().getRedirectUrl())
                 .users()
                 .ratingsSeasons(
-                        UserSlug.fromUsername(user.getTraktConnection().getThirdpartyUserId()),
+                        UserSlug.fromUsername(user.getConnections().get(ThirdPartyService.TRAKT).getThirdPartyUserId()),
                         RatingsFilter.ALL,
                         Extended.FULL)
                 .execute();
