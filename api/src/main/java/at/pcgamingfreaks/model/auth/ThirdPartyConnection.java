@@ -19,7 +19,7 @@ public class ThirdPartyConnection {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private User user;
 
     @Enumerated(EnumType.STRING)

@@ -8,6 +8,7 @@ import at.pcgamingfreaks.model.dto.ThirdPartyAuthRequestDTO;
 import at.pcgamingfreaks.model.dto.ThirdPartyInfoResponseDTO;
 import at.pcgamingfreaks.model.exceptions.ThirdPartyAuthenticationException;
 import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
+import at.pcgamingfreaks.model.repo.ThirdPartyConnectionRepository;
 import at.pcgamingfreaks.model.repo.UserRepository;
 import com.uwetrottmann.trakt5.TraktV2;
 import com.uwetrottmann.trakt5.entities.AccessToken;
@@ -32,6 +33,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class TraktController implements ThirdPartyController {
     private final UserRepository userRepository;
+    private final ThirdPartyConnectionRepository thirdPartyConnectionRepository;
     private final ThirdPartyConfig thirdPartyConfig;
 
     @PostMapping("auth/{username}")
@@ -62,8 +64,8 @@ public class TraktController implements ThirdPartyController {
             connection.setRefreshToken(response.body().refresh_token);
             connection.setExpiresOn(LocalDateTime.now().plusSeconds(response.body().expires_in));
             connection.setThirdPartyUserId(traktUserInfo.body().ids.slug);
-            user.getConnections().put(ThirdPartyService.TRAKT, connection);
-            userRepository.save(user);
+            connection.setUser(user);
+            thirdPartyConnectionRepository.save(connection);
         } catch (IOException e) {
             throw new ThirdPartyAuthenticationException(e);
         }
