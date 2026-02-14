@@ -80,18 +80,18 @@ export default function Profile() {
 
                     <CardContent className="space-y-4">
                         <div className="grid columns-1 gap-4 pb-4">
-                            {isConfigAllowed && configuredServices.find(service => service == "anilist") && !userResponse.anilistConnected
+                            {isConfigAllowed && configuredServices.find(service => service == "anilist") && !userResponse.connectedServices.includes('ANILIST')
                                 && <ThirdPartyLoginButton index={0} title={"Connect AniList"} path={"/auth/anilist"} color={"bg-blue-600 hover:bg-blue-700"} service="anilist"/>}
-                            {isConfigAllowed && configuredServices.find(service => service == "trakt") && !userResponse.traktConnected
+                            {isConfigAllowed && configuredServices.find(service => service == "trakt") && !userResponse.connectedServices.includes('TRAKT')
                                 && <ThirdPartyLoginButton index={1} title={"Connect Trakt"} path={"/auth/trakt"} color={"bg-red-600 hover:bg-red-700"} service="trakt"/>}
                         </div>
 
                         <div className="grid columns-1 gap-4">
-                            {userResponse.anilistConnected && <ThirdPartyButton service={"anilist"} type={"anime"} title={"Anime"} username={userResponse.username} configAllowed={isConfigAllowed} token={token} logout={logout}/>}
-                            {userResponse.anilistConnected && <ThirdPartyButton service={"anilist"} type={"manga"} title={"Manga"} username={userResponse.username} configAllowed={isConfigAllowed} token={token} logout={logout}/>}
-                            {userResponse.traktConnected && <ThirdPartyButton service={"trakt"} type={"movies"} title={"Movies"} username={userResponse.username} configAllowed={isConfigAllowed} token={token} logout={logout}/>}
-                            {userResponse.traktConnected && <ThirdPartyButton service={"trakt"} type={"tvshows"} title={"TV Shows"} username={userResponse.username} configAllowed={isConfigAllowed} token={token} logout={logout}/>}
-                            {userResponse.traktConnected && <ThirdPartyButton service={"trakt"} type={"tvshows-seasons"} title={"TV Shows - Seasons"} username={userResponse.username} configAllowed={isConfigAllowed} token={token} logout={logout}/>}
+                            {userResponse.connectedServices.includes('ANILIST') && <ThirdPartyButton service={"anilist"} type={"anime"} title={"Anime"} username={userResponse.username} configAllowed={isConfigAllowed} token={token} logout={logout}/>}
+                            {userResponse.connectedServices.includes('ANILIST') && <ThirdPartyButton service={"anilist"} type={"manga"} title={"Manga"} username={userResponse.username} configAllowed={isConfigAllowed} token={token} logout={logout}/>}
+                            {userResponse.connectedServices.includes('TRAKT') && <ThirdPartyButton service={"trakt"} type={"movies"} title={"Movies"} username={userResponse.username} configAllowed={isConfigAllowed} token={token} logout={logout}/>}
+                            {userResponse.connectedServices.includes('TRAKT') && <ThirdPartyButton service={"trakt"} type={"tvshows"} title={"TV Shows"} username={userResponse.username} configAllowed={isConfigAllowed} token={token} logout={logout}/>}
+                            {userResponse.connectedServices.includes('TRAKT') && <ThirdPartyButton service={"trakt"} type={"tvshows-seasons"} title={"TV Shows - Seasons"} username={userResponse.username} configAllowed={isConfigAllowed} token={token} logout={logout}/>}
                         </div>
                     </CardContent>
                 </Card>

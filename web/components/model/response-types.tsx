@@ -22,9 +22,7 @@ export interface UserResponse {
     id: number;
     username: string;
     bio: string;
-
-    anilistConnected: boolean;
-    traktConnected: boolean;
+    connectedServices: string[];
 }
 
 export interface ThirdPartyAuthResponse {
