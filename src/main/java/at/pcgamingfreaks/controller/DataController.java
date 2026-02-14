@@ -17,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 import static at.pcgamingfreaks.model.ThirdPartyService.hasUserConnection;
@@ -42,7 +43,11 @@ public class DataController {
                                                         @PathVariable ContentType type) {
         DataProviderService dataProviderService = dataProviderFactory.getProvider(service, type);
         if (dataProviderService == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(dataProviderService.fetchData(username, type));
+        return ResponseEntity.ok(
+                dataProviderService.fetchData(username).stream()
+                        .sorted(Comparator.comparing(ListEntryDTO::getScore).reversed())
+                        .toList()
+        );
     }
 
     /**

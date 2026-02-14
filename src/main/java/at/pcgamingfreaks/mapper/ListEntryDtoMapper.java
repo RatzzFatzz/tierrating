@@ -1,8 +1,9 @@
 package at.pcgamingfreaks.mapper;
 
-import at.pcgamingfreaks.model.anilist.AniListListEntry;
-import at.pcgamingfreaks.model.anilist.AniListMediaCoverImage;
-import at.pcgamingfreaks.model.anilist.AniListMediaTitle;
+import at.pcgamingfreaks.model.thirdparty.anilist.AniListEntryScore;
+import at.pcgamingfreaks.model.thirdparty.anilist.external.AniListListEntry;
+import at.pcgamingfreaks.model.thirdparty.anilist.external.AniListMediaCoverImage;
+import at.pcgamingfreaks.model.thirdparty.anilist.external.AniListMediaTitle;
 import at.pcgamingfreaks.model.dto.ListEntryDTO;
 import at.pcgamingfreaks.service.TmdbCoverFinder;
 import com.uwetrottmann.trakt5.entities.*;
@@ -15,17 +16,12 @@ import org.springframework.stereotype.Service;
 public class ListEntryDtoMapper {
     private final TmdbCoverFinder tmdbCoverFinder;
 
-    public ListEntryDTO map(AniListListEntry entry) {
+    public ListEntryDTO map(AniListEntryScore entryScore) {
         ListEntryDTO dto = new ListEntryDTO();
-        dto.setId(entry.getMedia().getId());
-
-        AniListMediaTitle title = entry.getMedia().getTitle();
-        dto.setTitle(Strings.isNotBlank(title.getEnglish()) ? title.getEnglish() : title.getRomaji());
-
-        AniListMediaCoverImage cover = entry.getMedia().getCoverImage();
-        dto.setCover(Strings.isNotBlank(cover.getLarge()) ? cover.getLarge() : cover.getExtraLarge());
-
-        dto.setScore(entry.getScore());
+        dto.setId(entryScore.getEntry().getId());
+        dto.setScore(entryScore.getScore());
+        dto.setTitle(Strings.isNotBlank(entryScore.getEntry().getTitle()) ? entryScore.getEntry().getTitle() : entryScore.getEntry().getTitleRomaji());
+        dto.setCover(entryScore.getEntry().getCover());
         return dto;
     }
 

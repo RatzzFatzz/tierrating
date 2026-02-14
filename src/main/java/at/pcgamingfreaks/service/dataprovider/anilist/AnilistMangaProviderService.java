@@ -3,14 +3,15 @@ package at.pcgamingfreaks.service.dataprovider.anilist;
 
 import at.pcgamingfreaks.mapper.ListEntryDtoMapper;
 import at.pcgamingfreaks.model.ContentType;
+import at.pcgamingfreaks.model.repo.AniListEntryScoreRepository;
 import at.pcgamingfreaks.model.repo.UserRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AnilistMangaProviderService extends AnilistDataProviderService{
 
-    public AnilistMangaProviderService(UserRepository userRepository, ListEntryDtoMapper listEntryDtoMapper) {
-        super(userRepository, listEntryDtoMapper);
+    public AnilistMangaProviderService(UserRepository userRepository, AniListEntryScoreRepository aniListEntryScoreRepository, ListEntryDtoMapper listEntryDtoMapper) {
+        super(userRepository, aniListEntryScoreRepository, listEntryDtoMapper);
     }
 
     @Override
