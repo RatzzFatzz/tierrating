@@ -10,8 +10,7 @@ public class UserDtoMapper {
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setBio(user.getBio() == null ? "" : user.getBio());
-        dto.setAnilistConnected(user.getAnilistConnection() != null);
-        dto.setTraktConnected(user.getTraktConnection() != null);
+        dto.setConnectedServices(user.getConnections().keySet());
         return dto;
     }
 }

@@ -1,5 +1,6 @@
 package at.pcgamingfreaks.model.auth;
 
+import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.TierList;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,6 +13,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -19,8 +22,8 @@ import java.util.List;
 @Table(name = "users")
 public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(unique = true, nullable = false)
     private String username;
@@ -41,13 +44,11 @@ public class User implements UserDetails {
 
     private String bio;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private ThirdPartyConnection anilistConnection;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "user")
+    @MapKey(name = "service")
+    private Map<ThirdPartyService, ThirdPartyConnection> connections;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private  ThirdPartyConnection traktConnection;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
     private List<TierList> tierlists;
 
     @Override

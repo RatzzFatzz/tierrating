@@ -8,6 +8,6 @@ import java.util.List;
 @Getter
 @Setter
 public class AniListPage {
-    private Page pageInfo;
+    private AniListPageInfo pageInfo;
     private List<AniListListEntry> mediaList;
 }

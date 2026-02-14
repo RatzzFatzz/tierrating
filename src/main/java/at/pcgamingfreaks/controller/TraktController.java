@@ -46,7 +46,7 @@ public class TraktController implements ThirdPartyController {
         if (!thirdPartyConfig.getTrakt().isValid()) throw new ThirdPartyUnconfiguredException(ThirdPartyService.TRAKT);
 
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
-        if (user.getTraktConnection() != null) throw new ThirdPartyAuthenticationException("Already authenticated");
+        if (user.getConnections().get(ThirdPartyService.TRAKT) != null) throw new ThirdPartyAuthenticationException("Already authenticated");
 
         try {
             TraktV2 trakt = new TraktV2(thirdPartyConfig.getTrakt().getClient().getKey(), thirdPartyConfig.getTrakt().getClient().getSecret(), thirdPartyConfig.getTrakt().getRedirectUrl());
@@ -61,8 +61,8 @@ public class TraktController implements ThirdPartyController {
             connection.setAccessToken(response.body().access_token);
             connection.setRefreshToken(response.body().refresh_token);
             connection.setExpiresOn(LocalDateTime.now().plusSeconds(response.body().expires_in));
-            connection.setThirdpartyUserId(traktUserInfo.body().ids.slug);
-            user.setTraktConnection(connection);
+            connection.setThirdPartyUserId(traktUserInfo.body().ids.slug);
+            user.getConnections().put(ThirdPartyService.TRAKT, connection);
             userRepository.save(user);
         } catch (IOException e) {
             throw new ThirdPartyAuthenticationException(e);
