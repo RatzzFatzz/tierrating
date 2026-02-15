@@ -1,16 +1,15 @@
 package at.pcgamingfreaks.controller;
 
+import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.dto.*;
 import at.pcgamingfreaks.service.AuthService;
+import at.pcgamingfreaks.service.thirdparty.auth.ThirdPartyAuthenticatorFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthController {
     private final AuthService authService;
+    private final ThirdPartyAuthenticatorFactory thirdPartyAuthenticatorFactory;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
@@ -48,5 +48,18 @@ public class AuthController {
     public void deleteAccount(@RequestBody AccountDeletionRequestDTO request) {
         log.debug("Account deletion request from {}", request.getUsername());
         authService.deleteAccount(request);
+    }
+
+    @PostMapping("{service}/{username}")
+    @PreAuthorize("authentication.principal.username == #username")
+    @Validated
+    @CrossOrigin
+    public void authThirdPartyAccount(
+            @PathVariable ThirdPartyService service,
+            @PathVariable String username,
+            @RequestBody ThirdPartyAuthRequestDTO request
+    ) {
+        log.info("Auth request for {} from {}", service, username);
+        thirdPartyAuthenticatorFactory.getProvider(service).auth(username, request);
     }
 }

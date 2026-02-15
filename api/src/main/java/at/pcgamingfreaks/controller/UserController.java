@@ -6,7 +6,7 @@ import at.pcgamingfreaks.model.auth.User;
 import at.pcgamingfreaks.model.dto.ThirdPartyRemovalResponseDTO;
 import at.pcgamingfreaks.model.dto.UserDTO;
 import at.pcgamingfreaks.model.repo.UserRepository;
-import at.pcgamingfreaks.service.thirdpartyconnector.ThirdPartyConnectorFactory;
+import at.pcgamingfreaks.service.thirdparty.connector.ThirdPartyConnectorFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
