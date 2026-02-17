@@ -1,4 +1,4 @@
-package at.pcgamingfreaks.service.thirdparty.dataupdate.trakt;
+package at.pcgamingfreaks.service.thirdparty.data.update.trakt;
 
 import at.pcgamingfreaks.config.ThirdPartyConfig;
 import at.pcgamingfreaks.model.ContentType;

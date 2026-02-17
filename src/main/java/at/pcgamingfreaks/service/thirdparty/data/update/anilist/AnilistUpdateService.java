@@ -1,8 +1,8 @@
-package at.pcgamingfreaks.service.thirdparty.dataupdate.anilist;
+package at.pcgamingfreaks.service.thirdparty.data.update.anilist;
 
 import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.auth.User;
-import at.pcgamingfreaks.service.thirdparty.dataupdate.DataUpdateService;
+import at.pcgamingfreaks.service.thirdparty.data.update.DataUpdateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.client.HttpGraphQlClient;
 import org.springframework.stereotype.Service;

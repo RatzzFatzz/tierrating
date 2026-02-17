@@ -1,4 +1,4 @@
-package at.pcgamingfreaks.model.thirdparty.anilist;
+package at.pcgamingfreaks.model.thirdparty.trakt;
 
 import at.pcgamingfreaks.model.auth.User;
 import jakarta.persistence.*;
@@ -11,21 +11,21 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@Entity(name = "anilist_entry_scores")
+@Entity(name = "trakt_entry_scores")
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = { "user_id", "entry_id"})
 })
-public class AniListEntryScore {
+public class TraktEntryScore {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
-    private AniListEntry entry;
+    private TraktEntry entry;
 
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
     private User user;
 
-    private float score;
+    private int score;
 }

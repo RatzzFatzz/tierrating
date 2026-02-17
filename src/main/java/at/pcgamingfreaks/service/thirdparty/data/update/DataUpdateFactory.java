@@ -1,4 +1,4 @@
-package at.pcgamingfreaks.service.thirdparty.dataupdate;
+package at.pcgamingfreaks.service.thirdparty.data.update;
 
 import at.pcgamingfreaks.model.ContentType;
 import at.pcgamingfreaks.model.ThirdPartyService;

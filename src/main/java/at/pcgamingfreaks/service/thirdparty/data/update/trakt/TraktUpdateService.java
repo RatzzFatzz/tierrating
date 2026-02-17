@@ -1,7 +1,7 @@
-package at.pcgamingfreaks.service.thirdparty.dataupdate.trakt;
+package at.pcgamingfreaks.service.thirdparty.data.update.trakt;
 
 import at.pcgamingfreaks.model.ThirdPartyService;
-import at.pcgamingfreaks.service.thirdparty.dataupdate.DataUpdateService;
+import at.pcgamingfreaks.service.thirdparty.data.update.DataUpdateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

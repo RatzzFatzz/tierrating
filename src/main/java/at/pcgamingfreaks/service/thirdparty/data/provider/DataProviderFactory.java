@@ -1,4 +1,4 @@
-package at.pcgamingfreaks.service.thirdparty.dataprovider;
+package at.pcgamingfreaks.service.thirdparty.data.provider;
 
 import at.pcgamingfreaks.model.ContentType;
 import at.pcgamingfreaks.model.ThirdPartyService;
