@@ -1,4 +1,4 @@
-package at.pcgamingfreaks.model;
+package at.pcgamingfreaks.model.thirdparty;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;

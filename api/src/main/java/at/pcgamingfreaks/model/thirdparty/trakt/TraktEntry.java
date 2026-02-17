@@ -1,10 +1,8 @@
-package at.pcgamingfreaks.model.thirdparty.anilist;
+package at.pcgamingfreaks.model.thirdparty.trakt;
 
 import at.pcgamingfreaks.model.ContentType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+import jakarta.annotation.Nullable;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,16 +12,18 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "anilist_entries")
-public class AniListEntry {
+@Entity(name = "trakt_entries")
+public class TraktEntry {
+
     @Id
     private long id;
 
     @Enumerated(EnumType.STRING)
     private ContentType type;
 
-    private String title;
-    private String titleRomaji;
+    @Nullable
+    private Integer season;
 
+    private String title;
     private String cover;
 }

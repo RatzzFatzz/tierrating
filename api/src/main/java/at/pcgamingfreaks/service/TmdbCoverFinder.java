@@ -1,6 +1,6 @@
 package at.pcgamingfreaks.service;
 
-import at.pcgamingfreaks.model.TmdbCoverCache;
+import at.pcgamingfreaks.model.thirdparty.TmdbCoverCache;
 import at.pcgamingfreaks.model.dto.TmdbInfoRequest;
 import at.pcgamingfreaks.model.repo.TmdbCoverCacheRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class TmdbCoverFinder {
      * @return cover url
      */
     public String findMovie(long id) {
-        return find("/movie/%d", id, 0);
+        return find("/movie/%d", id, null);
     }
 
     /**
@@ -35,7 +35,7 @@ public class TmdbCoverFinder {
      * @return cover url
      */
     public String findShow(long id) {
-        return find("/tv/%d", id, 0);
+        return find("/tv/%d", id, null);
     }
 
     /**
@@ -58,8 +58,8 @@ public class TmdbCoverFinder {
      * @param season season number
      * @return cover url
      */
-    private String find(String urlExtension, long id, long season) {
-        TmdbCoverCache tmdbCoverCache = tmdbCoverCacheRepository.findByIdAndSeason(id, season > 0 ? season : null).orElse(null);
+    private String find(String urlExtension, long id, Long season) {
+        TmdbCoverCache tmdbCoverCache = tmdbCoverCacheRepository.findByIdAndSeason(id, season != null && season > 0 ? season : null).orElse(null);
         if (tmdbCoverCache != null) return tmdbCoverCache.getCoverUrl();
 
         try {
@@ -77,7 +77,7 @@ public class TmdbCoverFinder {
 
             tmdbCoverCache = new TmdbCoverCache();
             tmdbCoverCache.setId(id);
-            if (season > 0) tmdbCoverCache.setSeason(season);
+            if (season != null && season > 0) tmdbCoverCache.setSeason(season);
             tmdbCoverCache.setCoverUrl(TMDB_IMAGE_API_URL + response.getPosterPath());
             tmdbCoverCacheRepository.save(tmdbCoverCache);
             return tmdbCoverCache.getCoverUrl();

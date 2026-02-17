@@ -1,13 +1,11 @@
-package at.pcgamingfreaks.service.thirdparty.dataupdate.trakt;
+package at.pcgamingfreaks.service.thirdparty.data.update.trakt;
 
 import at.pcgamingfreaks.config.ThirdPartyConfig;
 import at.pcgamingfreaks.model.ContentType;
 import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.auth.User;
 import com.uwetrottmann.trakt5.TraktV2;
-import com.uwetrottmann.trakt5.entities.ShowIds;
-import com.uwetrottmann.trakt5.entities.SyncItems;
-import com.uwetrottmann.trakt5.entities.SyncShow;
+import com.uwetrottmann.trakt5.entities.*;
 import com.uwetrottmann.trakt5.enums.Rating;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,12 +16,12 @@ import java.io.IOException;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TraktTvShowsUpdateService extends TraktUpdateService {
+public class TraktMoviesUpdateService extends TraktUpdateService {
     private final ThirdPartyConfig thirdPartyConfig;
 
     @Override
     public ContentType getContentType() {
-        return ContentType.TVSHOWS;
+        return ContentType.MOVIES;
     }
 
     @Override
@@ -34,8 +32,8 @@ public class TraktTvShowsUpdateService extends TraktUpdateService {
             new TraktV2(thirdPartyConfig.getTrakt().getClient().getKey(), thirdPartyConfig.getTrakt().getClient().getSecret(), thirdPartyConfig.getTrakt().getRedirectUrl())
                     .accessToken(user.getConnections().get(ThirdPartyService.TRAKT).getAccessToken())
                     .sync()
-                    .addRatings(new SyncItems().shows(new SyncShow()
-                            .id(ShowIds.trakt((int) id))
+                    .addRatings(new SyncItems().movies(new SyncMovie()
+                            .id(MovieIds.trakt((int) id))
                             .rating(Rating.fromValue((int) score))))
                     .execute();
         } catch (IOException e) {
