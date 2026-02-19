@@ -4,6 +4,9 @@ import at.pcgamingfreaks.config.ThirdPartyConfig;
 import at.pcgamingfreaks.model.ContentType;
 import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.auth.User;
+import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
+import at.pcgamingfreaks.model.repo.TraktEntryScoreRepository;
+import at.pcgamingfreaks.model.thirdparty.trakt.TraktEntryScore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -14,6 +17,7 @@ import org.springframework.web.client.RestClient;
 @Service
 @RequiredArgsConstructor
 public class TraktTvShowsSeasonsUpdateService extends TraktUpdateService{
+    private final TraktEntryScoreRepository entryScoreRepository;
     private final ThirdPartyConfig thirdPartyConfig;
 
     @Override
@@ -22,8 +26,13 @@ public class TraktTvShowsSeasonsUpdateService extends TraktUpdateService{
     }
 
     @Override
-    public void updateData(long id, double score, User user) {
-        if (!thirdPartyConfig.getTrakt().isValid())  throw new RuntimeException("Trakt config is invalid");
+    public void updateData(long id, float score, User user) {
+        if (!thirdPartyConfig.getTrakt().isValid())  throw new ThirdPartyUnconfiguredException(ThirdPartyService.TRAKT);
+
+        TraktEntryScore entryScore = entryScoreRepository.findByUserAndEntry_Id(user, id).orElseThrow(() -> new RuntimeException("Trakt entry not found"));
+        entryScore.setScore((int) score);
+        entryScoreRepository.save(entryScore);
+
         String body = "{\"seasons\":[{\"ids\":{\"trakt\":" + id + "},\"rating\":" + (int) score + "}]}";
         RestClient.builder()
                 .baseUrl("https://api.trakt.tv")

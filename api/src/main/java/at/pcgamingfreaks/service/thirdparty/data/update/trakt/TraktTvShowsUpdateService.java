@@ -4,6 +4,9 @@ import at.pcgamingfreaks.config.ThirdPartyConfig;
 import at.pcgamingfreaks.model.ContentType;
 import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.auth.User;
+import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
+import at.pcgamingfreaks.model.repo.TraktEntryScoreRepository;
+import at.pcgamingfreaks.model.thirdparty.trakt.TraktEntryScore;
 import com.uwetrottmann.trakt5.TraktV2;
 import com.uwetrottmann.trakt5.entities.ShowIds;
 import com.uwetrottmann.trakt5.entities.SyncItems;
@@ -19,6 +22,7 @@ import java.io.IOException;
 @Service
 @RequiredArgsConstructor
 public class TraktTvShowsUpdateService extends TraktUpdateService {
+    private final TraktEntryScoreRepository entryScoreRepository;
     private final ThirdPartyConfig thirdPartyConfig;
 
     @Override
@@ -27,8 +31,12 @@ public class TraktTvShowsUpdateService extends TraktUpdateService {
     }
 
     @Override
-    public void updateData(long id, double score, User user) {
-        if (!thirdPartyConfig.getTrakt().isValid())  throw new RuntimeException("Trakt config is invalid");
+    public void updateData(long id, float score, User user) {
+        if (!thirdPartyConfig.getTrakt().isValid())  throw new ThirdPartyUnconfiguredException(ThirdPartyService.TRAKT);
+
+        TraktEntryScore entryScore = entryScoreRepository.findByUserAndEntry_Id(user, id).orElseThrow(() -> new RuntimeException("Trakt entry not found"));
+        entryScore.setScore((int) score);
+        entryScoreRepository.save(entryScore);
 
         try {
             new TraktV2(thirdPartyConfig.getTrakt().getClient().getKey(), thirdPartyConfig.getTrakt().getClient().getSecret(), thirdPartyConfig.getTrakt().getRedirectUrl())

@@ -7,5 +7,5 @@ import at.pcgamingfreaks.model.auth.User;
 public interface DataUpdateService {
     ThirdPartyService getService();
     ContentType getContentType();
-    void updateData(long id, double score, User user);
+    void updateData(long id, float score, User user);
 }

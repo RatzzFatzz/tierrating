@@ -15,5 +15,5 @@ public class UpdateScoreRequestDTO {
     private ContentType type;
 
     private long id;
-    private double score;
+    private float score;
 }
