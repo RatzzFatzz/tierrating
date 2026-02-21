@@ -33,6 +33,10 @@ public class TraktTvShowsSeasonsUpdateService extends TraktUpdateService{
         entryScore.setScore((int) score);
         entryScoreRepository.save(entryScore);
 
+        if (user.getConnections().get(ThirdPartyService.TRAKT).isAutoUpdateSync()) syncData(id, score, user);
+    }
+
+    protected void syncData(long id, float score, User user) {
         String body = "{\"seasons\":[{\"ids\":{\"trakt\":" + id + "},\"rating\":" + (int) score + "}]}";
         RestClient.builder()
                 .baseUrl("https://api.trakt.tv")

@@ -32,4 +32,6 @@ public class ThirdPartyConnection {
     @Column(length = 2047)
     private String refreshToken;
 
+    private boolean autoUpdateSync = true;
+    private boolean autoImportSync = true;
 }
