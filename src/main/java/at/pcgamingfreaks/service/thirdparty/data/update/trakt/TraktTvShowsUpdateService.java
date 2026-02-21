@@ -38,6 +38,10 @@ public class TraktTvShowsUpdateService extends TraktUpdateService {
         entryScore.setScore((int) score);
         entryScoreRepository.save(entryScore);
 
+        if (user.getConnections().get(ThirdPartyService.TRAKT).isAutoUpdateSync()) syncData(id, score, user);
+    }
+
+    protected void syncData(long id, float score, User user) {
         try {
             new TraktV2(thirdPartyConfig.getTrakt().getClient().getKey(), thirdPartyConfig.getTrakt().getClient().getSecret(), thirdPartyConfig.getTrakt().getRedirectUrl())
                     .accessToken(user.getConnections().get(ThirdPartyService.TRAKT).getAccessToken())

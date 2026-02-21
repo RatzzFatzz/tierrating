@@ -3,6 +3,7 @@ package at.pcgamingfreaks.service.thirdparty.data.update.anilist;
 import at.pcgamingfreaks.config.ThirdPartyConfig;
 import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.auth.User;
+import at.pcgamingfreaks.model.exceptions.ThirdPartySyncException;
 import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
 import at.pcgamingfreaks.model.repo.AniListEntryScoreRepository;
 import at.pcgamingfreaks.model.thirdparty.anilist.AniListEntryScore;
@@ -40,9 +41,14 @@ public abstract class AnilistUpdateService implements DataUpdateService {
     public void updateData(long id, float score, User user) {
         if (!thirdPartyConfig.getAnilist().isValid())  throw new ThirdPartyUnconfiguredException(ThirdPartyService.ANILIST);
 
-        AniListEntryScore entryScore = aniListEntryScoreRepository.findByUserAndEntry_Id(user, id).orElseThrow(() -> new RuntimeException("Anilist entry not found"));
+        AniListEntryScore entryScore = aniListEntryScoreRepository.findByUserAndEntry_Id(user, id).orElseThrow(() -> new ThirdPartySyncException("Anilist entry not found"));
         entryScore.setScore(score);
         aniListEntryScoreRepository.save(entryScore);
+
+        if (user.getConnections().get(ThirdPartyService.ANILIST).isAutoUpdateSync()) syncData(id, score, user);
+    }
+
+    protected void syncData(long id, float score, User user) {
         HttpGraphQlClient.create(WebClient.create(ANILIST_API_URL))
                 .mutate()
                 .header("Authorization", user.getConnections().get(ThirdPartyService.ANILIST).getAccessToken())
