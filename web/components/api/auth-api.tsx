@@ -9,7 +9,7 @@ export default async function authorize(service: string, username: string | null
     }
 
     try {
-        const response = await fetch(`${API_URL}/${service}/auth/${username}`, {
+        const response = await fetch(`${API_URL}/auth/${service}/${username}`, {
             method: 'POST',
             headers: {
                 "Authorization": "Bearer " + token,
@@ -32,7 +32,7 @@ export async function info(service: string, token: string | null): Promise<Serve
     }
 
     try {
-        const response = await fetch(`${API_URL}/${service}/info`, {
+        const response = await fetch(`${API_URL}/info/${service}`, {
             method: 'GET',
             headers: {
                 "Authorization": "Bearer " + token,
