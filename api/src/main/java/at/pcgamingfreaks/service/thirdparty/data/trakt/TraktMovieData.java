@@ -1,34 +1,34 @@
-package at.pcgamingfreaks.service.thirdparty.data.provider.trakt;
+package at.pcgamingfreaks.service.thirdparty.data.trakt;
 
 import at.pcgamingfreaks.config.ThirdPartyConfig;
 import at.pcgamingfreaks.mapper.ListEntryDtoMapper;
 import at.pcgamingfreaks.model.ContentType;
 import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.auth.User;
-import at.pcgamingfreaks.model.dto.ListEntryDTO;
 import at.pcgamingfreaks.model.exceptions.ThirdPartySyncException;
+import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
 import at.pcgamingfreaks.model.repo.TraktEntryScoreRepository;
 import at.pcgamingfreaks.model.repo.UserRepository;
 import at.pcgamingfreaks.model.thirdparty.trakt.TraktEntry;
 import at.pcgamingfreaks.model.thirdparty.trakt.TraktEntryScore;
 import at.pcgamingfreaks.service.TmdbCoverFinder;
 import com.uwetrottmann.trakt5.TraktV2;
-import com.uwetrottmann.trakt5.entities.BaseMovie;
-import com.uwetrottmann.trakt5.entities.RatedMovie;
-import com.uwetrottmann.trakt5.entities.UserSlug;
+import com.uwetrottmann.trakt5.entities.*;
 import com.uwetrottmann.trakt5.enums.Extended;
+import com.uwetrottmann.trakt5.enums.Rating;
 import com.uwetrottmann.trakt5.enums.RatingsFilter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import retrofit2.Response;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
+@Slf4j
 @Service
-public class TraktMovieDataProvider extends TraktDataProviderService{
+public class TraktMovieData extends TraktDataService {
 
-    public TraktMovieDataProvider(UserRepository userRepository, TraktEntryScoreRepository entryScoreRepository, TmdbCoverFinder coverFinder, ThirdPartyConfig thirdPartyConfig, ListEntryDtoMapper listEntryDtoMapper) {
+    public TraktMovieData(UserRepository userRepository, TraktEntryScoreRepository entryScoreRepository, TmdbCoverFinder coverFinder, ThirdPartyConfig thirdPartyConfig, ListEntryDtoMapper listEntryDtoMapper) {
         super(userRepository, entryScoreRepository, coverFinder, thirdPartyConfig, listEntryDtoMapper);
     }
 
@@ -38,9 +38,9 @@ public class TraktMovieDataProvider extends TraktDataProviderService{
     }
 
     @Override
-    protected List<TraktEntryScore> fetch(User user) {
+    protected List<TraktEntryScore> pull(User user) {
         Map<Long, TraktEntryScore> entries = new HashMap<>();
-        fetchRated(user).stream()
+        pullRated(user).stream()
                 .map(ratedMovie -> {
                     TraktEntry entry = new TraktEntry(
                             ratedMovie.movie.ids.trakt,
@@ -55,7 +55,7 @@ public class TraktMovieDataProvider extends TraktDataProviderService{
                     return entryScore;
                 })
                 .forEach(entry -> entries.put(entry.getEntry().getId(), entry));
-        fetchWatched(user).stream()
+        pullWatched(user).stream()
                 .map(baseMovie -> {
                     TraktEntry entry = new TraktEntry(
                             baseMovie.movie.ids.trakt,
@@ -74,7 +74,7 @@ public class TraktMovieDataProvider extends TraktDataProviderService{
     }
 
     @Override
-    protected List<RatedMovie> fetchRated(User user) {
+    protected List<RatedMovie> pullRated(User user) {
         try {
             Response<List<RatedMovie>> response = new TraktV2(
                     thirdPartyConfig.getTrakt().getClient().getKey(),
@@ -97,7 +97,7 @@ public class TraktMovieDataProvider extends TraktDataProviderService{
     }
 
     @Override
-    protected List<BaseMovie> fetchWatched(User user) {
+    protected List<BaseMovie> pullWatched(User user) {
         try {
             Response<List<BaseMovie>> response = new TraktV2(
                     thirdPartyConfig.getTrakt().getClient().getKey(),
@@ -115,6 +115,28 @@ public class TraktMovieDataProvider extends TraktDataProviderService{
             return response.body();
         } catch (IOException e) {
             throw new ThirdPartySyncException("Error occurred fetching watched movies: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void update(long id, float score, User user) {
+        if (!thirdPartyConfig.getTrakt().isValid())  throw new ThirdPartyUnconfiguredException(ThirdPartyService.TRAKT);
+
+        TraktEntryScore entryScore = entryScoreRepository.findByUserAndEntry_Id(user, id).orElseThrow(() -> new RuntimeException("Trakt entry not found"));
+        entryScore.setScore((int) score);
+        entryScoreRepository.save(entryScore);
+
+        try {
+            new TraktV2(thirdPartyConfig.getTrakt().getClient().getKey(), thirdPartyConfig.getTrakt().getClient().getSecret(), thirdPartyConfig.getTrakt().getRedirectUrl())
+                    .accessToken(user.getConnections().get(ThirdPartyService.TRAKT).getAccessToken())
+                    .sync()
+                    .addRatings(new SyncItems().movies(new SyncMovie()
+                            .id(MovieIds.trakt((int) id))
+                            .rating(Rating.fromValue((int) score))))
+                    .execute();
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
     }
 }

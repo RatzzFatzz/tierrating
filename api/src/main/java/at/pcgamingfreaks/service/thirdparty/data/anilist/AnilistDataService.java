@@ -1,7 +1,9 @@
-package at.pcgamingfreaks.service.thirdparty.data.provider.anilist;
+package at.pcgamingfreaks.service.thirdparty.data.anilist;
 
+import at.pcgamingfreaks.config.ThirdPartyConfig;
 import at.pcgamingfreaks.mapper.ListEntryDtoMapper;
 import at.pcgamingfreaks.model.ThirdPartyService;
+import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
 import at.pcgamingfreaks.model.repo.AniListEntryRepository;
 import at.pcgamingfreaks.model.repo.AniListEntryScoreRepository;
 import at.pcgamingfreaks.model.thirdparty.anilist.AniListEntry;
@@ -13,7 +15,7 @@ import at.pcgamingfreaks.model.thirdparty.anilist.external.AniListPage;
 import at.pcgamingfreaks.model.auth.User;
 import at.pcgamingfreaks.model.dto.ListEntryDTO;
 import at.pcgamingfreaks.model.repo.UserRepository;
-import at.pcgamingfreaks.service.thirdparty.data.provider.DataProviderService;
+import at.pcgamingfreaks.service.thirdparty.data.DataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
@@ -34,10 +36,11 @@ import static at.pcgamingfreaks.config.GlobalProperties.ANILIST_API_URL;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public abstract class AnilistDataProviderService implements DataProviderService {
+public abstract class AnilistDataService implements DataService {
     private final UserRepository userRepository;
     private final AniListEntryScoreRepository aniListEntryScoreRepository;
     private final AniListEntryRepository aniListEntryRepository;
+    private final ThirdPartyConfig thirdPartyConfig;
     private final ListEntryDtoMapper listEntryDtoMapper;
 
     public ThirdPartyService getService() {
@@ -157,5 +160,37 @@ public abstract class AnilistDataProviderService implements DataProviderService 
                 getContentType(),
                 username,
                 (System.currentTimeMillis() - duration) / 1000);
+    }
+
+    @Override
+    public void update(long id, float score, User user) {
+        if (!thirdPartyConfig.getAnilist().isValid())  throw new ThirdPartyUnconfiguredException(ThirdPartyService.ANILIST);
+
+        AniListEntryScore entryScore = aniListEntryScoreRepository.findByUserAndEntry_Id(user, id).orElseThrow(() -> new RuntimeException("Anilist entry not found"));
+        entryScore.setScore(score);
+        aniListEntryScoreRepository.save(entryScore);
+
+        String anilistUpdateQuery = """
+            mutation ($listEntryId: Int, $mediaId: Int, $score: Float) {
+              SaveMediaListEntry(id: $listEntryId, mediaId: $mediaId, score: $score) {
+                id
+                mediaId
+                score
+              }
+            }
+            """;
+        HttpGraphQlClient.create(WebClient.create(ANILIST_API_URL))
+                .mutate()
+                .header("Authorization", user.getConnections().get(ThirdPartyService.ANILIST).getAccessToken())
+                .build()
+                .document(anilistUpdateQuery)
+                .variable("mediaId", id)
+                .variable("score", score)
+                .retrieveSync("UpdateMediaListEntries");
+    }
+
+    @Override
+    public void push(String username) {
+
     }
 }

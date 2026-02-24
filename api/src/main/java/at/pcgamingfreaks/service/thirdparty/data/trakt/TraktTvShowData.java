@@ -1,23 +1,23 @@
-package at.pcgamingfreaks.service.thirdparty.data.provider.trakt;
+package at.pcgamingfreaks.service.thirdparty.data.trakt;
 
 import at.pcgamingfreaks.config.ThirdPartyConfig;
 import at.pcgamingfreaks.mapper.ListEntryDtoMapper;
 import at.pcgamingfreaks.model.ContentType;
 import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.auth.User;
-import at.pcgamingfreaks.model.dto.ListEntryDTO;
 import at.pcgamingfreaks.model.exceptions.ThirdPartySyncException;
+import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
 import at.pcgamingfreaks.model.repo.TraktEntryScoreRepository;
 import at.pcgamingfreaks.model.repo.UserRepository;
 import at.pcgamingfreaks.model.thirdparty.trakt.TraktEntry;
 import at.pcgamingfreaks.model.thirdparty.trakt.TraktEntryScore;
 import at.pcgamingfreaks.service.TmdbCoverFinder;
 import com.uwetrottmann.trakt5.TraktV2;
-import com.uwetrottmann.trakt5.entities.BaseShow;
-import com.uwetrottmann.trakt5.entities.RatedShow;
-import com.uwetrottmann.trakt5.entities.UserSlug;
+import com.uwetrottmann.trakt5.entities.*;
 import com.uwetrottmann.trakt5.enums.Extended;
+import com.uwetrottmann.trakt5.enums.Rating;
 import com.uwetrottmann.trakt5.enums.RatingsFilter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import retrofit2.Response;
 
@@ -26,10 +26,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
-public class TraktTvShowDataProvider extends TraktDataProviderService {
+public class TraktTvShowData extends TraktDataService {
 
-    public TraktTvShowDataProvider(UserRepository userRepository, TraktEntryScoreRepository entryScoreRepository, TmdbCoverFinder coverFinder, ThirdPartyConfig thirdPartyConfig, ListEntryDtoMapper listEntryDtoMapper) {
+    public TraktTvShowData(UserRepository userRepository, TraktEntryScoreRepository entryScoreRepository, TmdbCoverFinder coverFinder, ThirdPartyConfig thirdPartyConfig, ListEntryDtoMapper listEntryDtoMapper) {
         super(userRepository, entryScoreRepository, coverFinder, thirdPartyConfig, listEntryDtoMapper);
     }
 
@@ -39,9 +40,9 @@ public class TraktTvShowDataProvider extends TraktDataProviderService {
     }
 
     @Override
-    protected List<TraktEntryScore> fetch(User user) {
+    protected List<TraktEntryScore> pull(User user) {
         Map<Long, TraktEntryScore> entries = new HashMap<>();
-        fetchRated(user).stream()
+        pullRated(user).stream()
                 .map(ratedShow -> {
                     TraktEntry entry = new TraktEntry(
                             ratedShow.show.ids.trakt,
@@ -56,7 +57,7 @@ public class TraktTvShowDataProvider extends TraktDataProviderService {
                     return entryScore;
                 })
                 .forEach(entry -> entries.put(entry.getEntry().getId(), entry));
-        fetchWatched(user).stream()
+        pullWatched(user).stream()
                 .map(baseShow -> {
                     TraktEntry entry = new TraktEntry(
                             baseShow.show.ids.trakt,
@@ -75,7 +76,7 @@ public class TraktTvShowDataProvider extends TraktDataProviderService {
     }
 
     @Override
-    protected List<RatedShow> fetchRated(User user) {
+    protected List<RatedShow> pullRated(User user) {
         try {
             Response<List<RatedShow>> response = new TraktV2(
                         thirdPartyConfig.getTrakt().getClient().getKey(),
@@ -98,7 +99,7 @@ public class TraktTvShowDataProvider extends TraktDataProviderService {
     }
 
     @Override
-    protected List<BaseShow> fetchWatched(User user) {
+    protected List<BaseShow> pullWatched(User user) {
         try {
             Response<List<BaseShow>> response = new TraktV2(
                         thirdPartyConfig.getTrakt().getClient().getKey(),
@@ -116,6 +117,28 @@ public class TraktTvShowDataProvider extends TraktDataProviderService {
             return response.body();
         } catch (IOException e) {
             throw new ThirdPartySyncException("Error retrieving watched shows: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void update(long id, float score, User user) {
+        if (!thirdPartyConfig.getTrakt().isValid())  throw new ThirdPartyUnconfiguredException(ThirdPartyService.TRAKT);
+
+        TraktEntryScore entryScore = entryScoreRepository.findByUserAndEntry_Id(user, id).orElseThrow(() -> new RuntimeException("Trakt entry not found"));
+        entryScore.setScore((int) score);
+        entryScoreRepository.save(entryScore);
+
+        try {
+            new TraktV2(thirdPartyConfig.getTrakt().getClient().getKey(), thirdPartyConfig.getTrakt().getClient().getSecret(), thirdPartyConfig.getTrakt().getRedirectUrl())
+                    .accessToken(user.getConnections().get(ThirdPartyService.TRAKT).getAccessToken())
+                    .sync()
+                    .addRatings(new SyncItems().shows(new SyncShow()
+                            .id(ShowIds.trakt((int) id))
+                            .rating(Rating.fromValue((int) score))))
+                    .execute();
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
     }
 }

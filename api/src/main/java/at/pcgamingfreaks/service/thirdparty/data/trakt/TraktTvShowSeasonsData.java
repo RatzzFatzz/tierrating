@@ -1,4 +1,4 @@
-package at.pcgamingfreaks.service.thirdparty.data.provider.trakt;
+package at.pcgamingfreaks.service.thirdparty.data.trakt;
 
 import at.pcgamingfreaks.config.ThirdPartyConfig;
 import at.pcgamingfreaks.mapper.ListEntryDtoMapper;
@@ -6,6 +6,7 @@ import at.pcgamingfreaks.model.ContentType;
 import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.auth.User;
 import at.pcgamingfreaks.model.exceptions.ThirdPartySyncException;
+import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
 import at.pcgamingfreaks.model.repo.TraktEntryScoreRepository;
 import at.pcgamingfreaks.model.repo.UserRepository;
 import at.pcgamingfreaks.model.thirdparty.trakt.TraktEntry;
@@ -16,7 +17,9 @@ import com.uwetrottmann.trakt5.entities.RatedSeason;
 import com.uwetrottmann.trakt5.entities.UserSlug;
 import com.uwetrottmann.trakt5.enums.Extended;
 import com.uwetrottmann.trakt5.enums.RatingsFilter;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 import retrofit2.Response;
 
 import java.io.IOException;
@@ -25,9 +28,9 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class TraktTvShowSeasonsDataProvider extends TraktDataProviderService{
+public class TraktTvShowSeasonsData extends TraktDataService {
 
-    public TraktTvShowSeasonsDataProvider(UserRepository userRepository, TraktEntryScoreRepository entryScoreRepository, TmdbCoverFinder coverFinder, ThirdPartyConfig thirdPartyConfig, ListEntryDtoMapper listEntryDtoMapper) {
+    public TraktTvShowSeasonsData(UserRepository userRepository, TraktEntryScoreRepository entryScoreRepository, TmdbCoverFinder coverFinder, ThirdPartyConfig thirdPartyConfig, ListEntryDtoMapper listEntryDtoMapper) {
         super(userRepository, entryScoreRepository, coverFinder, thirdPartyConfig, listEntryDtoMapper);
     }
 
@@ -37,9 +40,9 @@ public class TraktTvShowSeasonsDataProvider extends TraktDataProviderService{
     }
 
     @Override
-    protected List<TraktEntryScore> fetch(User user) {
+    protected List<TraktEntryScore> pull(User user) {
         Map<Long, TraktEntryScore> entries = new HashMap<>();
-        fetchRated(user).stream()
+        pullRated(user).stream()
                 .map(ratedSeason -> {
                     TraktEntry entry = new TraktEntry(
                             ratedSeason.season.ids.trakt,
@@ -59,7 +62,7 @@ public class TraktTvShowSeasonsDataProvider extends TraktDataProviderService{
     }
 
     @Override
-    protected List<RatedSeason> fetchRated(User user) {
+    protected List<RatedSeason> pullRated(User user) {
         try {
             Response<List<RatedSeason>> response = new TraktV2(
                     thirdPartyConfig.getTrakt().getClient().getKey(),
@@ -82,7 +85,29 @@ public class TraktTvShowSeasonsDataProvider extends TraktDataProviderService{
     }
 
     @Override
-    protected List<Object> fetchWatched(User user) {
+    protected List<Object> pullWatched(User user) {
         return List.of();
+    }
+
+    @Override
+    public void update(long id, float score, User user) {
+        if (!thirdPartyConfig.getTrakt().isValid())  throw new ThirdPartyUnconfiguredException(ThirdPartyService.TRAKT);
+
+        TraktEntryScore entryScore = entryScoreRepository.findByUserAndEntry_Id(user, id).orElseThrow(() -> new RuntimeException("Trakt entry not found"));
+        entryScore.setScore((int) score);
+        entryScoreRepository.save(entryScore);
+
+        String body = "{\"seasons\":[{\"ids\":{\"trakt\":" + id + "},\"rating\":" + (int) score + "}]}";
+        RestClient.builder()
+                .baseUrl("https://api.trakt.tv")
+                .defaultHeader("Authorization", user.getConnections().get(ThirdPartyService.TRAKT).getAccessToken())
+                .build()
+                .post()
+                .uri("/sync/ratings")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("trakt-api-key", thirdPartyConfig.getTrakt().getClient().getKey())
+                .body(body)
+                .retrieve()
+                .body(String.class);
     }
 }
