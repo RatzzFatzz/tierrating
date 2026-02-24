@@ -7,7 +7,6 @@ import at.pcgamingfreaks.model.auth.User;
 import at.pcgamingfreaks.model.dto.ListEntryDTO;
 import at.pcgamingfreaks.model.repo.TraktEntryScoreRepository;
 import at.pcgamingfreaks.model.repo.UserRepository;
-import at.pcgamingfreaks.model.thirdparty.anilist.AniListEntryScore;
 import at.pcgamingfreaks.model.thirdparty.trakt.TraktEntryScore;
 import at.pcgamingfreaks.service.TmdbCoverFinder;
 import at.pcgamingfreaks.service.thirdparty.data.provider.DataProviderService;
@@ -16,12 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -39,12 +34,12 @@ public abstract class TraktDataProviderService implements DataProviderService {
     }
 
     @Override
-    public List<ListEntryDTO> fetchData(String username) {
+    public List<ListEntryDTO> fetch(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
         Set<TraktEntryScore> existingScores = entryScoreRepository.findAllByUserAndEntry_TypeOrderByScoreDesc(user, getContentType());
 
         if (existingScores.isEmpty()) {
-            syncData(username);
+            pull(username);
             existingScores = entryScoreRepository.findAllByUserAndEntry_TypeOrderByScoreDesc(user, getContentType()); // TODO: improve?
         }
 
@@ -52,7 +47,7 @@ public abstract class TraktDataProviderService implements DataProviderService {
     }
 
     @Override
-    public void syncData(String username) {
+    public void pull(String username) {
         if (!thirdPartyConfig.getTrakt().isValid()) throw new RuntimeException("Trakt config is invalid");
         long duration = System.currentTimeMillis();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
