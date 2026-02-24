@@ -34,32 +34,58 @@ public class DataController {
     private final UserRepository userRepository;
 
     /**
-     * Request and map third-party data.
+     * Fetch data for username, service and type.
+     * If no data is synced yet and auto sync is active, pull data before returning result.
      * @return mapped third-party data ordered by score descending
      */
     @GetMapping("{username}/{service}/{type}")
-    public ResponseEntity<List<ListEntryDTO>> fetchData(@PathVariable String username,
-                                                        @PathVariable ThirdPartyService service,
-                                                        @PathVariable ContentType type) {
+    public ResponseEntity<List<ListEntryDTO>> fetch(@PathVariable String username,
+                                                    @PathVariable ThirdPartyService service,
+                                                    @PathVariable ContentType type) {
         DataProviderService dataProviderService = dataProviderFactory.getProvider(service, type);
         if (dataProviderService == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(
-                dataProviderService.fetchData(username).stream()
+                dataProviderService.fetch(username).stream()
                         .sorted(Comparator.comparing(ListEntryDTO::getScore).reversed())
                         .toList()
         );
     }
 
     /**
-     * Update score/rating at third-party service
+     * Update score for resource.
+     * If auto sync is active, send changes directly to third-party service.
      * @param request
-     * @return
      */
     @PostMapping("update")
     @PreAuthorize("authentication.principal.username == #request.username")
-    public void updateData(@RequestBody UpdateScoreRequestDTO request) {
+    public void update(@RequestBody UpdateScoreRequestDTO request) {
         User user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new UsernameNotFoundException(request.getUsername()));
         if (!hasUserConnection(user, request.getService())) throw new ThirdPartyUnconfiguredException(request.getService());
         dataUpdateFactory.getProvider(request.getService(), request.getType()).updateData(request.getId(), request.getScore(), user);
     }
+
+    /**
+     * Pull data from third-party service for user and type. Overwriting existing scores.
+     * @param username
+     * @param service
+     * @param type
+     */
+    @GetMapping("pull/{username}/{service}/{type}")
+    public void pull(@PathVariable String username, @PathVariable ThirdPartyService service, @PathVariable ContentType type) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
+        if (!hasUserConnection(user, service)) throw new ThirdPartyUnconfiguredException(service);
+        dataProviderFactory.getProvider(service, type).pull(username);
+    }
+
+    /**
+     * Push score changes for user and type to third-party service.
+     * @param username
+     * @param service
+     * @param type
+     */
+    @GetMapping("push/{username}/{service}/{type}")
+    public void push(@PathVariable String username, @PathVariable ThirdPartyService service, @PathVariable ContentType type) {
+
+    }
+
 }

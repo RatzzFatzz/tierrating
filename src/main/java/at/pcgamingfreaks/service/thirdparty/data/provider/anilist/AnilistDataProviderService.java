@@ -2,11 +2,13 @@ package at.pcgamingfreaks.service.thirdparty.data.provider.anilist;
 
 import at.pcgamingfreaks.mapper.ListEntryDtoMapper;
 import at.pcgamingfreaks.model.ThirdPartyService;
+import at.pcgamingfreaks.model.repo.AniListEntryRepository;
 import at.pcgamingfreaks.model.repo.AniListEntryScoreRepository;
 import at.pcgamingfreaks.model.thirdparty.anilist.AniListEntry;
 import at.pcgamingfreaks.model.thirdparty.anilist.AniListEntryScore;
 import at.pcgamingfreaks.model.thirdparty.anilist.external.AniListListEntry;
 import at.pcgamingfreaks.model.thirdparty.anilist.external.AniListMediaCoverImage;
+import at.pcgamingfreaks.model.thirdparty.anilist.external.AniListMediaTitle;
 import at.pcgamingfreaks.model.thirdparty.anilist.external.AniListPage;
 import at.pcgamingfreaks.model.auth.User;
 import at.pcgamingfreaks.model.dto.ListEntryDTO;
@@ -22,7 +24,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static at.pcgamingfreaks.config.GlobalProperties.ANILIST_API_URL;
@@ -33,6 +37,7 @@ import static at.pcgamingfreaks.config.GlobalProperties.ANILIST_API_URL;
 public abstract class AnilistDataProviderService implements DataProviderService {
     private final UserRepository userRepository;
     private final AniListEntryScoreRepository aniListEntryScoreRepository;
+    private final AniListEntryRepository aniListEntryRepository;
     private final ListEntryDtoMapper listEntryDtoMapper;
 
     public ThirdPartyService getService() {
@@ -40,52 +45,56 @@ public abstract class AnilistDataProviderService implements DataProviderService 
     }
 
     @Override
-    public List<ListEntryDTO> fetchData(String username) {
+    public List<ListEntryDTO> fetch(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
         Set<AniListEntryScore> existingScores = aniListEntryScoreRepository.findAllByUserAndEntry_TypeOrderByScoreDesc(user, getContentType());
 
         if (existingScores.isEmpty()) {
-            syncData(username);
+            pull(username);
             existingScores = aniListEntryScoreRepository.findAllByUserAndEntry_TypeOrderByScoreDesc(user, getContentType());
         }
 
         return existingScores.stream().map(listEntryDtoMapper::map).toList();
     }
 
-    public void syncData(String username) {
+    @Override
+    public void pull(String username) {
         long duration = System.currentTimeMillis();
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
 
         List<AniListListEntry> anilistQueryResult = new ArrayList<>();
         AniListPage page;
         int currentPage = 1;
+
         do {
             String query = """
-                        query ($userId: Int, $type: MediaType, $status: MediaListStatus, $page: Int, $perPage: Int) {
-                            Page(page: $page, perPage: $perPage) {
-                                pageInfo {
-                                    currentPage
-                                    hasNextPage
-                                    perPage
+                query ($userId: Int, $type: MediaType, $status: MediaListStatus, $page: Int, $perPage: Int) {
+                    Page(page: $page, perPage: $perPage) {
+                        pageInfo {
+                            currentPage
+                            hasNextPage
+                            perPage
+                        }
+                        mediaList(userId: $userId, type: $type, status: $status) {
+                            score(format: POINT_10_DECIMAL)
+                            media {
+                                id
+                                title {
+                                    romaji
+                                    english
+                                    native
                                 }
-                                mediaList(userId: $userId, type: $type, status: $status) {
-                                    score(format: POINT_10_DECIMAL)
-                                    media {
-                                        id
-                                        title {
-                                            romaji
-                                            english
-                                            native
-                                        }
-                                        coverImage {
-                                            large
-                                            extraLarge
-                                        }
-                                    }
+                                coverImage {
+                                    large
+                                    extraLarge
                                 }
                             }
                         }
-                        """;
+                    }
+                }
+                """;
+
             page = HttpGraphQlClient.create(WebClient.create(ANILIST_API_URL))
                     .document(query)
                     .variable("userId", user.getConnections().get(ThirdPartyService.ANILIST).getThirdPartyUserId())
@@ -95,26 +104,54 @@ public abstract class AnilistDataProviderService implements DataProviderService 
                     .variable("perPage", 50)
                     .retrieveSync("Page")
                     .toEntity(AniListPage.class);
+
             anilistQueryResult.addAll(page.getMediaList());
         } while (page.getPageInfo().isHasNextPage());
 
-        Set<AniListEntryScore> entryScores = anilistQueryResult.stream()
-                .map(queryResult -> {
-                    AniListEntry entry = new AniListEntry();
-                    entry.setId(queryResult.getMedia().getId());
-                    entry.setTitle(queryResult.getMedia().getTitle().getEnglish());
-                    entry.setTitleRomaji(queryResult.getMedia().getTitle().getRomaji());
-                    AniListMediaCoverImage cover = queryResult.getMedia().getCoverImage();
-                    entry.setCover(Strings.isNotBlank(cover.getLarge()) ? cover.getLarge() : cover.getExtraLarge());
-                    entry.setType(getContentType());
-                    AniListEntryScore entryScore = new AniListEntryScore();
-                    entryScore.setScore(queryResult.getScore());
-                    entryScore.setUser(user);
-                    entryScore.setEntry(entry);
-                    return entryScore;
-                })
+        // Collect all remote IDs from this sync for batch lookup
+        Set<Long> remoteIds = anilistQueryResult.stream()
+                .map(q -> q.getMedia().getId())
                 .collect(Collectors.toSet());
-        aniListEntryScoreRepository.saveAll(entryScores);
+
+        // Fetch all existing entries and scores in bulk to avoid N+1 queries
+        Map<Long, AniListEntry> existingEntries = aniListEntryRepository
+                .findAllByIdIn(remoteIds)
+                .stream()
+                .collect(Collectors.toMap(AniListEntry::getId, Function.identity()));
+
+        Map<Long, AniListEntryScore> existingScores = aniListEntryScoreRepository
+                .findAllByUserAndEntryIdIn(user, remoteIds)
+                .stream()
+                .collect(Collectors.toMap(s -> s.getEntry().getId(), Function.identity()));
+
+        List<AniListEntryScore> scoresToSave = new ArrayList<>();
+
+        for (AniListListEntry queryResult : anilistQueryResult) {
+            long mediaId = queryResult.getMedia().getId();
+            AniListMediaTitle title = queryResult.getMedia().getTitle();
+            AniListMediaCoverImage cover = queryResult.getMedia().getCoverImage();
+            String resolvedCover = Strings.isNotBlank(cover.getExtraLarge())
+                    ? cover.getExtraLarge()
+                    : cover.getLarge();
+
+            // Update existing entry or create a new one
+            AniListEntry entry = existingEntries.getOrDefault(mediaId, new AniListEntry());
+            entry.setId(mediaId);
+            entry.setTitle(title.getEnglish());
+            entry.setTitleRomaji(title.getRomaji());
+            entry.setCover(resolvedCover);
+            entry.setType(getContentType());
+
+            // Update existing score or create a new one
+            AniListEntryScore entryScore = existingScores.getOrDefault(mediaId, new AniListEntryScore());
+            entryScore.setScore(queryResult.getScore());
+            entryScore.setUser(user);
+            entryScore.setEntry(entry);
+            scoresToSave.add(entryScore);
+        }
+
+        aniListEntryScoreRepository.saveAll(scoresToSave);
+
         log.info("Synced {} {} for {} in {}s",
                 getService(),
                 getContentType(),
