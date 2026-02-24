@@ -7,9 +7,8 @@ import at.pcgamingfreaks.model.auth.User;
 import at.pcgamingfreaks.model.dto.ListEntryDTO;
 import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
 import at.pcgamingfreaks.model.repo.UserRepository;
-import at.pcgamingfreaks.service.thirdparty.data.provider.DataProviderFactory;
-import at.pcgamingfreaks.service.thirdparty.data.provider.DataProviderService;
-import at.pcgamingfreaks.service.thirdparty.data.update.DataUpdateFactory;
+import at.pcgamingfreaks.service.thirdparty.data.DataFactory;
+import at.pcgamingfreaks.service.thirdparty.data.DataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +27,7 @@ import static at.pcgamingfreaks.model.ThirdPartyService.hasUserConnection;
 @CrossOrigin
 @RequiredArgsConstructor
 public class DataController {
-    private final DataProviderFactory dataProviderFactory;
-    private final DataUpdateFactory dataUpdateFactory;
-
+    private final DataFactory dataFactory;
     private final UserRepository userRepository;
 
     /**
@@ -42,10 +39,10 @@ public class DataController {
     public ResponseEntity<List<ListEntryDTO>> fetch(@PathVariable String username,
                                                     @PathVariable ThirdPartyService service,
                                                     @PathVariable ContentType type) {
-        DataProviderService dataProviderService = dataProviderFactory.getProvider(service, type);
-        if (dataProviderService == null) return ResponseEntity.notFound().build();
+        DataService dataService = dataFactory.getProvider(service, type);
+        if (dataService == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(
-                dataProviderService.fetch(username).stream()
+                dataService.fetch(username).stream()
                         .sorted(Comparator.comparing(ListEntryDTO::getScore).reversed())
                         .toList()
         );
@@ -61,7 +58,7 @@ public class DataController {
     public void update(@RequestBody UpdateScoreRequestDTO request) {
         User user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new UsernameNotFoundException(request.getUsername()));
         if (!hasUserConnection(user, request.getService())) throw new ThirdPartyUnconfiguredException(request.getService());
-        dataUpdateFactory.getProvider(request.getService(), request.getType()).updateData(request.getId(), request.getScore(), user);
+        dataFactory.getProvider(request.getService(), request.getType()).update(request.getId(), request.getScore(), user);
     }
 
     /**
@@ -74,7 +71,7 @@ public class DataController {
     public void pull(@PathVariable String username, @PathVariable ThirdPartyService service, @PathVariable ContentType type) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
         if (!hasUserConnection(user, service)) throw new ThirdPartyUnconfiguredException(service);
-        dataProviderFactory.getProvider(service, type).pull(username);
+        dataFactory.getProvider(service, type).pull(username);
     }
 
     /**

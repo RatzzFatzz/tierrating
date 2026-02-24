@@ -1,4 +1,4 @@
-package at.pcgamingfreaks.service.thirdparty.data.provider.trakt;
+package at.pcgamingfreaks.service.thirdparty.data.trakt;
 
 import at.pcgamingfreaks.config.ThirdPartyConfig;
 import at.pcgamingfreaks.mapper.ListEntryDtoMapper;
@@ -9,7 +9,7 @@ import at.pcgamingfreaks.model.repo.TraktEntryScoreRepository;
 import at.pcgamingfreaks.model.repo.UserRepository;
 import at.pcgamingfreaks.model.thirdparty.trakt.TraktEntryScore;
 import at.pcgamingfreaks.service.TmdbCoverFinder;
-import at.pcgamingfreaks.service.thirdparty.data.provider.DataProviderService;
+import at.pcgamingfreaks.service.thirdparty.data.DataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,7 +21,7 @@ import java.util.Set;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public abstract class TraktDataProviderService implements DataProviderService {
+public abstract class TraktDataService implements DataService {
     protected final UserRepository userRepository;
     protected final TraktEntryScoreRepository entryScoreRepository;
     protected final TmdbCoverFinder coverFinder;
@@ -52,7 +52,7 @@ public abstract class TraktDataProviderService implements DataProviderService {
         long duration = System.currentTimeMillis();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
 
-        entryScoreRepository.saveAll(fetch(user));
+        entryScoreRepository.saveAll(pull(user));
 
         log.info("Fetched {} {} for {} in {}s",
                 getService(),
@@ -61,10 +61,14 @@ public abstract class TraktDataProviderService implements DataProviderService {
                 (System.currentTimeMillis() - duration) / 1000);
     }
 
-    protected abstract List<TraktEntryScore> fetch(User user);
+    protected abstract List<TraktEntryScore> pull(User user);
 
-    abstract protected List<?> fetchRated(User user);
+    abstract protected List<?> pullRated(User user);
 
-    abstract protected List<?> fetchWatched(User user);
+    abstract protected List<?> pullWatched(User user);
 
+    @Override
+    public void push(String username) {
+
+    }
 }
