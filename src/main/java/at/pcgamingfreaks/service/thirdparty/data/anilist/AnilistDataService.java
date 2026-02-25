@@ -170,10 +170,10 @@ public abstract class AnilistDataService implements DataService {
         entryScore.setScore(score);
         aniListEntryScoreRepository.save(entryScore);
 
-        if (user.getConnections().get(ThirdPartyService.ANILIST).isAutoUpdateSync()) syncData(id, score, user);
+        if (user.getConnections().get(ThirdPartyService.ANILIST).isAutoUpdateSync()) pushSingleChange(id, score, user);
     }
 
-    protected void syncData(long id, float score, User user) {
+    protected void pushSingleChange(long id, float score, User user) {
         String anilistUpdateQuery = """
             mutation ($listEntryId: Int, $mediaId: Int, $score: Float) {
               SaveMediaListEntry(id: $listEntryId, mediaId: $mediaId, score: $score) {

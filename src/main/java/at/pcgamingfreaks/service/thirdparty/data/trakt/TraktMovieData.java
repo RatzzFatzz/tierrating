@@ -119,18 +119,7 @@ public class TraktMovieData extends TraktDataService {
         }
     }
 
-    @Override
-    public void update(long id, float score, User user) {
-        if (!thirdPartyConfig.getTrakt().isValid())  throw new ThirdPartyUnconfiguredException(ThirdPartyService.TRAKT);
-
-        TraktEntryScore entryScore = entryScoreRepository.findByUserAndEntry_Id(user, id).orElseThrow(() -> new RuntimeException("Trakt entry not found"));
-        entryScore.setScore((int) score);
-        entryScoreRepository.save(entryScore);
-
-        if (user.getConnections().get(ThirdPartyService.TRAKT).isAutoUpdateSync()) syncData(id, score, user);
-    }
-
-    protected void syncData(long id, float score, User user) {
+    protected void pushSingleChange(long id, float score, User user) {
         try {
             new TraktV2(thirdPartyConfig.getTrakt().getClient().getKey(), thirdPartyConfig.getTrakt().getClient().getSecret(), thirdPartyConfig.getTrakt().getRedirectUrl())
                     .accessToken(user.getConnections().get(ThirdPartyService.TRAKT).getAccessToken())
