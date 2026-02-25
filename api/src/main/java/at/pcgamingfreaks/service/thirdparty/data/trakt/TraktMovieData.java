@@ -7,6 +7,7 @@ import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.auth.User;
 import at.pcgamingfreaks.model.exceptions.ThirdPartySyncException;
 import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
+import at.pcgamingfreaks.model.repo.TraktEntryRepository;
 import at.pcgamingfreaks.model.repo.TraktEntryScoreRepository;
 import at.pcgamingfreaks.model.repo.UserRepository;
 import at.pcgamingfreaks.model.thirdparty.trakt.TraktEntry;
@@ -28,8 +29,8 @@ import java.util.*;
 @Service
 public class TraktMovieData extends TraktDataService {
 
-    public TraktMovieData(UserRepository userRepository, TraktEntryScoreRepository entryScoreRepository, TmdbCoverFinder coverFinder, ThirdPartyConfig thirdPartyConfig, ListEntryDtoMapper listEntryDtoMapper) {
-        super(userRepository, entryScoreRepository, coverFinder, thirdPartyConfig, listEntryDtoMapper);
+    public TraktMovieData(UserRepository userRepository, TraktEntryScoreRepository entryScoreRepository, TraktEntryRepository entryRepository, TmdbCoverFinder coverFinder, ThirdPartyConfig thirdPartyConfig, ListEntryDtoMapper listEntryDtoMapper) {
+        super(userRepository, entryScoreRepository, entryRepository, coverFinder, thirdPartyConfig, listEntryDtoMapper);
     }
 
     @Override
