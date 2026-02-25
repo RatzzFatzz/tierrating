@@ -5,6 +5,7 @@ import at.pcgamingfreaks.mapper.ListEntryDtoMapper;
 import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.auth.User;
 import at.pcgamingfreaks.model.dto.ListEntryDTO;
+import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
 import at.pcgamingfreaks.model.repo.TraktEntryRepository;
 import at.pcgamingfreaks.model.repo.TraktEntryScoreRepository;
 import at.pcgamingfreaks.model.repo.UserRepository;
@@ -114,6 +115,19 @@ public abstract class TraktDataService implements DataService {
     abstract protected List<?> pullRated(User user);
 
     abstract protected List<?> pullWatched(User user);
+
+    @Override
+    public void update(long id, float score, User user) {
+        if (!thirdPartyConfig.getTrakt().isValid())  throw new ThirdPartyUnconfiguredException(ThirdPartyService.TRAKT);
+
+        TraktEntryScore entryScore = entryScoreRepository.findByUserAndEntry_Id(user, id).orElseThrow(() -> new RuntimeException("Trakt entry not found"));
+        entryScore.setScore((int) score);
+        entryScoreRepository.save(entryScore);
+
+        if (user.getConnections().get(ThirdPartyService.TRAKT).isAutoUpdateSync()) pushSingleChange(id, score, user);
+    }
+
+    abstract protected void pushSingleChange(long id, float score, User user);
 
     @Override
     public void push(String username) {
