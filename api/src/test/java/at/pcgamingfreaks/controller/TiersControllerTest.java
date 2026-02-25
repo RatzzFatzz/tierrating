@@ -11,6 +11,7 @@ import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
 import at.pcgamingfreaks.model.repo.TierListsRepository;
 import at.pcgamingfreaks.model.repo.TiersRepository;
 import at.pcgamingfreaks.model.repo.UserRepository;
+import at.pcgamingfreaks.model.thirdparty.anilist.AniListEntry;
 import at.pcgamingfreaks.service.TiersService;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,12 +23,10 @@ import org.mockito.Mock;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
+import static at.pcgamingfreaks.model.ThirdPartyService.ANILIST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -55,8 +54,9 @@ class TiersControllerTest {
     @ParameterizedTest
     @MethodSource("expectedExceptions")
     public void setTierListNotFound(Optional<User> user, Class<RuntimeException> expectedException) {
+        user.ifPresent(u -> u.setConnections(new HashMap<>()));
         when(userRepository.findByUsername(any())).thenReturn(user);
-        assertThrows(expectedException, () -> tiersService.updateTierlist("testing", ThirdPartyService.ANILIST, ContentType.ANIME, new ArrayList<>()));
+        assertThrows(expectedException, () -> tiersService.updateTierlist("testing", ANILIST, ContentType.ANIME, new ArrayList<>()));
     }
 
     private static Stream<Arguments> settingTierlist() {
@@ -104,7 +104,7 @@ class TiersControllerTest {
     public void setTierListExisting(List<Tier> immutableExistingTiers, List<TierDTO> changedTiers, List<Tier> expectedTiers, List<Tier> expectedRemovedTiers) {
         User user = new User();
         user.setUsername("test");
-        user.getConnections().put(ThirdPartyService.ANILIST, new ThirdPartyConnection());
+        user.setConnections(Map.of(ANILIST, new ThirdPartyConnection()));
         when(userRepository.findByUsername(any())).thenReturn(Optional.of(user));
 
         List<Tier> existingTiers = new ArrayList<>(immutableExistingTiers);
@@ -117,7 +117,7 @@ class TiersControllerTest {
         ArgumentCaptor<TierList> tierListCaptor = ArgumentCaptor.forClass(TierList.class);
         ArgumentCaptor<List<Tier>> tiersCaptor = ArgumentCaptor.forClass(List.class);
 
-        tiersService.updateTierlist("test", ThirdPartyService.ANILIST, ContentType.ANIME, changedTiers);
+        tiersService.updateTierlist("test", ANILIST, ContentType.ANIME, changedTiers);
 
         verify(tierListsRepository, times(1)).save(tierListCaptor.capture());
 
