@@ -8,7 +8,7 @@ export const fetchData = async (token: string | null, username: string, service:
     if (!token) throw new Error("No authentication token");
 
     try {
-        const response = await fetch(`${API_URL}/data/${username}/${service}/${type}`, {
+        const response = await fetch(`${API_URL}/data/fetch/${username}/${service}/${type}`, {
             method: 'GET',
             headers: {
                 "Authorization": `Bearer ${token}`,
@@ -41,6 +41,26 @@ export async function updateData(id: string, score: number, service: string, typ
                 service: service,
                 type: type,
             })
+        });
+
+        const data = await response.json().catch(() => null)
+        return {data, status: response.status};
+    } catch (error) {
+        console.error('API proxy error: ', error);
+        return {error: 'Server unavailable', status: 500}
+    }
+}
+
+export async function pullData(token: string | null, username: string, service: string, type: string): Promise<ServerResponse<GenericErrorResponse>> {
+    if (!token) throw new Error("No authentication token");
+
+    try {
+        const response = await fetch(`${API_URL}/data/pull/${username}/${service}/${type}`, {
+            method: 'GET',
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            }
         });
 
         const data = await response.json().catch(() => null)

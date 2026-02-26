@@ -11,6 +11,7 @@ export interface DataProvider {
     fetchData: (token: string | null, username: string, logout: () => void) => Promise<TierlistEntry[]>
     fetchTierlist: (token: string | null, username: string, logout: () => void) => Promise<Tier[]>
     updateData: (id: string, rating: number, token: string | null, username: string, logout: () => void) => Promise<void>
+    pullData: (token: string | null, username: string, logout: () => void) => Promise<void>
 }
 
 const providers: Record<string, DataProvider> = {

@@ -1,7 +1,7 @@
 import {DataProvider} from "@/components/data-providers/data-provider";
 import {Tier, TierlistEntry} from "@/components/model/types";
 import {fetchTiers} from "@/components/api/tier-api";
-import {fetchData, updateData} from "@/components/api/data-api";
+import {fetchData, pullData, updateData} from "@/components/api/data-api";
 import {getDefaultTiers} from "@/components/model/defaults";
 
 export abstract class AbstractDataProvider implements DataProvider {
@@ -48,6 +48,19 @@ export abstract class AbstractDataProvider implements DataProvider {
                 if (response.status === 401 || response.status === 403) {
                     logout()
                     throw new Error("Session expired or unauthorized");
+                }
+                if (response.status != 200) throw new Error(response.data ? response.data.message : `API error: ${response.status}`)
+
+                return;
+            });
+    }
+
+    async pullData(token: string | null, username: string, logout: () => void): Promise<void> {
+        return pullData(token, username, this.getServiceName(), this.getTypeName())
+            .then(response => {
+                if (response.status === 401 || response.status === 403) {
+                    logout();
+                    throw new Error("Session expired");
                 }
                 if (response.status != 200) throw new Error(response.data ? response.data.message : `API error: ${response.status}`)
 
