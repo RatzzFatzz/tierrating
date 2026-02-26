@@ -35,7 +35,7 @@ public class DataController {
      * If no data is synced yet and auto sync is active, pull data before returning result.
      * @return mapped third-party data ordered by score descending
      */
-    @GetMapping("{username}/{service}/{type}")
+    @GetMapping("fetch/{username}/{service}/{type}")
     public ResponseEntity<List<ListEntryDTO>> fetch(@PathVariable String username,
                                                     @PathVariable ThirdPartyService service,
                                                     @PathVariable ContentType type) {
