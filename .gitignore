@@ -26,3 +26,13 @@ replay_pid*
 
 # intellij
 .idea/
+
+# Secrets and local configuration
+.env
+.env.*
+application-local.yml
+application-local.properties
+application-prod.yml
+application-prod.properties
+*.secrets
+secrets/

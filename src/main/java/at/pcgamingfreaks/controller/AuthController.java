@@ -4,6 +4,7 @@ import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.dto.*;
 import at.pcgamingfreaks.service.AuthService;
 import at.pcgamingfreaks.service.thirdparty.auth.ThirdPartyAuthenticatorFactory;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +21,13 @@ public class AuthController {
     private final ThirdPartyAuthenticatorFactory thirdPartyAuthenticatorFactory;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
         log.debug("Login request from {}", request.getUsername());
         return ResponseEntity.ok(authService.authenticate(request.getUsername(), request.getPassword()));
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<SignupResponseDTO> signup(@RequestBody SignupRequestDTO request) {
+    public ResponseEntity<SignupResponseDTO> signup(@Valid @RequestBody SignupRequestDTO request) {
         log.debug("Signup request from {}", request.getUsername());
         return ResponseEntity.ok(authService.signup(request));
     }

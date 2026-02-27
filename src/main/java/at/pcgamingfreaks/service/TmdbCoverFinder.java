@@ -3,22 +3,27 @@ package at.pcgamingfreaks.service;
 import at.pcgamingfreaks.model.thirdparty.TmdbCoverCache;
 import at.pcgamingfreaks.model.dto.TmdbInfoRequest;
 import at.pcgamingfreaks.model.repo.TmdbCoverCacheRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestClient;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class TmdbCoverFinder {
     private static final String TMDB_API_URL = "https://api.themoviedb.org/3";
     private static final String TMDB_IMAGE_API_URL = "https://image.tmdb.org/t/p/w185";
-    private static final String TMDB_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzZGJhZGU4MDI2NTc1ODlhYjUxODJiMDY1M2Y4ZTliOCIsIm5iZiI6MTc2Mjc4NDQxMy43OCwic3ViIjoiNjkxMWY0OWQ4MDQ3NzZkYmUyZDI1Y2FjIiwic2NvcGVzIjpbImFwaV9yZWFkIl0sInZlcnNpb24iOjF9.iJWmmP6WPkcTqNSmdkoam5ZS3fDHeG1JsFKodhVJRQs";
-
+    private final String tmdbApiKey;
     private final TmdbCoverCacheRepository tmdbCoverCacheRepository;
+
+    public TmdbCoverFinder(
+            @Value("${tmdb.api.key:}") String tmdbApiKey,
+            TmdbCoverCacheRepository tmdbCoverCacheRepository) {
+        this.tmdbApiKey = tmdbApiKey;
+        this.tmdbCoverCacheRepository = tmdbCoverCacheRepository;
+    }
 
     /**
      * Find cover image for movies from TMDB
@@ -65,7 +70,7 @@ public class TmdbCoverFinder {
         try {
             TmdbInfoRequest response = RestClient.builder()
                     .baseUrl(TMDB_API_URL)
-                    .defaultHeader("Authorization", "Bearer " + TMDB_API_KEY)
+                    .defaultHeader("Authorization", "Bearer " + tmdbApiKey)
                     .build()
                     .get()
                     .uri(urlExtension.formatted(id))

@@ -14,6 +14,7 @@ import at.pcgamingfreaks.model.repo.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Function;
@@ -43,15 +44,14 @@ public class TiersService {
         return tiers;
     }
 
+    @Transactional
     public void updateTierlist(String username, ThirdPartyService service, ContentType type, List<TierDTO> changedTierlist) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
         if (!hasUserConnection(user, service)) throw new ThirdPartyUnconfiguredException(service);
 
-        Optional<TierList> existingTierlist = tierListsRepository.findByUserAndServiceAndType(user, service, type);
-
-        if (existingTierlist.isPresent()) {
+        tierListsRepository.findByUserAndServiceAndType(user, service, type).ifPresentOrElse(existingTierlist -> {
             Set<UUID> changedTiers = changedTierlist.stream().map(TierDTO::getId).collect(Collectors.toSet());
-            List<Tier> existingTiers = existingTierlist.get().getTiers();
+            List<Tier> existingTiers = existingTierlist.getTiers();
             List<Tier> removedTiers = new ArrayList<>();
             // handle removed tiers
             int i = 0;
@@ -65,7 +65,7 @@ public class TiersService {
             }
 
             // handle added and modified tiers
-            Map<UUID, Tier> existingTiersMap = existingTierlist.get().getTiers().stream().collect(Collectors.toMap(Tier::getId, Function.identity()));
+            Map<UUID, Tier> existingTiersMap = existingTierlist.getTiers().stream().collect(Collectors.toMap(Tier::getId, Function.identity()));
             for (TierDTO changedTier: changedTierlist) {
                 if (existingTiersMap.containsKey(changedTier.getId())) {
                     Tier tier = existingTiersMap.get(changedTier.getId());
@@ -75,14 +75,14 @@ public class TiersService {
                     tier.setAdjustedScore(changedTier.getAdjustedScore());
                 } else {
                     Tier tier = TierDtoMapper.map(changedTier);
-                    tier.setTierlist(existingTierlist.get());
+                    tier.setTierlist(existingTierlist);
                     existingTiers.add(tier);
                 }
             }
 
-            tierListsRepository.save(existingTierlist.get());
+            tierListsRepository.save(existingTierlist);
             tiersRepository.deleteAll(removedTiers);
-        } else {
+        }, () -> {
             TierList tierlist = new TierList();
             tierlist.setUser(user);
             tierlist.setService(service);
@@ -97,6 +97,6 @@ public class TiersService {
             });
 
             tierListsRepository.save(tierlist);
-        }
+        });
     }
 }

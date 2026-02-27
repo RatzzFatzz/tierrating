@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -32,6 +33,7 @@ public class AuthService {
         return new LoginResponseDTO(token);
     }
 
+    @Transactional
     public SignupResponseDTO signup(SignupRequestDTO request) {
         SignupResponseDTO response = new SignupResponseDTO();
         response.setUsernameTaken(userRepository.findByUsername(request.getUsername()).isPresent());
@@ -63,20 +65,23 @@ public class AuthService {
         return new LoginResponseDTO(refreshedToken);
     }
 
+    @Transactional
     public void changePassword(ChangePasswordRequestDTO request) {
-        Optional<User> user = userRepository.findByUsername(request.getUsername());
-        if (user.isEmpty()) throw new UsernameNotFoundException(request.getUsername());
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException(request.getUsername()));
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getOldPassword()));
-        user.get().setPassword(passwordEncoder.encode(request.getNewPassword()));
-        userRepository.save(user.get());
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 
+    @Transactional
     public void deleteAccount(AccountDeletionRequestDTO request) {
-        Optional<User> user = userRepository.findByUsername(request.getUsername());
-        if (user.isEmpty()) throw new UsernameNotFoundException(request.getUsername());
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException(request.getUsername()));
 
-        userRepository.delete(user.get());
-        log.info("Deleted {} successfully", user.get().getUsername());
+        userRepository.delete(user);
+        log.info("Deleted {} successfully", user.getUsername());
     }
+
 }
