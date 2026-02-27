@@ -3,6 +3,7 @@ package at.pcgamingfreaks.model;
 import at.pcgamingfreaks.model.auth.User;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity(name = "tierlists")
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = { "user_id", "service", "type"})

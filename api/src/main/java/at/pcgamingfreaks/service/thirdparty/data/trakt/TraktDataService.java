@@ -1,5 +1,8 @@
 package at.pcgamingfreaks.service.thirdparty.data.trakt;
 
+import at.pcgamingfreaks.model.exceptions.ThirdPartySyncException;
+import at.pcgamingfreaks.model.exceptions.EntryNotFoundException;
+import at.pcgamingfreaks.model.ContentType;
 import at.pcgamingfreaks.config.ThirdPartyConfig;
 import at.pcgamingfreaks.mapper.ListEntryDtoMapper;
 import at.pcgamingfreaks.model.ThirdPartyService;
@@ -17,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,9 +58,10 @@ public abstract class TraktDataService implements DataService {
         return existingScores.stream().map(listEntryDtoMapper::map).toList();
     }
 
+    @Transactional
     @Override
     public void pull(String username) {
-        if (!thirdPartyConfig.getTrakt().isValid()) throw new RuntimeException("Trakt config is invalid");
+        if (!thirdPartyConfig.getTrakt().isValid()) throw new ThirdPartySyncException("Trakt config is invalid");
         long duration = System.currentTimeMillis();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
 
@@ -116,11 +121,12 @@ public abstract class TraktDataService implements DataService {
 
     abstract protected List<?> pullWatched(User user);
 
+    @Transactional
     @Override
     public void update(long id, float score, User user) {
-        if (!thirdPartyConfig.getTrakt().isValid())  throw new ThirdPartyUnconfiguredException(ThirdPartyService.TRAKT);
+        if (!thirdPartyConfig.getTrakt().isValid()) throw new ThirdPartyUnconfiguredException(ThirdPartyService.TRAKT);
 
-        TraktEntryScore entryScore = entryScoreRepository.findByUserAndEntry_Id(user, id).orElseThrow(() -> new RuntimeException("Trakt entry not found"));
+        TraktEntryScore entryScore = entryScoreRepository.findByUserAndEntry_Id(user, id).orElseThrow(() -> new EntryNotFoundException(getContentType(), id));
         entryScore.setScore((int) score);
         entryScoreRepository.save(entryScore);
 

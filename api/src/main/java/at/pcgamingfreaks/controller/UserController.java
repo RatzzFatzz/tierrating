@@ -33,9 +33,11 @@ public class UserController {
     @PostMapping("{username}/remove/{service}")
     @PreAuthorize("authentication.principal.username == #username")
     public ResponseEntity<ThirdPartyRemovalResponseDTO> removeThirdPartyService(@PathVariable String username, @PathVariable ThirdPartyService service) {
-        Optional<User> user = userRepository.findByUsername(username);
-        if (user.isEmpty()) return ResponseEntity.ok(new ThirdPartyRemovalResponseDTO(false, "Unknown user"));
+        User user = userRepository.findByUsername(username)
+                .orElse(null);
+        if (user == null) return ResponseEntity.ok(new ThirdPartyRemovalResponseDTO(false, "Unknown user"));
 
-        return ResponseEntity.ok(thirdPartyConnectorFactory.getProvider(service).removeConnection(user.get()));
-    }
+        return ResponseEntity.ok(thirdPartyConnectorFactory.getProvider(service).removeConnection(user));
+}
+
 }
