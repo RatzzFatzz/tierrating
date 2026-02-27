@@ -39,7 +39,7 @@ public class AuthController {
 
     @PostMapping("/change-password")
     @PreAuthorize("authentication.principal.username == #request.username")
-    public void changePassword(@RequestBody ChangePasswordRequestDTO request) {
+    public void changePassword(@Valid @RequestBody ChangePasswordRequestDTO request) {
         log.debug("Change password request from {}", request.getUsername());
         authService.changePassword(request);
     }

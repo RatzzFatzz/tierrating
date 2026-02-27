@@ -16,8 +16,15 @@ spring:
 
 security:
   jwt:
+    # JWT secret key - MUST be changed in production!
+    # Use a strong, random string of at least 256 bits
     secret-key: ${JWT_SECRET_KEY:please-change-this-secret-key-in-production}
-    expiration-time: ${JWT_EXPIRATION_TIME:3600000}
+    # Token expiration in minutes (default: 60 minutes = 1 hour)
+    # Consider implementing refresh token rotation for better security:
+    # - Short-lived access tokens (15-30 min) + long-lived refresh tokens
+    # - Refresh tokens should be rotated on each use and stored securely
+    # - See: https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/
+    expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
 
 services:
   anilist:
