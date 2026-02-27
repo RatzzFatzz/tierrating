@@ -37,9 +37,11 @@ export default function ThirdPartyButton({service, type, title, username, config
         setIsRemovingService(true);
         removeConnection(service, username, token)
             .then(response => {
-                if (response.error) throw new Error(response.error);
-                if (!response.data) throw new Error("Faulty response");
-                if (!response.data.success) throw new Error(response.data.message);
+                if (response.status === 401 || response.status === 403) {
+                    logout()
+                    throw new Error("Session expired or unauthorized");
+                }
+                if (response.status != 200) throw new Error(response.data ? response.data.message : `API error: ${response.status}`)
                 router.refresh();
                 console.debug(`${service} connection removed`);
             })

@@ -15,12 +15,14 @@ export default function AccountModification() {
         setIsDeleting(true);
         deleteAccount(user, token)
             .then(response => {
-                if (response.error) throw new Error(response.error);
-                if (!response.data) throw new Error("Faulty response");
-                if (!response.data.success) throw new Error(response.data.message);
+                if (response.status === 401 || response.status === 403) {
+                    logout()
+                    throw new Error("Session expired or unauthorized");
+                }
+                if (response.status != 200) throw new Error(response.data ? response.data.message : `API error: ${response.status}`)
+
                 setTimeout(() => logout(), 1000);
                 setErrorMessage("");
-                console.info("account deleted")
             })
             .catch(error => {
                 setErrorMessage(error.message);
