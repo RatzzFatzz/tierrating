@@ -3,6 +3,7 @@ package at.pcgamingfreaks.service.thirdparty.data.anilist;
 import at.pcgamingfreaks.config.ThirdPartyConfig;
 import at.pcgamingfreaks.mapper.ListEntryDtoMapper;
 import at.pcgamingfreaks.model.ThirdPartyService;
+import at.pcgamingfreaks.model.exceptions.EntryNotFoundException;
 import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
 import at.pcgamingfreaks.model.repo.AniListEntryRepository;
 import at.pcgamingfreaks.model.repo.AniListEntryScoreRepository;
@@ -22,6 +23,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.graphql.client.HttpGraphQlClient;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
@@ -60,6 +62,7 @@ public abstract class AnilistDataService implements DataService {
         return existingScores.stream().map(listEntryDtoMapper::map).toList();
     }
 
+    @Transactional
     @Override
     public void pull(String username) {
         long duration = System.currentTimeMillis();
@@ -162,11 +165,13 @@ public abstract class AnilistDataService implements DataService {
                 (System.currentTimeMillis() - duration) / 1000);
     }
 
+    @Transactional
     @Override
     public void update(long id, float score, User user) {
-        if (!thirdPartyConfig.getAnilist().isValid())  throw new ThirdPartyUnconfiguredException(ThirdPartyService.ANILIST);
+        if (!thirdPartyConfig.getAnilist().isValid()) throw new ThirdPartyUnconfiguredException(ThirdPartyService.ANILIST);
 
-        AniListEntryScore entryScore = aniListEntryScoreRepository.findByUserAndEntry_Id(user, id).orElseThrow(() -> new RuntimeException("Anilist entry not found"));
+        AniListEntryScore entryScore = aniListEntryScoreRepository.findByUserAndEntry_Id(user, id)
+                .orElseThrow(() -> new EntryNotFoundException("Anilist entry not found"));
         entryScore.setScore(score);
         aniListEntryScoreRepository.save(entryScore);
 
@@ -195,6 +200,6 @@ public abstract class AnilistDataService implements DataService {
 
     @Override
     public void push(String username) {
-
+        // Not implemented - reserved for future bulk sync
     }
 }

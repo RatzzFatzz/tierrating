@@ -86,7 +86,7 @@ public class AniListAuthenticatorService implements ThirdPartyAuthenticatorServi
         );
 
         if (!tokenResponse.hasBody() || tokenResponse.getBody() == null)
-            throw new RuntimeException("AniList OAuth responded with empty body");
+            throw new ThirdPartyAuthenticationException("AniList OAuth responded with empty body");
 
         return tokenResponse.getBody();
     }

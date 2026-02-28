@@ -19,8 +19,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleUnknownException(Exception e) {
-        log.info("", e);
-        return ResponseEntity.badRequest().body(new ErrorResponseDTO(e.getMessage()));
+        log.error("Unexpected error occurred", e);
+        return ResponseEntity.internalServerError().body(new ErrorResponseDTO("An unexpected error occurred"));
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
@@ -36,13 +36,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CredentialsExpiredException.class)
     public ResponseEntity<ErrorResponseDTO> handleTokenExpiredException(CredentialsExpiredException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponseDTO(e.getMessage()));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponseDTO("Token has expired"));
     }
 
     @ExceptionHandler(ThirdPartyAuthenticationException.class)
     public ResponseEntity<ErrorResponseDTO> handleThirdPartyAuthenticationException(ThirdPartyAuthenticationException ex) {
-        log.warn(ex.getMessage(), ex);
-        return ResponseEntity.internalServerError().body(new ErrorResponseDTO(ex.getMessage()));
+        log.warn("Third-party authentication error: {}", ex.getMessage());
+        return ResponseEntity.internalServerError().body(new ErrorResponseDTO("Third-party authentication failed"));
     }
 
     @ExceptionHandler(ThirdPartyUnconfiguredException.class)
@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ThirdPartySyncException.class)
     public ResponseEntity<ErrorResponseDTO> handleThirdPartySyncException(ThirdPartySyncException ex) {
-        log.warn(ex.getMessage(), ex);
-        return ResponseEntity.internalServerError().body(new ErrorResponseDTO(ex.getMessage()));
+        log.warn("Third-party sync error: {}", ex.getMessage());
+        return ResponseEntity.internalServerError().body(new ErrorResponseDTO("Third-party synchronization failed"));
     }
 }
