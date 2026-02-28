@@ -1,9 +1,11 @@
-# This workflow will run every time a commit is made to dev
+# This workflow will run every time a new release is created.
 
-name: Dev Build
+name: build web release
+
 on:
   push:
-    branches: ['dev']
+    tags:
+      - 'v*'
 
 env:
   REGISTRY: ghcr.io
@@ -18,19 +20,13 @@ jobs:
       contents: read
       packages: write
 
+    defaults:
+      run:
+        working-directory: ./web
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v2
-        with:
-          distribution: temurin
-          java-version: 21
-
-      - name: Build with Maven
-        run: |
-          mvn clean package install --file pom.xml
 
       - name: Auth Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
@@ -43,7 +39,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.GITHUB_REPOSITORY }}-web
 
       - name: Build and push Docker image
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4

@@ -1,11 +1,10 @@
-# This workflow will run every time a new release is created.
+# This workflow will run every time a commit is made to dev
 
-name: UI Release Build
+name: build web ci
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches: ['dev']
 
 env:
   REGISTRY: ghcr.io
@@ -19,6 +18,10 @@ jobs:
     permissions:
       contents: read
       packages: write
+
+    defaults:
+      run:
+        working-directory: ./web
 
     steps:
       - name: Checkout
@@ -35,7 +38,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.GITHUB_REPOSITORY }}-web
 
       - name: Build and push Docker image
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4

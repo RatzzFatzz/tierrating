@@ -2,7 +2,7 @@ name: tierrating
 services:
 
   server:
-    build: .
+    build: api
     restart: unless-stopped
     ports:
       - 8080
