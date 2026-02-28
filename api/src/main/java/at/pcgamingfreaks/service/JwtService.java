@@ -13,16 +13,20 @@ import java.util.Date;
 @Service
 public class JwtService {
     private final Algorithm algorithm;
+    private final long expirationMinutes;
 
-    public JwtService(@Value("${security.jwt.secret-key}") String key) {
-        algorithm = Algorithm.HMAC256(key);
+    public JwtService(
+            @Value("${security.jwt.secret-key}") String key,
+            @Value("${security.jwt.expiration-minutes:60}") long expirationMinutes) {
+        this.algorithm = Algorithm.HMAC256(key);
+        this.expirationMinutes = expirationMinutes;
     }
 
     public String create(String username) {
         return JWT.create()
                 .withSubject(username)
                 .withIssuedAt(Date.from(Instant.now()))
-                .withExpiresAt(Date.from(Instant.now().plus(60, ChronoUnit.MINUTES)))
+                .withExpiresAt(Date.from(Instant.now().plus(expirationMinutes, ChronoUnit.MINUTES)))
                 .sign(algorithm);
     }
 

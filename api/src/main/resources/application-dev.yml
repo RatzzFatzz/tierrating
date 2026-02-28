@@ -4,7 +4,7 @@ spring:
     url: jdbc:postgresql://localhost:5433/tierrating
     driver-class-name: org.postgresql.Driver
     username: tierrating
-    password: testingPW
+    password: ${DB_PASSWORD:testingPW}
 
   jpa:
     hibernate:
@@ -16,8 +16,8 @@ spring:
 
 security:
   jwt:
-    secret-key: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b
-    expiration-time: 3600000
+    secret-key: ${JWT_SECRET_KEY:dev-secret-key-change-in-production}
+    expiration-time: ${JWT_EXPIRATION_TIME:3600000}
 
 services:
   anilist:
@@ -30,3 +30,6 @@ services:
       key: ${TRAKT_CLIENT_KEY:}
       secret: ${TRAKT_CLIENT_SECRET:}
     url: ${TRAKT_REDIRECT_URL:}
+tmdb:
+  api:
+    key: ${TMDB_API_KEY:}

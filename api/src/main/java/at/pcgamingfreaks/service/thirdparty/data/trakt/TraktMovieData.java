@@ -129,8 +129,8 @@ public class TraktMovieData extends TraktDataService {
                             .rating(Rating.fromValue((int) score))))
                     .execute();
         } catch (IOException e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException(e);
+            log.error("Error pushing rating change to Trakt: {}", e.getMessage(), e);
+            throw new ThirdPartySyncException("Failed to push rating change to Trakt: " + e.getMessage());
         }
     }
 }
