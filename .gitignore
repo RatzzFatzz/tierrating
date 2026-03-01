@@ -1,12 +1,14 @@
 # Compiled class file
 *.class
 target/
+/.next/
+/out/
+/build
+*.tsbuildinfo
+next-env.d.ts
 
 # Log file
 *.log
-
-# BlueJ files
-*.ctxt
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
@@ -47,16 +49,6 @@ secrets/
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
 # misc
 .DS_Store
 *.pem
@@ -67,9 +59,5 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# local data
+/data/
