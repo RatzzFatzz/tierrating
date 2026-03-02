@@ -1,7 +1,7 @@
 # Compiled class file
 *.class
-target/
-/.next/
+**/target/
+**/.next/
 /out/
 /build
 *.tsbuildinfo
@@ -40,7 +40,7 @@ application-prod.properties
 secrets/
 
 # dependencies
-/node_modules
+**/node_modules
 /.pnp
 .pnp.*
 .yarn/*
