@@ -1,14 +1,13 @@
 # TierRating
-[![Server Release Build](https://github.com/tierrating/tierrating/actions/workflows/build-api-release.yml/badge.svg)](https://github.com/tierrating/tierrating/actions/workflows/release-build.yml)
-[![UI Release Build](https://github.com/tierrating/tierrating/actions/workflows/build-web-release.yml/badge.svg)](https://github.com/tierrating/tierrating-ui/actions/workflows/release-build.yml)
-
+[![Server Release Build](https://github.com/tierrating/tierrating/actions/workflows/build-api-release.yml/badge.svg)](https://github.com/tierrating/tierrating/actions/workflows/build-api-release.yml)
+[![UI Release Build](https://github.com/tierrating/tierrating/actions/workflows/build-web-release.yml/badge.svg)](https://github.com/tierrating/tierrating-ui/actions/workflows/build-web-release.yml)
 
 Fetch ratings from third-party providers like AniList & Trakt and organize them in tier lists. Changes will be synced back to the provider.
 
 ## Overview
 * Import your ratings from Anilist and Trakt
 * View and organize your content in tier lists
-* Sync rating changes back to the original platform
+* Automatically keep rating changes in sync
 * Fully selfhostable
 
 ## Screenshots
