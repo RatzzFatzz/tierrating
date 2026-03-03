@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>at.pcgamingfreaks</groupId>
-    <artifactId>tierrating</artifactId>
+    <artifactId>tierrating-api</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 
     <parent>
