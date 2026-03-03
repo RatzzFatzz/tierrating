@@ -28,6 +28,7 @@ replay_pid*
 
 # intellij
 .idea/
+**/*.iml
 
 # Secrets and local configuration
 .env
