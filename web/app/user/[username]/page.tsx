@@ -9,17 +9,15 @@ import LoadingPage from "@/components/loading-skeletons/loading-page";
 import {cn} from "@/lib/utils"
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {UserResponse} from "@/components/model/response-types";
-import ThirdPartyLoginButton from "@/app/user/[username]/third-party-login-button";
-import ThirdPartyButton from "@/app/user/[username]/third-party-button";
 import {fetchConfiguredServices} from "@/components/api/config-api";
+import TierlistLink from "@/app/user/[username]/tierlist-link";
 
 
 export default function Profile() {
     const params = useParams<{ username: string }>();
     const username: string = params.username;
     const [userResponse, setUserResponse] = useState<UserResponse>();
-    const {user, token, isLoading, isAuthenticated, logout} = useAuth();
-    const isConfigAllowed: boolean = username === user;
+    const {token, isLoading, isAuthenticated, logout} = useAuth();
 
     const [configuredServices, setConfiguredServices] = useState<string[]>();
 
@@ -79,19 +77,12 @@ export default function Profile() {
                     </CardHeader>
 
                     <CardContent className="space-y-4">
-                        <div className="grid columns-1 gap-4 pb-4">
-                            {isConfigAllowed && configuredServices.find(service => service == "anilist") && !userResponse.connectedServices.includes('ANILIST')
-                                && <ThirdPartyLoginButton index={0} title={"Connect AniList"} path={"/auth/anilist"} color={"bg-blue-600 hover:bg-blue-700"} service="anilist"/>}
-                            {isConfigAllowed && configuredServices.find(service => service == "trakt") && !userResponse.connectedServices.includes('TRAKT')
-                                && <ThirdPartyLoginButton index={1} title={"Connect Trakt"} path={"/auth/trakt"} color={"bg-red-600 hover:bg-red-700"} service="trakt"/>}
-                        </div>
-
                         <div className="grid columns-1 gap-4">
-                            {userResponse.connectedServices.includes('ANILIST') && <ThirdPartyButton service={"anilist"} type={"anime"} title={"Anime"} username={userResponse.username} configAllowed={isConfigAllowed} token={token} logout={logout}/>}
-                            {userResponse.connectedServices.includes('ANILIST') && <ThirdPartyButton service={"anilist"} type={"manga"} title={"Manga"} username={userResponse.username} configAllowed={isConfigAllowed} token={token} logout={logout}/>}
-                            {userResponse.connectedServices.includes('TRAKT') && <ThirdPartyButton service={"trakt"} type={"movies"} title={"Movies"} username={userResponse.username} configAllowed={isConfigAllowed} token={token} logout={logout}/>}
-                            {userResponse.connectedServices.includes('TRAKT') && <ThirdPartyButton service={"trakt"} type={"tvshows"} title={"TV Shows"} username={userResponse.username} configAllowed={isConfigAllowed} token={token} logout={logout}/>}
-                            {userResponse.connectedServices.includes('TRAKT') && <ThirdPartyButton service={"trakt"} type={"tvshows-seasons"} title={"TV Shows - Seasons"} username={userResponse.username} configAllowed={isConfigAllowed} token={token} logout={logout}/>}
+                            {userResponse.connectedServices.includes('ANILIST') && <TierlistLink service={"anilist"} type={"anime"} title={"Anime"} username={userResponse.username}/>}
+                            {userResponse.connectedServices.includes('ANILIST') && <TierlistLink service={"anilist"} type={"manga"} title={"Manga"} username={userResponse.username}/>}
+                            {userResponse.connectedServices.includes('TRAKT') && <TierlistLink service={"trakt"} type={"movies"} title={"Movies"} username={userResponse.username}/>}
+                            {userResponse.connectedServices.includes('TRAKT') && <TierlistLink service={"trakt"} type={"tvshows"} title={"TV Shows"} username={userResponse.username}/>}
+                            {userResponse.connectedServices.includes('TRAKT') && <TierlistLink service={"trakt"} type={"tvshows-seasons"} title={"TV Shows - Seasons"} username={userResponse.username}/>}
                         </div>
                     </CardContent>
                 </Card>
