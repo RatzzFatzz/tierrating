@@ -18,8 +18,8 @@ export default function ThirdPartyConnection({service, types, removeConnection, 
 }) {
 
     return (
-        <Card className={"gap-1"}>
-            <CardHeader className={"h-9"}>
+        <Card className={"gap-1 py-4"}>
+            <CardHeader className={"h-9 px-4"}>
                 <div className={"w-full flex gap-2 items-center"}>
                     <div className="relative size-7">
                         <Image
@@ -39,10 +39,10 @@ export default function ThirdPartyConnection({service, types, removeConnection, 
                     </Button>
                 </div>
             </CardHeader>
-            <CardContent className={"grid gap-1"}>
+            <CardContent className={"grid gap-1 px-4"}>
                 {
                     types.map(entry => (
-                        <ThirdPartyConnectedButton service={service.id} type={entry.id} title={entry.title} username={username} token={token} logout={logout}/>
+                        <ThirdPartyConnectedButton key={service.id + '.' + entry.id} service={service.id} type={entry.id} title={entry.title} username={username} token={token} logout={logout}/>
                     ))
                 }
             </CardContent>

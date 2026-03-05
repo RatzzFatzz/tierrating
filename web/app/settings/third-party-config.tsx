@@ -76,36 +76,42 @@ export default function ThirdPartyConfig() {
 
     return (
         <div className={"w-full grid gap-4"}>
-            <div className="grid columns-1 gap-2">
-                {
-                    configuredServices.includes('anilist')
-                    && !userResponse.connectedServices.includes('ANILIST')
-                    && <ThirdPartyLoginButton index={0} title={"Connect AniList"} path={"/auth/anilist"}
-                                              color={"bg-blue-600 hover:bg-blue-700"} service="anilist"/>
-                }
-                {
-                    configuredServices.includes('trakt')
-                    && !userResponse.connectedServices.includes('TRAKT')
-                    && <ThirdPartyLoginButton index={1} title={"Connect Trakt"} path={"/auth/trakt"}
-                                              color={"bg-red-600 hover:bg-red-700"} service="trakt"/>
-                }
-            </div>
-            <div className="grid columns-1 gap-2">
-                {
-                    userResponse.connectedServices.includes('ANILIST')
-                    && <ThirdPartyConnection service={{id: "anilist", title: "Anilist"}}
-                                             types={[{id: "anime", title: "Anime"}, {id: "manga", title: "Manga"}]}
-                                             removeConnection={removeService} isRemovingService={isRemovingService}
-                                             username={user} token={token} logout={logout}/>
-                }
-                {
-                    userResponse.connectedServices.includes('TRAKT')
-                    && <ThirdPartyConnection service={{id: "trakt", title: "Trakt"}}
-                                             types={[{id: "movies", title: "Movies"}, {id: "tvshows", title: "TV Shows"}, {id: "tvshows-seasons", title: "TV Shows - Seasons"}]}
-                                             removeConnection={removeService} isRemovingService={isRemovingService}
-                                             username={user} token={token} logout={logout}/>
-                }
-            </div>
+            {
+                userResponse.connectedServices.length != configuredServices.length
+                &&  <div className="grid columns-1 gap-2">
+                    {
+                        configuredServices.includes('anilist')
+                        && !userResponse.connectedServices.includes('ANILIST')
+                        && <ThirdPartyLoginButton title={"Connect AniList"} path={"/auth/anilist"}
+                                                  color={"bg-blue-600 hover:bg-blue-700"} service="anilist"/>
+                    }
+                    {
+                        configuredServices.includes('trakt')
+                        && !userResponse.connectedServices.includes('TRAKT')
+                        && <ThirdPartyLoginButton title={"Connect Trakt"} path={"/auth/trakt"}
+                                                  color={"bg-red-600 hover:bg-red-700"} service="trakt"/>
+                    }
+                </div>
+            }
+            {
+                userResponse.connectedServices.length > 0
+                && <div className="grid columns-1 gap-2">
+                    {
+                        userResponse.connectedServices.includes('ANILIST')
+                        && <ThirdPartyConnection service={{id: "anilist", title: "Anilist"}}
+                                                 types={[{id: "anime", title: "Anime"}, {id: "manga", title: "Manga"}]}
+                                                 removeConnection={removeService} isRemovingService={isRemovingService}
+                                                 username={user} token={token} logout={logout}/>
+                    }
+                    {
+                        userResponse.connectedServices.includes('TRAKT')
+                        && <ThirdPartyConnection service={{id: "trakt", title: "Trakt"}}
+                                                 types={[{id: "movies", title: "Movies"}, {id: "tvshows", title: "TV Shows"}, {id: "tvshows-seasons", title: "TV Shows - Seasons"}]}
+                                                 removeConnection={removeService} isRemovingService={isRemovingService}
+                                                 username={user} token={token} logout={logout}/>
+                    }
+                </div>
+            }
         </div>
     )
 }
