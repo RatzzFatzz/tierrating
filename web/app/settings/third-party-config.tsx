@@ -82,14 +82,12 @@ export default function ThirdPartyConfig() {
                     {
                         configuredServices.includes('anilist')
                         && !userResponse.connectedServices.includes('ANILIST')
-                        && <ThirdPartyLoginButton title={"Connect AniList"} path={"/auth/anilist"}
-                                                  color={"bg-blue-600 hover:bg-blue-700"} service="anilist"/>
+                        && <ThirdPartyLoginButton title={"Connect AniList"} path={"/auth/anilist"} service="anilist"/>
                     }
                     {
                         configuredServices.includes('trakt')
                         && !userResponse.connectedServices.includes('TRAKT')
-                        && <ThirdPartyLoginButton title={"Connect Trakt"} path={"/auth/trakt"}
-                                                  color={"bg-red-600 hover:bg-red-700"} service="trakt"/>
+                        && <ThirdPartyLoginButton title={"Connect Trakt"} path={"/auth/trakt"} service="trakt"/>
                     }
                 </div>
             }

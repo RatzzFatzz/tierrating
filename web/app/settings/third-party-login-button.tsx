@@ -3,10 +3,9 @@ import {Button} from "@/components/ui/button";
 import Image from "next/image";
 import React from "react";
 
-export default function ThirdPartyLoginButton({title, path, color, service}: {
+export default function ThirdPartyLoginButton({title, path, service}: {
     title: string,
     path: string,
-    color: string,
     service: string
 }) {
     return (
