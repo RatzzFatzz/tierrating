@@ -156,46 +156,54 @@ describe("groupBySingle", () => {
 		expect(result.size).toBe(0);
 	});
 
-	it("maps each element by its key", () => {
-		const arr = [
-			{ id: "a", value: 1 },
-			{ id: "b", value: 2 },
-		];
-		const result = groupBySingle(arr, (x) => x.id);
-
-		expect(result.size).toBe(2);
-		expect(result.get("a")).toEqual({ id: "a", value: 1 });
-		expect(result.get("b")).toEqual({ id: "b", value: 2 });
-	});
-
-	it("last element wins when there are duplicate keys", () => {
-		const arr = [
-			{ id: "a", value: 1 },
-			{ id: "a", value: 2 },
-		];
-		const result = groupBySingle(arr, (x) => x.id);
-
-		expect(result.size).toBe(1);
-		expect(result.get("a")).toEqual({ id: "a", value: 2 });
-	});
-
-	it("works with numeric keys", () => {
-		const arr = [
-			{ id: 1, name: "Alice" },
-			{ id: 2, name: "Bob" },
-		];
-		const result = groupBySingle(arr, (x) => x.id);
-
-		expect(result.size).toBe(2);
-		expect(result.get(1)).toEqual({ id: 1, name: "Alice" });
-		expect(result.get(2)).toEqual({ id: 2, name: "Bob" });
-	});
-
 	it("works with single-element arrays", () => {
 		const arr = [{ id: "x", value: 42 }];
 		const result = groupBySingle(arr, (x) => x.id);
 
 		expect(result.size).toBe(1);
 		expect(result.get("x")).toEqual({ id: "x", value: 42 });
+	});
+
+	it.each([
+		[
+			"string keys",
+			[
+				{ id: "a", value: 1 },
+				{ id: "b", value: 2 },
+			],
+			2,
+			[
+				["a", { id: "a", value: 1 }],
+				["b", { id: "b", value: 2 }],
+			],
+		],
+		[
+			"numeric keys",
+			[
+				{ id: 1, name: "Alice" },
+				{ id: 2, name: "Bob" },
+			],
+			2,
+			[
+				[1, { id: 1, name: "Alice" }],
+				[2, { id: 2, name: "Bob" }],
+			],
+		],
+		[
+			"duplicate keys (last wins)",
+			[
+				{ id: "a", value: 1 },
+				{ id: "a", value: 2 },
+			],
+			1,
+			[["a", { id: "a", value: 2 }]],
+		],
+	])("maps elements by %s", (_description, arr, expectedSize, expectedEntries) => {
+		const result = groupBySingle(arr, (x) => x.id);
+
+		expect(result.size).toBe(expectedSize);
+		for (const [key, value] of expectedEntries) {
+			expect(result.get(key)).toEqual(value);
+		}
 	});
 });

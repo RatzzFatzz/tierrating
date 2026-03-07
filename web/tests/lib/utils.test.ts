@@ -2,38 +2,18 @@ import { describe, it, expect } from "vitest";
 import { sortByName } from "@/components/tierlist/tier-mapper";
 
 describe("sortByName", () => {
-	it("should return -1 when first item comes before second alphabetically", () => {
-		const a = { title: "Alpha" };
-		const b = { title: "Beta" };
+	it.each([
+		// [titleA, titleB, expectedResult, description]
+		["Alpha", "Beta", -1, "first item comes before second alphabetically"],
+		["Zeta", "Alpha", 1, "first item comes after second alphabetically"],
+		["Same", "Same", 0, "items have same name"],
+		["alpha", "BETA", -1, "case insensitive comparison"],
+		["!First", "Second", -1, "special characters"],
+	])("returns %i when %s vs %s (%s)", (titleA, titleB, expected, _description) => {
+		const a = { title: titleA };
+		const b = { title: titleB };
 
-		expect(sortByName(a as any, b as any)).toBe(-1);
-	});
-
-	it("should return 1 when first item comes after second alphabetically", () => {
-		const a = { title: "Zeta" };
-		const b = { title: "Alpha" };
-
-		expect(sortByName(a as any, b as any)).toBe(1);
-	});
-
-	it("should return 0 when items have same name", () => {
-		const a = { title: "Same" };
-		const b = { title: "Same" };
-
-		expect(sortByName(a as any, b as any)).toBe(0);
-	});
-
-	it("should be case insensitive", () => {
-		const a = { title: "alpha" };
-		const b = { title: "BETA" };
-
-		expect(sortByName(a as any, b as any)).toBe(-1);
-	});
-
-	it("should handle special characters", () => {
-		const a = { title: "!First" };
-		const b = { title: "Second" };
-
-		expect(sortByName(a as any, b as any)).toBe(-1);
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		expect(sortByName(a as any, b as any)).toBe(expected);
 	});
 });
