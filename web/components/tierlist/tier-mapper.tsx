@@ -1,4 +1,4 @@
-import {Tier, TierlistEntry} from "@/components/model/types";
+import { Tier, TierlistEntry } from "@/components/model/types";
 
 export function assignTiersAndGroupEntriesByTier(tiers: Tier[], items: TierlistEntry[]): Map<string, TierlistEntry[]> {
 	// Proper order (sorted descending by score) is assured by the server
@@ -7,7 +7,7 @@ export function assignTiersAndGroupEntriesByTier(tiers: Tier[], items: TierlistE
 	let positionIndex = 0;
 
 	const entriesByTier = new Map<string, TierlistEntry[]>();
-	tiers.forEach(tier => entriesByTier.set(tier.id, []))
+	tiers.forEach((tier) => entriesByTier.set(tier.id, []));
 
 	while (itemsIndex < items.length && tiersIndex < tiers.length) {
 		if (items[itemsIndex].score >= tiers[tiersIndex].score) {
@@ -27,19 +27,19 @@ export function assignTiersAndGroupEntriesByTier(tiers: Tier[], items: TierlistE
 		}
 	}
 
-	entriesByTier.keys().forEach(key => entriesByTier.set(key, entriesByTier.get(key)!.sort(sortByName)))
+	Array.from(entriesByTier.keys()).forEach((key) => entriesByTier.set(key, entriesByTier.get(key)!.sort(sortByName)));
 
 	return entriesByTier;
 }
 
 export function groupBySingle<T, K>(arr: T[], key: (i: T) => K): Map<K, T> {
 	const map = new Map<K, T>();
-	arr.forEach(elem => map.set(key(elem), elem));
+	arr.forEach((elem) => map.set(key(elem), elem));
 	return map;
 }
 
 export function sortByName(a: TierlistEntry, b: TierlistEntry) {
 	const textA = a.title.toLowerCase();
 	const textB = b.title.toLowerCase();
-	return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+	return textA < textB ? -1 : textA > textB ? 1 : 0;
 }

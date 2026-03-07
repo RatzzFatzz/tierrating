@@ -1,49 +1,45 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import {useState} from "react"
-import {Button} from "@/components/ui/button"
-import {Input} from "@/components/ui/input"
-import {Label} from "@/components/ui/label"
-import {EyeIcon, EyeOffIcon} from "lucide-react"
-import {useAuth} from "@/components/contexts/auth-context";
-import {requestLogin} from "@/components/api/user-api";
+import Link from "next/link";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { useAuth } from "@/components/contexts/auth-context";
+import { requestLogin } from "@/components/api/user-api";
 
 export function InputForm() {
-	const [showPassword, setShowPassword] = useState(false)
-	const [isLoading, setIsLoading] = useState(false)
-	const [username, setUsername] = useState("")
-	const [password, setPassword] = useState("")
-	const [errorMessage, setErrorMessage] = useState("")
-	const {login} = useAuth();
+	const [showPassword, setShowPassword] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
+	const [username, setUsername] = useState("");
+	const [password, setPassword] = useState("");
+	const [errorMessage, setErrorMessage] = useState("");
+	const { login } = useAuth();
 
 	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault()
-		setIsLoading(true)
-		setErrorMessage("")
+		e.preventDefault();
+		setIsLoading(true);
+		setErrorMessage("");
 
 		requestLogin(username, password)
-			.then(response => {
+			.then((response) => {
 				if (response.status === 401) throw new Error("Invalid credentials");
 				if (response.error) throw new Error(response.error);
-				if (!response.data) throw new Error("Faulty response")
+				if (!response.data) throw new Error("Faulty response");
 				login(response.data.token);
 			})
-			.catch(error => {
-				setErrorMessage(error instanceof Error ? error.message : 'Login failed. Please try again.')
+			.catch((error) => {
+				setErrorMessage(error instanceof Error ? error.message : "Login failed. Please try again.");
 			})
 			.finally(() => {
 				setTimeout(() => setIsLoading(false), 1000);
 			});
-	}
+	};
 
 	return (
 		<div>
-			{errorMessage && (
-				<div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md mb-4">
-					{errorMessage}
-				</div>
-			)}
+			{errorMessage && <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md mb-4">{errorMessage}</div>}
 			<form onSubmit={handleSubmit} className="space-y-4">
 				<div className="space-y-2">
 					<Label htmlFor="username">Username</Label>
@@ -78,29 +74,20 @@ export function InputForm() {
 							className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground hover:text-foreground"
 							onClick={() => setShowPassword(!showPassword)}
 						>
-							{showPassword ? (<EyeOffIcon className="h-4 w-4"/>) : (
-								<EyeIcon className="h-4 w-4"/>)}
-							<span
-								className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
+							{showPassword ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
+							<span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
 						</Button>
 					</div>
 					<div className="flex items-center justify-end">
-						<Link
-							href="/forgot-password"
-							className="text-xs text-primary hover:underline"
-						>
+						<Link href="/forgot-password" className="text-xs text-primary hover:underline">
 							Forgot password?
 						</Link>
 					</div>
 				</div>
-				<Button
-					type="submit"
-					className="w-full"
-					disabled={isLoading}
-				>
+				<Button type="submit" className="w-full" disabled={isLoading}>
 					{isLoading ? "Signing in..." : "Sign in"}
 				</Button>
 			</form>
 		</div>
-	)
+	);
 }

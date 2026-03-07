@@ -1,10 +1,10 @@
 export interface TierlistEntry {
-	id: string
-	score: number
-	title: string
-	cover: string
-	tier: Tier
-	index: number
+	id: string;
+	score: number;
+	title: string;
+	cover: string;
+	tier: Tier;
+	index: number;
 }
 
 export interface Tier {
