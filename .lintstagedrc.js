@@ -9,11 +9,8 @@ module.exports = {
     if (javaFiles.length === 0) return [];
     return [`mvn checkstyle:check --file api/pom.xml`];
   },
-  // lint-staged v14+ uses execa without a shell, so `cd web && npx ...`
-  // does not work (cd is a shell built-in, not an executable). Instead we
-  // invoke the commands ourselves with the correct cwd so that ESLint can
-  // locate eslint.config.mjs and Prettier can resolve its config.
   "web/**/*.{js,jsx,ts,tsx}": async (filenames) => {
+    if (filenames.length === 0) return [];
     const relativePaths = filenames
       .map((f) => path.relative(webDir, f))
       .join(" ");
