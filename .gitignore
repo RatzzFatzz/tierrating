@@ -71,3 +71,7 @@ yarn-error.log*
 
 # test coverage
 web/coverage/
+# Playwright
+web/playwright-report/
+web/test-results/
+web/playwright/.cache/
