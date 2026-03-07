@@ -3,86 +3,105 @@ package at.pcgamingfreaks.model.exceptions;
 import at.pcgamingfreaks.model.ContentType;
 import at.pcgamingfreaks.model.ThirdPartyService;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Model Exceptions Tests")
 class ModelExceptionsTest {
 
-    @Test
-    @DisplayName("ThirdPartyUnconfiguredException should store service")
-    void thirdPartyUnconfiguredException_shouldStoreService() {
-        ThirdPartyUnconfiguredException ex = new ThirdPartyUnconfiguredException(ThirdPartyService.ANILIST);
-        
-        assertEquals(ThirdPartyService.ANILIST, ex.getUnconfiguredService());
+    @Nested
+    @DisplayName("ThirdPartyUnconfiguredException Tests")
+    class ThirdPartyUnconfiguredExceptionTests {
+
+        static Stream<Arguments> services() {
+            return Stream.of(
+                Arguments.of(ThirdPartyService.ANILIST),
+                Arguments.of(ThirdPartyService.TRAKT)
+            );
+        }
+
+        @ParameterizedTest(name = "should store service: {0}")
+        @MethodSource("services")
+        @DisplayName("ThirdPartyUnconfiguredException should store service")
+        void thirdPartyUnconfiguredException_shouldStoreService(ThirdPartyService service) {
+            ThirdPartyUnconfiguredException ex = new ThirdPartyUnconfiguredException(service);
+            
+            assertEquals(service, ex.getUnconfiguredService());
+        }
     }
 
-    @Test
-    @DisplayName("ThirdPartyUnconfiguredException should work with TRAKT")
-    void thirdPartyUnconfiguredException_shouldWorkWithTrakt() {
-        ThirdPartyUnconfiguredException ex = new ThirdPartyUnconfiguredException(ThirdPartyService.TRAKT);
-        
-        assertEquals(ThirdPartyService.TRAKT, ex.getUnconfiguredService());
+    @Nested
+    @DisplayName("ThirdPartySyncException Tests")
+    class ThirdPartySyncExceptionTests {
+
+        @Test
+        @DisplayName("should store message")
+        void shouldStoreMessage() {
+            ThirdPartySyncException ex = new ThirdPartySyncException("Sync failed");
+            
+            assertEquals("Sync failed", ex.getMessage());
+        }
     }
 
-    @Test
-    @DisplayName("ThirdPartySyncException should store message")
-    void thirdPartySyncException_shouldStoreMessage() {
-        ThirdPartySyncException ex = new ThirdPartySyncException("Sync failed");
-        
-        assertEquals("Sync failed", ex.getMessage());
+    @Nested
+    @DisplayName("ThirdPartyAuthenticationException Tests")
+    class ThirdPartyAuthenticationExceptionTests {
+
+        @Test
+        @DisplayName("should store message")
+        void shouldStoreMessage() {
+            ThirdPartyAuthenticationException ex = new ThirdPartyAuthenticationException("Auth failed");
+            
+            assertEquals("Auth failed", ex.getMessage());
+        }
+
+        @Test
+        @DisplayName("should store cause")
+        void shouldStoreCause() {
+            RuntimeException cause = new RuntimeException("Root cause");
+            ThirdPartyAuthenticationException ex = new ThirdPartyAuthenticationException(cause);
+            
+            assertEquals(cause, ex.getCause());
+        }
     }
 
-    @Test
-    @DisplayName("ThirdPartyAuthenticationException should store message")
-    void thirdPartyAuthenticationException_shouldStoreMessage() {
-        ThirdPartyAuthenticationException ex = new ThirdPartyAuthenticationException("Auth failed");
-        
-        assertEquals("Auth failed", ex.getMessage());
-    }
+    @Nested
+    @DisplayName("EntryNotFoundException Tests")
+    class EntryNotFoundExceptionTests {
 
-    @Test
-    @DisplayName("ThirdPartyAuthenticationException should store cause")
-    void thirdPartyAuthenticationException_shouldStoreCause() {
-        RuntimeException cause = new RuntimeException("Root cause");
-        ThirdPartyAuthenticationException ex = new ThirdPartyAuthenticationException(cause);
-        
-        assertEquals(cause, ex.getCause());
-    }
+        @Test
+        @DisplayName("should store message")
+        void shouldStoreMessage() {
+            EntryNotFoundException ex = new EntryNotFoundException("Entry not found");
+            
+            assertEquals("Entry not found", ex.getMessage());
+        }
 
-    @Test
-    @DisplayName("EntryNotFoundException should store message")
-    void entryNotFoundException_shouldStoreMessage() {
-        EntryNotFoundException ex = new EntryNotFoundException("Entry not found");
-        
-        assertEquals("Entry not found", ex.getMessage());
-    }
+        static Stream<Arguments> contentTypeAndId() {
+            return Stream.of(
+                Arguments.of(ContentType.ANIME, 12345L),
+                Arguments.of(ContentType.MOVIES, 67890L),
+                Arguments.of(ContentType.TVSHOWS, 11111L),
+                Arguments.of(ContentType.MANGA, 22222L),
+                Arguments.of(ContentType.TVSHOWS_SEASONS, 33333L)
+            );
+        }
 
-    @Test
-    @DisplayName("EntryNotFoundException should format message with type and id")
-    void entryNotFoundException_shouldFormatMessage() {
-        EntryNotFoundException ex = new EntryNotFoundException(ContentType.ANIME, 12345L);
-        
-        assertTrue(ex.getMessage().contains("ANIME"));
-        assertTrue(ex.getMessage().contains("12345"));
-    }
-
-    @Test
-    @DisplayName("EntryNotFoundException should work with MOVIES type")
-    void entryNotFoundException_shouldWorkWithMovieType() {
-        EntryNotFoundException ex = new EntryNotFoundException(ContentType.MOVIES, 67890L);
-        
-        assertTrue(ex.getMessage().contains("MOVIES"));
-        assertTrue(ex.getMessage().contains("67890"));
-    }
-
-    @Test
-    @DisplayName("EntryNotFoundException should work with TVSHOWS type")
-    void entryNotFoundException_shouldWorkWithShowType() {
-        EntryNotFoundException ex = new EntryNotFoundException(ContentType.TVSHOWS, 11111L);
-        
-        assertTrue(ex.getMessage().contains("TVSHOWS"));
-        assertTrue(ex.getMessage().contains("11111"));
+        @ParameterizedTest(name = "should format message with type={0} and id={1}")
+        @MethodSource("contentTypeAndId")
+        @DisplayName("should format message with type and id")
+        void shouldFormatMessage(ContentType type, long id) {
+            EntryNotFoundException ex = new EntryNotFoundException(type, id);
+            
+            assertTrue(ex.getMessage().contains(type.name()));
+            assertTrue(ex.getMessage().contains(String.valueOf(id)));
+        }
     }
 }

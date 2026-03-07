@@ -1,104 +1,100 @@
 package at.pcgamingfreaks.model;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Tier Tests")
 class TierTest {
 
-    @Test
-    @DisplayName("equals() should return true for same values")
-    void equals_shouldReturnTrueForSameValues() {
-        UUID id = UUID.randomUUID();
-        Tier tier1 = new Tier(id, "#FF0000", "S Tier", 10.0, 9.5);
-        Tier tier2 = new Tier(id, "#FF0000", "S Tier", 10.0, 9.5);
+    private static final UUID BASE_ID = UUID.randomUUID();
+    private static final String BASE_COLOR = "#FF0000";
+    private static final String BASE_NAME = "S Tier";
+    private static final double BASE_SCORE = 10.0;
+    private static final double BASE_ADJUSTED_SCORE = 9.5;
 
-        assertEquals(tier1, tier2);
+    private static Tier createBaseTier() {
+        return new Tier(BASE_ID, BASE_COLOR, BASE_NAME, BASE_SCORE, BASE_ADJUSTED_SCORE);
     }
 
-    @Test
-    @DisplayName("equals() should return false for different id")
-    void equals_shouldReturnFalseForDifferentId() {
-        Tier tier1 = new Tier(UUID.randomUUID(), "#FF0000", "S Tier", 10.0, 9.5);
-        Tier tier2 = new Tier(UUID.randomUUID(), "#FF0000", "S Tier", 10.0, 9.5);
+    @Nested
+    @DisplayName("equals() tests")
+    class EqualsTests {
 
-        assertNotEquals(tier1, tier2);
-    }
+        static Stream<Arguments> equalTiers() {
+            return Stream.of(
+                Arguments.of("same values", createBaseTier(), createBaseTier())
+            );
+        }
 
-    @Test
-    @DisplayName("equals() should return false for different color")
-    void equals_shouldReturnFalseForDifferentColor() {
-        UUID id = UUID.randomUUID();
-        Tier tier1 = new Tier(id, "#FF0000", "S Tier", 10.0, 9.5);
-        Tier tier2 = new Tier(id, "#00FF00", "S Tier", 10.0, 9.5);
+        static Stream<Arguments> unequalTiers() {
+            return Stream.of(
+                Arguments.of("different id", 
+                    new Tier(UUID.randomUUID(), BASE_COLOR, BASE_NAME, BASE_SCORE, BASE_ADJUSTED_SCORE),
+                    new Tier(UUID.randomUUID(), BASE_COLOR, BASE_NAME, BASE_SCORE, BASE_ADJUSTED_SCORE)),
+                Arguments.of("different color",
+                    new Tier(BASE_ID, "#FF0000", BASE_NAME, BASE_SCORE, BASE_ADJUSTED_SCORE),
+                    new Tier(BASE_ID, "#00FF00", BASE_NAME, BASE_SCORE, BASE_ADJUSTED_SCORE)),
+                Arguments.of("different name",
+                    new Tier(BASE_ID, BASE_COLOR, "S Tier", BASE_SCORE, BASE_ADJUSTED_SCORE),
+                    new Tier(BASE_ID, BASE_COLOR, "A Tier", BASE_SCORE, BASE_ADJUSTED_SCORE)),
+                Arguments.of("different score",
+                    new Tier(BASE_ID, BASE_COLOR, BASE_NAME, 10.0, BASE_ADJUSTED_SCORE),
+                    new Tier(BASE_ID, BASE_COLOR, BASE_NAME, 9.0, BASE_ADJUSTED_SCORE)),
+                Arguments.of("different adjustedScore",
+                    new Tier(BASE_ID, BASE_COLOR, BASE_NAME, BASE_SCORE, 9.5),
+                    new Tier(BASE_ID, BASE_COLOR, BASE_NAME, BASE_SCORE, 8.5))
+            );
+        }
 
-        assertNotEquals(tier1, tier2);
-    }
+        @ParameterizedTest(name = "should return true for {0}")
+        @MethodSource("equalTiers")
+        @DisplayName("equals() should return true for equal tiers")
+        void equals_shouldReturnTrueForEqualTiers(String description, Tier tier1, Tier tier2) {
+            assertEquals(tier1, tier2);
+        }
 
-    @Test
-    @DisplayName("equals() should return false for different name")
-    void equals_shouldReturnFalseForDifferentName() {
-        UUID id = UUID.randomUUID();
-        Tier tier1 = new Tier(id, "#FF0000", "S Tier", 10.0, 9.5);
-        Tier tier2 = new Tier(id, "#FF0000", "A Tier", 10.0, 9.5);
+        @ParameterizedTest(name = "should return false for {0}")
+        @MethodSource("unequalTiers")
+        @DisplayName("equals() should return false for unequal tiers")
+        void equals_shouldReturnFalseForUnequalTiers(String description, Tier tier1, Tier tier2) {
+            assertNotEquals(tier1, tier2);
+        }
 
-        assertNotEquals(tier1, tier2);
-    }
+        @ParameterizedTest(name = "should return false for {0}")
+        @ValueSource(strings = {"null", "different class"})
+        @DisplayName("equals() edge cases")
+        void equals_edgeCases(String caseType) {
+            Tier tier = createBaseTier();
+            
+            switch (caseType) {
+                case "null" -> assertNotEquals(null, tier);
+                case "different class" -> assertNotEquals("string", tier);
+            }
+        }
 
-    @Test
-    @DisplayName("equals() should return false for different score")
-    void equals_shouldReturnFalseForDifferentScore() {
-        UUID id = UUID.randomUUID();
-        Tier tier1 = new Tier(id, "#FF0000", "S Tier", 10.0, 9.5);
-        Tier tier2 = new Tier(id, "#FF0000", "S Tier", 9.0, 9.5);
-
-        assertNotEquals(tier1, tier2);
-    }
-
-    @Test
-    @DisplayName("equals() should return false for different adjustedScore")
-    void equals_shouldReturnFalseForDifferentAdjustedScore() {
-        UUID id = UUID.randomUUID();
-        Tier tier1 = new Tier(id, "#FF0000", "S Tier", 10.0, 9.5);
-        Tier tier2 = new Tier(id, "#FF0000", "S Tier", 10.0, 8.5);
-
-        assertNotEquals(tier1, tier2);
-    }
-
-    @Test
-    @DisplayName("equals() should return false for null")
-    void equals_shouldReturnFalseForNull() {
-        Tier tier = new Tier(UUID.randomUUID(), "#FF0000", "S Tier", 10.0, 9.5);
-
-        assertNotEquals(null, tier);
-    }
-
-    @Test
-    @DisplayName("equals() should return false for different class")
-    void equals_shouldReturnFalseForDifferentClass() {
-        Tier tier = new Tier(UUID.randomUUID(), "#FF0000", "S Tier", 10.0, 9.5);
-
-        assertNotEquals("string", tier);
-    }
-
-    @Test
-    @DisplayName("equals() should return true for same object")
-    void equals_shouldReturnTrueForSameObject() {
-        Tier tier = new Tier(UUID.randomUUID(), "#FF0000", "S Tier", 10.0, 9.5);
-
-        assertEquals(tier, tier);
+        @Test
+        @DisplayName("equals() should return true for same object")
+        void equals_shouldReturnTrueForSameObject() {
+            Tier tier = createBaseTier();
+            assertEquals(tier, tier);
+        }
     }
 
     @Test
     @DisplayName("hashCode() should be consistent for same values")
     void hashCode_shouldBeConsistent() {
-        UUID id = UUID.randomUUID();
-        Tier tier1 = new Tier(id, "#FF0000", "S Tier", 10.0, 9.5);
-        Tier tier2 = new Tier(id, "#FF0000", "S Tier", 10.0, 9.5);
+        Tier tier1 = createBaseTier();
+        Tier tier2 = createBaseTier();
 
         assertEquals(tier1.hashCode(), tier2.hashCode());
     }
@@ -114,29 +110,28 @@ class TierTest {
     @Test
     @DisplayName("all-args constructor should set all fields")
     void allArgsConstructor_shouldSetAllFields() {
-        UUID id = UUID.randomUUID();
-        Tier tier = new Tier(id, "#FF0000", "S Tier", 10.0, 9.5);
+        Tier tier = createBaseTier();
 
-        assertEquals(id, tier.getId());
-        assertEquals("#FF0000", tier.getColor());
-        assertEquals("S Tier", tier.getName());
-        assertEquals(10.0, tier.getScore());
-        assertEquals(9.5, tier.getAdjustedScore());
+        assertEquals(BASE_ID, tier.getId());
+        assertEquals(BASE_COLOR, tier.getColor());
+        assertEquals(BASE_NAME, tier.getName());
+        assertEquals(BASE_SCORE, tier.getScore());
+        assertEquals(BASE_ADJUSTED_SCORE, tier.getAdjustedScore());
     }
 
     @Test
     @DisplayName("setters should update fields")
     void setters_shouldUpdateFields() {
         Tier tier = new Tier();
-        UUID id = UUID.randomUUID();
+        UUID newId = UUID.randomUUID();
         
-        tier.setId(id);
+        tier.setId(newId);
         tier.setColor("#00FF00");
         tier.setName("A Tier");
         tier.setScore(8.0);
         tier.setAdjustedScore(7.5);
 
-        assertEquals(id, tier.getId());
+        assertEquals(newId, tier.getId());
         assertEquals("#00FF00", tier.getColor());
         assertEquals("A Tier", tier.getName());
         assertEquals(8.0, tier.getScore());
