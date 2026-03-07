@@ -33,7 +33,9 @@ describe("getProviderByName", () => {
   });
 
   it("throws error for invalid provider name", () => {
-    expect(() => getProviderByName("invalid-provider")).toThrow("Invalid provider: invalid-provider");
+    expect(() => getProviderByName("invalid-provider")).toThrow(
+      "Invalid provider: invalid-provider"
+    );
   });
 
   it("throws error for empty provider name", () => {
