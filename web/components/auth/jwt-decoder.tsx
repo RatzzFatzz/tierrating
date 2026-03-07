@@ -1,4 +1,4 @@
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from "jwt-decode";
 
 interface JwtPayload {
 	sub?: string;
@@ -15,24 +15,23 @@ export function extractJwtData(token: string): {
 	expiration: Date | null;
 	isExpired: boolean;
 } | null {
-
 	if (!token) {
 		return null;
 	}
 
 	try {
 		const decoded = jwtDecode<JwtPayload>(token);
-		const username = decoded.sub || '';
+		const username = decoded.sub || "";
 		const expiration = decoded.exp ? new Date(decoded.exp * 1000) : null;
 		const isExpired = expiration ? new Date() > expiration : false;
 
 		return {
 			username,
 			expiration,
-			isExpired
+			isExpired,
 		};
 	} catch (error) {
-		console.error('Failed to decode JWT:', error);
+		console.error("Failed to decode JWT:", error);
 		return null;
 	}
 }

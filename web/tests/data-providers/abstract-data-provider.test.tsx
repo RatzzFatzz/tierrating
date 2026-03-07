@@ -3,13 +3,13 @@ import { AbstractDataProvider } from "@/components/data-providers/abstract-data-
 import { Tier, TierlistEntry } from "@/components/model/types";
 
 vi.mock("@/components/api/tier-api", () => ({
-  fetchTiers: vi.fn(),
+	fetchTiers: vi.fn(),
 }));
 
 vi.mock("@/components/api/data-api", () => ({
-  fetchData: vi.fn(),
-  pullData: vi.fn(),
-  updateData: vi.fn(),
+	fetchData: vi.fn(),
+	pullData: vi.fn(),
+	updateData: vi.fn(),
 }));
 
 import { fetchTiers } from "@/components/api/tier-api";
@@ -21,296 +21,261 @@ const mockPullData = vi.mocked(pullData);
 const mockUpdateData = vi.mocked(updateData);
 
 class TestDataProvider extends AbstractDataProvider {
-  getServiceName(): string {
-    return "test-service";
-  }
+	getServiceName(): string {
+		return "test-service";
+	}
 
-  getTypeName(): string {
-    return "test-type";
-  }
+	getTypeName(): string {
+		return "test-type";
+	}
 }
 
 function createMockTier(overrides: Partial<Tier> = {}): Tier {
-  return {
-    id: "tier-1",
-    name: "S",
-    score: 90,
-    adjustedScore: 95,
-    color: "#ff0000",
-    ...overrides,
-  };
+	return {
+		id: "tier-1",
+		name: "S",
+		score: 90,
+		adjustedScore: 95,
+		color: "#ff0000",
+		...overrides,
+	};
 }
 
 function createMockEntry(overrides: Partial<TierlistEntry> = {}): TierlistEntry {
-  return {
-    id: "entry-1",
-    score: 95,
-    title: "Test Entry",
-    cover: "https://example.com/cover.jpg",
-    tier: createMockTier(),
-    index: 0,
-    ...overrides,
-  };
+	return {
+		id: "entry-1",
+		score: 95,
+		title: "Test Entry",
+		cover: "https://example.com/cover.jpg",
+		tier: createMockTier(),
+		index: 0,
+		...overrides,
+	};
 }
 
 describe("AbstractDataProvider", () => {
-  let provider: TestDataProvider;
-  const mockLogout = vi.fn();
+	let provider: TestDataProvider;
+	const mockLogout = vi.fn();
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-    provider = new TestDataProvider();
-  });
+	beforeEach(() => {
+		vi.clearAllMocks();
+		provider = new TestDataProvider();
+	});
 
-  describe("fetchData", () => {
-    it("should return data on successful fetch", async () => {
-      const mockEntries = [createMockEntry()];
-      mockFetchData.mockResolvedValue({
-        status: 200,
-        data: mockEntries,
-      });
+	describe("fetchData", () => {
+		it("should return data on successful fetch", async () => {
+			const mockEntries = [createMockEntry()];
+			mockFetchData.mockResolvedValue({
+				status: 200,
+				data: mockEntries,
+			});
 
-      const result = await provider.fetchData("token", "user", mockLogout);
+			const result = await provider.fetchData("token", "user", mockLogout);
 
-      expect(result).toEqual(mockEntries);
-      expect(mockFetchData).toHaveBeenCalledWith("token", "user", "test-service", "test-type");
-    });
+			expect(result).toEqual(mockEntries);
+			expect(mockFetchData).toHaveBeenCalledWith("token", "user", "test-service", "test-type");
+		});
 
-    it("should call logout and throw on 401", async () => {
-      mockFetchData.mockResolvedValue({
-        status: 401,
-      });
+		it("should call logout and throw on 401", async () => {
+			mockFetchData.mockResolvedValue({
+				status: 401,
+			});
 
-      await expect(provider.fetchData("token", "user", mockLogout)).rejects.toThrow(
-        "Session expired"
-      );
-      expect(mockLogout).toHaveBeenCalled();
-    });
+			await expect(provider.fetchData("token", "user", mockLogout)).rejects.toThrow("Session expired");
+			expect(mockLogout).toHaveBeenCalled();
+		});
 
-    it("should call logout and throw on 403", async () => {
-      mockFetchData.mockResolvedValue({
-        status: 403,
-      });
+		it("should call logout and throw on 403", async () => {
+			mockFetchData.mockResolvedValue({
+				status: 403,
+			});
 
-      await expect(provider.fetchData("token", "user", mockLogout)).rejects.toThrow(
-        "Session expired"
-      );
-      expect(mockLogout).toHaveBeenCalled();
-    });
+			await expect(provider.fetchData("token", "user", mockLogout)).rejects.toThrow("Session expired");
+			expect(mockLogout).toHaveBeenCalled();
+		});
 
-    it("should throw on 404", async () => {
-      mockFetchData.mockResolvedValue({
-        status: 404,
-      });
+		it("should throw on 404", async () => {
+			mockFetchData.mockResolvedValue({
+				status: 404,
+			});
 
-      await expect(provider.fetchData("token", "user", mockLogout)).rejects.toThrow(
-        "User not found"
-      );
-    });
+			await expect(provider.fetchData("token", "user", mockLogout)).rejects.toThrow("User not found");
+		});
 
-    it("should throw on API error", async () => {
-      mockFetchData.mockResolvedValue({
-        status: 500,
-        error: "Server error",
-      });
+		it("should throw on API error", async () => {
+			mockFetchData.mockResolvedValue({
+				status: 500,
+				error: "Server error",
+			});
 
-      await expect(provider.fetchData("token", "user", mockLogout)).rejects.toThrow(
-        "API error: 500"
-      );
-    });
+			await expect(provider.fetchData("token", "user", mockLogout)).rejects.toThrow("API error: 500");
+		});
 
-    it("should throw on faulty response", async () => {
-      mockFetchData.mockResolvedValue({
-        status: 200,
-      });
+		it("should throw on faulty response", async () => {
+			mockFetchData.mockResolvedValue({
+				status: 200,
+			});
 
-      await expect(provider.fetchData("token", "user", mockLogout)).rejects.toThrow(
-        "Faulty response"
-      );
-    });
-  });
+			await expect(provider.fetchData("token", "user", mockLogout)).rejects.toThrow("Faulty response");
+		});
+	});
 
-  describe("fetchTierlist", () => {
-    it("should return tiers on successful fetch", async () => {
-      const mockTiers = [createMockTier()];
-      mockFetchTiers.mockResolvedValue({
-        status: 200,
-        data: mockTiers,
-      });
+	describe("fetchTierlist", () => {
+		it("should return tiers on successful fetch", async () => {
+			const mockTiers = [createMockTier()];
+			mockFetchTiers.mockResolvedValue({
+				status: 200,
+				data: mockTiers,
+			});
 
-      const result = await provider.fetchTierlist("token", "user", mockLogout);
+			const result = await provider.fetchTierlist("token", "user", mockLogout);
 
-      expect(result).toEqual(mockTiers);
-      expect(mockFetchTiers).toHaveBeenCalledWith("token", "user", "test-service", "test-type");
-    });
+			expect(result).toEqual(mockTiers);
+			expect(mockFetchTiers).toHaveBeenCalledWith("token", "user", "test-service", "test-type");
+		});
 
-    it("should call logout and throw on 401", async () => {
-      mockFetchTiers.mockResolvedValue({
-        status: 401,
-      });
+		it("should call logout and throw on 401", async () => {
+			mockFetchTiers.mockResolvedValue({
+				status: 401,
+			});
 
-      await expect(provider.fetchTierlist("token", "user", mockLogout)).rejects.toThrow(
-        "Session expired"
-      );
-      expect(mockLogout).toHaveBeenCalled();
-    });
+			await expect(provider.fetchTierlist("token", "user", mockLogout)).rejects.toThrow("Session expired");
+			expect(mockLogout).toHaveBeenCalled();
+		});
 
-    it("should call logout and throw on 403", async () => {
-      mockFetchTiers.mockResolvedValue({
-        status: 403,
-      });
+		it("should call logout and throw on 403", async () => {
+			mockFetchTiers.mockResolvedValue({
+				status: 403,
+			});
 
-      await expect(provider.fetchTierlist("token", "user", mockLogout)).rejects.toThrow(
-        "Session expired"
-      );
-      expect(mockLogout).toHaveBeenCalled();
-    });
+			await expect(provider.fetchTierlist("token", "user", mockLogout)).rejects.toThrow("Session expired");
+			expect(mockLogout).toHaveBeenCalled();
+		});
 
-    it("should return default tiers on 404", async () => {
-      mockFetchTiers.mockResolvedValue({
-        status: 404,
-      });
+		it("should return default tiers on 404", async () => {
+			mockFetchTiers.mockResolvedValue({
+				status: 404,
+			});
 
-      const result = await provider.fetchTierlist("token", "user", mockLogout);
+			const result = await provider.fetchTierlist("token", "user", mockLogout);
 
-      expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThan(0);
-    });
+			expect(result).toBeDefined();
+			expect(result.length).toBeGreaterThan(0);
+		});
 
-    it("should throw on API error", async () => {
-      mockFetchTiers.mockResolvedValue({
-        status: 500,
-        error: "Server error",
-      });
+		it("should throw on API error", async () => {
+			mockFetchTiers.mockResolvedValue({
+				status: 500,
+				error: "Server error",
+			});
 
-      await expect(provider.fetchTierlist("token", "user", mockLogout)).rejects.toThrow(
-        "API error status: 500"
-      );
-    });
+			await expect(provider.fetchTierlist("token", "user", mockLogout)).rejects.toThrow("API error status: 500");
+		});
 
-    it("should throw on faulty response", async () => {
-      mockFetchTiers.mockResolvedValue({
-        status: 200,
-      });
+		it("should throw on faulty response", async () => {
+			mockFetchTiers.mockResolvedValue({
+				status: 200,
+			});
 
-      await expect(provider.fetchTierlist("token", "user", mockLogout)).rejects.toThrow(
-        "Faulty response"
-      );
-    });
-  });
+			await expect(provider.fetchTierlist("token", "user", mockLogout)).rejects.toThrow("Faulty response");
+		});
+	});
 
-  describe("updateData", () => {
-    it("should succeed on 200 response", async () => {
-      mockUpdateData.mockResolvedValue({
-        status: 200,
-      });
+	describe("updateData", () => {
+		it("should succeed on 200 response", async () => {
+			mockUpdateData.mockResolvedValue({
+				status: 200,
+			});
 
-      await provider.updateData("entry-1", 95, "token", "user", mockLogout);
+			await provider.updateData("entry-1", 95, "token", "user", mockLogout);
 
-      expect(mockUpdateData).toHaveBeenCalledWith(
-        "entry-1",
-        95,
-        "test-service",
-        "test-type",
-        "token",
-        "user"
-      );
-    });
+			expect(mockUpdateData).toHaveBeenCalledWith("entry-1", 95, "test-service", "test-type", "token", "user");
+		});
 
-    it("should call logout and throw on 401", async () => {
-      mockUpdateData.mockResolvedValue({
-        status: 401,
-      });
+		it("should call logout and throw on 401", async () => {
+			mockUpdateData.mockResolvedValue({
+				status: 401,
+			});
 
-      await expect(provider.updateData("entry-1", 95, "token", "user", mockLogout)).rejects.toThrow(
-        "Session expired or unauthorized"
-      );
-      expect(mockLogout).toHaveBeenCalled();
-    });
+			await expect(provider.updateData("entry-1", 95, "token", "user", mockLogout)).rejects.toThrow(
+				"Session expired or unauthorized"
+			);
+			expect(mockLogout).toHaveBeenCalled();
+		});
 
-    it("should call logout and throw on 403", async () => {
-      mockUpdateData.mockResolvedValue({
-        status: 403,
-      });
+		it("should call logout and throw on 403", async () => {
+			mockUpdateData.mockResolvedValue({
+				status: 403,
+			});
 
-      await expect(provider.updateData("entry-1", 95, "token", "user", mockLogout)).rejects.toThrow(
-        "Session expired or unauthorized"
-      );
-      expect(mockLogout).toHaveBeenCalled();
-    });
+			await expect(provider.updateData("entry-1", 95, "token", "user", mockLogout)).rejects.toThrow(
+				"Session expired or unauthorized"
+			);
+			expect(mockLogout).toHaveBeenCalled();
+		});
 
-    it("should throw on non-200 with message", async () => {
-      mockUpdateData.mockResolvedValue({
-        status: 400,
-        data: { message: "Bad request" },
-      });
+		it("should throw on non-200 with message", async () => {
+			mockUpdateData.mockResolvedValue({
+				status: 400,
+				data: { message: "Bad request" },
+			});
 
-      await expect(provider.updateData("entry-1", 95, "token", "user", mockLogout)).rejects.toThrow(
-        "Bad request"
-      );
-    });
+			await expect(provider.updateData("entry-1", 95, "token", "user", mockLogout)).rejects.toThrow("Bad request");
+		});
 
-    it("should throw on non-200 without message", async () => {
-      mockUpdateData.mockResolvedValue({
-        status: 500,
-      });
+		it("should throw on non-200 without message", async () => {
+			mockUpdateData.mockResolvedValue({
+				status: 500,
+			});
 
-      await expect(provider.updateData("entry-1", 95, "token", "user", mockLogout)).rejects.toThrow(
-        "API error: 500"
-      );
-    });
-  });
+			await expect(provider.updateData("entry-1", 95, "token", "user", mockLogout)).rejects.toThrow("API error: 500");
+		});
+	});
 
-  describe("pullData", () => {
-    it("should succeed on 200 response", async () => {
-      mockPullData.mockResolvedValue({
-        status: 200,
-      });
+	describe("pullData", () => {
+		it("should succeed on 200 response", async () => {
+			mockPullData.mockResolvedValue({
+				status: 200,
+			});
 
-      await provider.pullData("token", "user", mockLogout);
+			await provider.pullData("token", "user", mockLogout);
 
-      expect(mockPullData).toHaveBeenCalledWith("token", "user", "test-service", "test-type");
-    });
+			expect(mockPullData).toHaveBeenCalledWith("token", "user", "test-service", "test-type");
+		});
 
-    it("should call logout and throw on 401", async () => {
-      mockPullData.mockResolvedValue({
-        status: 401,
-      });
+		it("should call logout and throw on 401", async () => {
+			mockPullData.mockResolvedValue({
+				status: 401,
+			});
 
-      await expect(provider.pullData("token", "user", mockLogout)).rejects.toThrow(
-        "Session expired"
-      );
-      expect(mockLogout).toHaveBeenCalled();
-    });
+			await expect(provider.pullData("token", "user", mockLogout)).rejects.toThrow("Session expired");
+			expect(mockLogout).toHaveBeenCalled();
+		});
 
-    it("should call logout and throw on 403", async () => {
-      mockPullData.mockResolvedValue({
-        status: 403,
-      });
+		it("should call logout and throw on 403", async () => {
+			mockPullData.mockResolvedValue({
+				status: 403,
+			});
 
-      await expect(provider.pullData("token", "user", mockLogout)).rejects.toThrow(
-        "Session expired"
-      );
-      expect(mockLogout).toHaveBeenCalled();
-    });
+			await expect(provider.pullData("token", "user", mockLogout)).rejects.toThrow("Session expired");
+			expect(mockLogout).toHaveBeenCalled();
+		});
 
-    it("should throw on non-200 with message", async () => {
-      mockPullData.mockResolvedValue({
-        status: 400,
-        data: { message: "Bad request" },
-      });
+		it("should throw on non-200 with message", async () => {
+			mockPullData.mockResolvedValue({
+				status: 400,
+				data: { message: "Bad request" },
+			});
 
-      await expect(provider.pullData("token", "user", mockLogout)).rejects.toThrow("Bad request");
-    });
+			await expect(provider.pullData("token", "user", mockLogout)).rejects.toThrow("Bad request");
+		});
 
-    it("should throw on non-200 without message", async () => {
-      mockPullData.mockResolvedValue({
-        status: 500,
-      });
+		it("should throw on non-200 without message", async () => {
+			mockPullData.mockResolvedValue({
+				status: 500,
+			});
 
-      await expect(provider.pullData("token", "user", mockLogout)).rejects.toThrow(
-        "API error: 500"
-      );
-    });
-  });
+			await expect(provider.pullData("token", "user", mockLogout)).rejects.toThrow("API error: 500");
+		});
+	});
 });

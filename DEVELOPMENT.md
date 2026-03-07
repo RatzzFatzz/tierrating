@@ -2,7 +2,27 @@
 
 ## IDE Configuration
 
-### Visual Studio Code (Recommended)
+### IntelliJ IDEA (Recommended)
+
+1. **Enable Checkstyle Plugin**
+   - Go to `Preferences` → `Plugins`
+   - Search for "Checkstyle-IDEA"
+   - Install and restart
+
+2. **Configure Checkstyle**
+   - Go to `Preferences` → `Tools` → `Checkstyle`
+   - Add configuration file: `api/checkstyle.xml`
+   - Set as active
+
+3. **Enable ESLint**
+   - Go to `Preferences` → `Languages & Frameworks` → `JavaScript` → `Code Quality Tools` → `ESLint`
+   - Enable: `Automatic ESLint configuration`
+
+4. **Enable Prettier**
+   - Go to `Preferences` → `Languages & Frameworks` → `JavaScript` → `Prettier`
+   - Enable: `On save`, `On code reformat`
+
+### Visual Studio Code
 
 Install the following extensions:
 
@@ -22,7 +42,7 @@ Install the following extensions:
 
 4. **Checkstyle for Java** (`shengchen.vscode-checkstyle`)
    - Shows Checkstyle violations inline
-   - Uses the same `google_checks.xml` as CI
+   - Uses the same `api/checkstyle.xml` as CI
 
 #### VS Code Settings
 
@@ -30,39 +50,19 @@ Create or update `.vscode/settings.json`:
 
 ```json
 {
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
-  },
-  "[java]": {
-    "editor.defaultFormatter": "redhat.java"
-  },
-  "java.format.settings.url": "google-style.xml",
-  "checkstyle.configurationPath": "google_checks.xml",
-  "typescript.tsdk": "web/node_modules/typescript/lib"
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": "explicit"
+	},
+	"[java]": {
+		"editor.defaultFormatter": "redhat.java"
+	},
+	"java.format.settings.url": "google-style.xml",
+	"checkstyle.configurationPath": "api/checkstyle.xml",
+	"typescript.tsdk": "web/node_modules/typescript/lib"
 }
 ```
-
-### IntelliJ IDEA (Recommended for Java)
-
-1. **Enable Checkstyle Plugin**
-   - Go to `Preferences` → `Plugins`
-   - Search for "Checkstyle-IDEA"
-   - Install and restart
-
-2. **Configure Checkstyle**
-   - Go to `Preferences` → `Tools` → `Checkstyle`
-   - Add configuration file: `google_checks.xml`
-   - Set as active
-
-3. **Enable ESLint**
-   - Go to `Preferences` → `Languages & Frameworks` → `JavaScript` → `Code Quality Tools` → `ESLint`
-   - Enable: `Automatic ESLint configuration`
-
-4. **Enable Prettier**
-   - Go to `Preferences` → `Languages & Frameworks` → `JavaScript` → `Prettier`
-   - Enable: `On save`, `On code reformat`
 
 ## Pre-Commit Hooks
 
@@ -90,7 +90,7 @@ If you need to commit without running hooks (emergency only):
 git commit --no-verify -m "Your message"
 ```
 
-**⚠️ Warning:** CI will still run these checks, so your PR may fail.
+**Warning:** CI will still run these checks, so your PR may fail.
 
 ## Running Linters Manually
 
@@ -122,48 +122,6 @@ npm run lint:fix        # Fix ESLint issues
 npm run format          # Format with Prettier
 ```
 
-## Troubleshooting
-
-### ESLint not working in VS Code
-
-1. Check ESLint extension is installed
-2. Reload VS Code window: `Cmd/Ctrl + Shift + P` → "Reload Window"
-3. Check ESLint output: `View` → `Output` → Select "ESLint"
-
-### Prettier not formatting on save
-
-1. Check Prettier extension is installed
-2. Verify `editor.formatOnSave` is `true` in settings
-3. Check Prettier output for errors
-
-### Java Checkstyle errors in IDE but not in CI
-
-1. Ensure Checkstyle plugin uses `google_checks.xml`
-2. Refresh Checkstyle configuration
-3. Rebuild project: `Build` → `Rebuild Project`
-
-### Pre-commit hooks not running
-
-1. Verify husky is installed:
-   ```bash
-   npm run prepare
-   ```
-2. Check `.husky/pre-commit` is executable:
-   ```bash
-   chmod +x .husky/pre-commit
-   ```
-
-### "Cannot find module" errors
-
-1. Install dependencies:
-   ```bash
-   # Root
-   npm install
-   
-   # Frontend
-   cd web && npm install
-   ```
-
 ## Code Style Guidelines
 
 ### Java
@@ -175,8 +133,8 @@ npm run format          # Format with Prettier
 
 ### TypeScript/JavaScript
 
-- Use 2-space indentation
-- Max line length: 100 characters
+- Use tabs for indentation (4 spaces)
+- Max line length: 140 characters
 - Prefer `const` over `let`
 - Use arrow functions for callbacks
 - Prefer async/await over Promises

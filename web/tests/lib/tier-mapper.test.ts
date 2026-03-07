@@ -3,199 +3,199 @@ import { assignTiersAndGroupEntriesByTier, groupBySingle } from "@/components/ti
 import { Tier, TierlistEntry } from "@/components/model/types";
 
 function createTier(overrides: Partial<Tier> = {}): Tier {
-  return {
-    id: "tier-s",
-    name: "S",
-    score: 10,
-    adjustedScore: 10,
-    color: "#FF7F7F",
-    ...overrides,
-  };
+	return {
+		id: "tier-s",
+		name: "S",
+		score: 10,
+		adjustedScore: 10,
+		color: "#FF7F7F",
+		...overrides,
+	};
 }
 
 function createEntry(overrides: Partial<TierlistEntry> = {}): TierlistEntry {
-  return {
-    id: "entry-1",
-    score: 10,
-    title: "Test Entry",
-    cover: "https://example.com/cover.jpg",
-    tier: createTier(),
-    index: 0,
-    ...overrides,
-  };
+	return {
+		id: "entry-1",
+		score: 10,
+		title: "Test Entry",
+		cover: "https://example.com/cover.jpg",
+		tier: createTier(),
+		index: 0,
+		...overrides,
+	};
 }
 
 describe("assignTiersAndGroupEntriesByTier", () => {
-  it("returns an empty map when tiers is empty", () => {
-    const result = assignTiersAndGroupEntriesByTier([], [createEntry()]);
-    expect(result.size).toBe(0);
-  });
+	it("returns an empty map when tiers is empty", () => {
+		const result = assignTiersAndGroupEntriesByTier([], [createEntry()]);
+		expect(result.size).toBe(0);
+	});
 
-  it("returns map with empty arrays when items is empty", () => {
-    const tiers = [createTier({ id: "s", score: 10 }), createTier({ id: "a", score: 8 })];
-    const result = assignTiersAndGroupEntriesByTier(tiers, []);
+	it("returns map with empty arrays when items is empty", () => {
+		const tiers = [createTier({ id: "s", score: 10 }), createTier({ id: "a", score: 8 })];
+		const result = assignTiersAndGroupEntriesByTier(tiers, []);
 
-    expect(result.size).toBe(2);
-    expect(result.get("s")).toEqual([]);
-    expect(result.get("a")).toEqual([]);
-  });
+		expect(result.size).toBe(2);
+		expect(result.get("s")).toEqual([]);
+		expect(result.get("a")).toEqual([]);
+	});
 
-  it("assigns a single item to the first matching tier", () => {
-    const sTier = createTier({ id: "s", name: "S", score: 10 });
-    const entry = createEntry({ id: "e1", score: 10, title: "Alpha" });
+	it("assigns a single item to the first matching tier", () => {
+		const sTier = createTier({ id: "s", name: "S", score: 10 });
+		const entry = createEntry({ id: "e1", score: 10, title: "Alpha" });
 
-    const result = assignTiersAndGroupEntriesByTier([sTier], [entry]);
+		const result = assignTiersAndGroupEntriesByTier([sTier], [entry]);
 
-    expect(result.get("s")).toHaveLength(1);
-    expect(result.get("s")![0].title).toBe("Alpha");
-  });
+		expect(result.get("s")).toHaveLength(1);
+		expect(result.get("s")![0].title).toBe("Alpha");
+	});
 
-  it("assigns items to different tiers based on score", () => {
-    const sTier = createTier({ id: "s", name: "S", score: 10 });
-    const aTier = createTier({ id: "a", name: "A", score: 8 });
-    const entry1 = createEntry({ id: "e1", score: 10, title: "S-Item" });
-    const entry2 = createEntry({ id: "e2", score: 8, title: "A-Item" });
+	it("assigns items to different tiers based on score", () => {
+		const sTier = createTier({ id: "s", name: "S", score: 10 });
+		const aTier = createTier({ id: "a", name: "A", score: 8 });
+		const entry1 = createEntry({ id: "e1", score: 10, title: "S-Item" });
+		const entry2 = createEntry({ id: "e2", score: 8, title: "A-Item" });
 
-    const result = assignTiersAndGroupEntriesByTier([sTier, aTier], [entry1, entry2]);
+		const result = assignTiersAndGroupEntriesByTier([sTier, aTier], [entry1, entry2]);
 
-    expect(result.get("s")).toHaveLength(1);
-    expect(result.get("a")).toHaveLength(1);
-    expect(result.get("s")![0].title).toBe("S-Item");
-    expect(result.get("a")![0].title).toBe("A-Item");
-  });
+		expect(result.get("s")).toHaveLength(1);
+		expect(result.get("a")).toHaveLength(1);
+		expect(result.get("s")![0].title).toBe("S-Item");
+		expect(result.get("a")![0].title).toBe("A-Item");
+	});
 
-  it("assigns multiple items to the same tier when scores match", () => {
-    const sTier = createTier({ id: "s", score: 10 });
-    const entry1 = createEntry({ id: "e1", score: 10, title: "Zebra" });
-    const entry2 = createEntry({ id: "e2", score: 10, title: "Alpha" });
+	it("assigns multiple items to the same tier when scores match", () => {
+		const sTier = createTier({ id: "s", score: 10 });
+		const entry1 = createEntry({ id: "e1", score: 10, title: "Zebra" });
+		const entry2 = createEntry({ id: "e2", score: 10, title: "Alpha" });
 
-    const result = assignTiersAndGroupEntriesByTier([sTier], [entry1, entry2]);
-    const sEntries = result.get("s")!;
+		const result = assignTiersAndGroupEntriesByTier([sTier], [entry1, entry2]);
+		const sEntries = result.get("s")!;
 
-    expect(sEntries).toHaveLength(2);
-    expect(sEntries[0].title).toBe("Alpha");
-    expect(sEntries[1].title).toBe("Zebra");
-  });
+		expect(sEntries).toHaveLength(2);
+		expect(sEntries[0].title).toBe("Alpha");
+		expect(sEntries[1].title).toBe("Zebra");
+	});
 
-  it("skips items whose score is below all tier thresholds", () => {
-    const sTier = createTier({ id: "s", score: 10 });
-    const entry = createEntry({ id: "e1", score: 2 });
+	it("skips items whose score is below all tier thresholds", () => {
+		const sTier = createTier({ id: "s", score: 10 });
+		const entry = createEntry({ id: "e1", score: 2 });
 
-    const result = assignTiersAndGroupEntriesByTier([sTier], [entry]);
+		const result = assignTiersAndGroupEntriesByTier([sTier], [entry]);
 
-    expect(result.get("s")).toHaveLength(0);
-  });
+		expect(result.get("s")).toHaveLength(0);
+	});
 
-  it("advances to the next tier when item score falls below current tier", () => {
-    const sTier = createTier({ id: "s", score: 10 });
-    const aTier = createTier({ id: "a", score: 8 });
-    const bTier = createTier({ id: "b", score: 6 });
-    const entry = createEntry({ id: "e1", score: 7, title: "B-Item" });
+	it("advances to the next tier when item score falls below current tier", () => {
+		const sTier = createTier({ id: "s", score: 10 });
+		const aTier = createTier({ id: "a", score: 8 });
+		const bTier = createTier({ id: "b", score: 6 });
+		const entry = createEntry({ id: "e1", score: 7, title: "B-Item" });
 
-    const result = assignTiersAndGroupEntriesByTier([sTier, aTier, bTier], [entry]);
+		const result = assignTiersAndGroupEntriesByTier([sTier, aTier, bTier], [entry]);
 
-    expect(result.get("s")).toHaveLength(0);
-    expect(result.get("a")).toHaveLength(0);
-    expect(result.get("b")).toHaveLength(1);
-    expect(result.get("b")![0].title).toBe("B-Item");
-  });
+		expect(result.get("s")).toHaveLength(0);
+		expect(result.get("a")).toHaveLength(0);
+		expect(result.get("b")).toHaveLength(1);
+		expect(result.get("b")![0].title).toBe("B-Item");
+	});
 
-  it("sets the tier reference on each assigned entry", () => {
-    const sTier = createTier({ id: "s", score: 10, name: "S" });
-    const entry = createEntry({ id: "e1", score: 10 });
+	it("sets the tier reference on each assigned entry", () => {
+		const sTier = createTier({ id: "s", score: 10, name: "S" });
+		const entry = createEntry({ id: "e1", score: 10 });
 
-    const result = assignTiersAndGroupEntriesByTier([sTier], [entry]);
-    const assigned = result.get("s")![0];
+		const result = assignTiersAndGroupEntriesByTier([sTier], [entry]);
+		const assigned = result.get("s")![0];
 
-    expect(assigned.tier).toBe(sTier);
-  });
+		expect(assigned.tier).toBe(sTier);
+	});
 
-  it("resets position index when moving to the next tier", () => {
-    const sTier = createTier({ id: "s", score: 10 });
-    const aTier = createTier({ id: "a", score: 8 });
-    const sEntry = createEntry({ id: "e1", score: 10, title: "S-Item" });
-    const aEntry = createEntry({ id: "e2", score: 8, title: "A-Item" });
+	it("resets position index when moving to the next tier", () => {
+		const sTier = createTier({ id: "s", score: 10 });
+		const aTier = createTier({ id: "a", score: 8 });
+		const sEntry = createEntry({ id: "e1", score: 10, title: "S-Item" });
+		const aEntry = createEntry({ id: "e2", score: 8, title: "A-Item" });
 
-    const result = assignTiersAndGroupEntriesByTier([sTier, aTier], [sEntry, aEntry]);
+		const result = assignTiersAndGroupEntriesByTier([sTier, aTier], [sEntry, aEntry]);
 
-    expect(result.get("s")![0].index).toBe(0);
-    expect(result.get("a")![0].index).toBe(0);
-  });
+		expect(result.get("s")![0].index).toBe(0);
+		expect(result.get("a")![0].index).toBe(0);
+	});
 
-  it("sorts entries within a tier alphabetically by title", () => {
-    const sTier = createTier({ id: "s", score: 10 });
-    const entries = [
-      createEntry({ id: "e3", score: 10, title: "Charlie" }),
-      createEntry({ id: "e1", score: 10, title: "Alpha" }),
-      createEntry({ id: "e2", score: 10, title: "Beta" }),
-    ];
+	it("sorts entries within a tier alphabetically by title", () => {
+		const sTier = createTier({ id: "s", score: 10 });
+		const entries = [
+			createEntry({ id: "e3", score: 10, title: "Charlie" }),
+			createEntry({ id: "e1", score: 10, title: "Alpha" }),
+			createEntry({ id: "e2", score: 10, title: "Beta" }),
+		];
 
-    const result = assignTiersAndGroupEntriesByTier([sTier], entries);
-    const sEntries = result.get("s")!;
+		const result = assignTiersAndGroupEntriesByTier([sTier], entries);
+		const sEntries = result.get("s")!;
 
-    expect(sEntries.map((e) => e.title)).toEqual(["Alpha", "Beta", "Charlie"]);
-  });
+		expect(sEntries.map((e) => e.title)).toEqual(["Alpha", "Beta", "Charlie"]);
+	});
 
-  it("handles the case where all items are assigned to the first tier", () => {
-    const sTier = createTier({ id: "s", score: 1 });
-    const entries = [
-      createEntry({ id: "e1", score: 10, title: "High" }),
-      createEntry({ id: "e2", score: 5, title: "Mid" }),
-      createEntry({ id: "e3", score: 2, title: "Low" }),
-    ];
+	it("handles the case where all items are assigned to the first tier", () => {
+		const sTier = createTier({ id: "s", score: 1 });
+		const entries = [
+			createEntry({ id: "e1", score: 10, title: "High" }),
+			createEntry({ id: "e2", score: 5, title: "Mid" }),
+			createEntry({ id: "e3", score: 2, title: "Low" }),
+		];
 
-    const result = assignTiersAndGroupEntriesByTier([sTier], entries);
+		const result = assignTiersAndGroupEntriesByTier([sTier], entries);
 
-    expect(result.get("s")).toHaveLength(3);
-  });
+		expect(result.get("s")).toHaveLength(3);
+	});
 });
 
 describe("groupBySingle", () => {
-  it("returns an empty map for an empty array", () => {
-    const result = groupBySingle([], (x: string) => x);
-    expect(result.size).toBe(0);
-  });
+	it("returns an empty map for an empty array", () => {
+		const result = groupBySingle([], (x: string) => x);
+		expect(result.size).toBe(0);
+	});
 
-  it("maps each element by its key", () => {
-    const arr = [
-      { id: "a", value: 1 },
-      { id: "b", value: 2 },
-    ];
-    const result = groupBySingle(arr, (x) => x.id);
+	it("maps each element by its key", () => {
+		const arr = [
+			{ id: "a", value: 1 },
+			{ id: "b", value: 2 },
+		];
+		const result = groupBySingle(arr, (x) => x.id);
 
-    expect(result.size).toBe(2);
-    expect(result.get("a")).toEqual({ id: "a", value: 1 });
-    expect(result.get("b")).toEqual({ id: "b", value: 2 });
-  });
+		expect(result.size).toBe(2);
+		expect(result.get("a")).toEqual({ id: "a", value: 1 });
+		expect(result.get("b")).toEqual({ id: "b", value: 2 });
+	});
 
-  it("last element wins when there are duplicate keys", () => {
-    const arr = [
-      { id: "a", value: 1 },
-      { id: "a", value: 2 },
-    ];
-    const result = groupBySingle(arr, (x) => x.id);
+	it("last element wins when there are duplicate keys", () => {
+		const arr = [
+			{ id: "a", value: 1 },
+			{ id: "a", value: 2 },
+		];
+		const result = groupBySingle(arr, (x) => x.id);
 
-    expect(result.size).toBe(1);
-    expect(result.get("a")).toEqual({ id: "a", value: 2 });
-  });
+		expect(result.size).toBe(1);
+		expect(result.get("a")).toEqual({ id: "a", value: 2 });
+	});
 
-  it("works with numeric keys", () => {
-    const arr = [
-      { id: 1, name: "Alice" },
-      { id: 2, name: "Bob" },
-    ];
-    const result = groupBySingle(arr, (x) => x.id);
+	it("works with numeric keys", () => {
+		const arr = [
+			{ id: 1, name: "Alice" },
+			{ id: 2, name: "Bob" },
+		];
+		const result = groupBySingle(arr, (x) => x.id);
 
-    expect(result.size).toBe(2);
-    expect(result.get(1)).toEqual({ id: 1, name: "Alice" });
-    expect(result.get(2)).toEqual({ id: 2, name: "Bob" });
-  });
+		expect(result.size).toBe(2);
+		expect(result.get(1)).toEqual({ id: 1, name: "Alice" });
+		expect(result.get(2)).toEqual({ id: 2, name: "Bob" });
+	});
 
-  it("works with single-element arrays", () => {
-    const arr = [{ id: "x", value: 42 }];
-    const result = groupBySingle(arr, (x) => x.id);
+	it("works with single-element arrays", () => {
+		const arr = [{ id: "x", value: 42 }];
+		const result = groupBySingle(arr, (x) => x.id);
 
-    expect(result.size).toBe(1);
-    expect(result.get("x")).toEqual({ id: "x", value: 42 });
-  });
+		expect(result.size).toBe(1);
+		expect(result.get("x")).toEqual({ id: "x", value: 42 });
+	});
 });
