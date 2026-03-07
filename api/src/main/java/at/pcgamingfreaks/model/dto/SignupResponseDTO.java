@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SignupResponseDTO {
-    boolean usernameTaken;
-    boolean emailTaken;
-    boolean signupSuccess;
+	boolean usernameTaken;
+	boolean emailTaken;
+	boolean signupSuccess;
 }

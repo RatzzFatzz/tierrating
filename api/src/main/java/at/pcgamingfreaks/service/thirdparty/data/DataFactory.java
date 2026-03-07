@@ -11,22 +11,22 @@ import java.util.stream.Collectors;
 
 @Service
 public class DataFactory {
-    private final Map<ThirdPartyService, Map<ContentType, DataService>> providers;
+	private final Map<ThirdPartyService, Map<ContentType, DataService>> providers;
 
-    @Autowired
-    public DataFactory(List<DataService> providerList) {
-        Map<ThirdPartyService, List<DataService>> providersByService = providerList.stream()
-                .collect(Collectors.groupingBy(DataService::getService));
-        providers = providersByService.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().stream()
-                        .collect(Collectors.toMap(DataService::getContentType, provider -> provider))));
-    }
+	@Autowired
+	public DataFactory(List<DataService> providerList) {
+		Map<ThirdPartyService, List<DataService>> providersByService = providerList.stream()
+				.collect(Collectors.groupingBy(DataService::getService));
+		providers = providersByService.entrySet().stream()
+				.collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().stream()
+						.collect(Collectors.toMap(DataService::getContentType, provider -> provider))));
+	}
 
-    public DataService getProvider(ThirdPartyService service, ContentType contentType) {
-        DataService provider = providers.containsKey(service) ? providers.get(service).get(contentType) : null;
-        if (provider == null) {
-            throw new IllegalArgumentException("No provider found for service: " + service);
-        }
-        return provider;
-    }
+	public DataService getProvider(ThirdPartyService service, ContentType contentType) {
+		DataService provider = providers.containsKey(service) ? providers.get(service).get(contentType) : null;
+		if (provider == null) {
+			throw new IllegalArgumentException("No provider found for service: " + service);
+		}
+		return provider;
+	}
 }

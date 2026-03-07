@@ -8,12 +8,15 @@ import at.pcgamingfreaks.model.dto.ListEntryDTO;
 import java.util.List;
 
 public interface DataService {
-    ThirdPartyService getService();
-    ContentType getContentType();
+	ThirdPartyService getService();
 
-    List<ListEntryDTO> fetch(String username);
-    void pull(String username);
+	ContentType getContentType();
 
-    void update(long id, float score, User user);
-    void push(String username);
+	List<ListEntryDTO> fetch(String username);
+
+	void pull(String username);
+
+	void update(long id, float score, User user);
+
+	void push(String username);
 }

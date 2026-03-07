@@ -17,50 +17,50 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 public class AuthController {
-    private final AuthService authService;
-    private final ThirdPartyAuthenticatorFactory thirdPartyAuthenticatorFactory;
+	private final AuthService authService;
+	private final ThirdPartyAuthenticatorFactory thirdPartyAuthenticatorFactory;
 
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
-        log.debug("Login request from {}", request.getUsername());
-        return ResponseEntity.ok(authService.authenticate(request.getUsername(), request.getPassword()));
-    }
+	@PostMapping("/login")
+	public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
+		log.debug("Login request from {}", request.getUsername());
+		return ResponseEntity.ok(authService.authenticate(request.getUsername(), request.getPassword()));
+	}
 
-    @PostMapping("/signup")
-    public ResponseEntity<SignupResponseDTO> signup(@Valid @RequestBody SignupRequestDTO request) {
-        log.debug("Signup request from {}", request.getUsername());
-        return ResponseEntity.ok(authService.signup(request));
-    }
+	@PostMapping("/signup")
+	public ResponseEntity<SignupResponseDTO> signup(@Valid @RequestBody SignupRequestDTO request) {
+		log.debug("Signup request from {}", request.getUsername());
+		return ResponseEntity.ok(authService.signup(request));
+	}
 
-    @PostMapping("/refresh")
-    public ResponseEntity<LoginResponseDTO> refresh(@RequestBody RefreshRequestDTO request) {
-        return ResponseEntity.ok(authService.refreshToken(request.getToken()));
-    }
+	@PostMapping("/refresh")
+	public ResponseEntity<LoginResponseDTO> refresh(@RequestBody RefreshRequestDTO request) {
+		return ResponseEntity.ok(authService.refreshToken(request.getToken()));
+	}
 
-    @PostMapping("/change-password")
-    @PreAuthorize("authentication.principal.username == #request.username")
-    public void changePassword(@Valid @RequestBody ChangePasswordRequestDTO request) {
-        log.debug("Change password request from {}", request.getUsername());
-        authService.changePassword(request);
-    }
+	@PostMapping("/change-password")
+	@PreAuthorize("authentication.principal.username == #request.username")
+	public void changePassword(@Valid @RequestBody ChangePasswordRequestDTO request) {
+		log.debug("Change password request from {}", request.getUsername());
+		authService.changePassword(request);
+	}
 
-    @PostMapping("/delete-account")
-    @PreAuthorize("authentication.principal.username == #request.username")
-    public void deleteAccount(@RequestBody AccountDeletionRequestDTO request) {
-        log.debug("Account deletion request from {}", request.getUsername());
-        authService.deleteAccount(request);
-    }
+	@PostMapping("/delete-account")
+	@PreAuthorize("authentication.principal.username == #request.username")
+	public void deleteAccount(@RequestBody AccountDeletionRequestDTO request) {
+		log.debug("Account deletion request from {}", request.getUsername());
+		authService.deleteAccount(request);
+	}
 
-    @PostMapping("{service}/{username}")
-    @PreAuthorize("authentication.principal.username == #username")
-    @Validated
-    @CrossOrigin
-    public void authThirdPartyAccount(
-            @PathVariable ThirdPartyService service,
-            @PathVariable String username,
-            @RequestBody ThirdPartyAuthRequestDTO request
-    ) {
-        log.info("Auth request for {} from {}", service, username);
-        thirdPartyAuthenticatorFactory.getProvider(service).auth(username, request);
-    }
+	@PostMapping("{service}/{username}")
+	@PreAuthorize("authentication.principal.username == #username")
+	@Validated
+	@CrossOrigin
+	public void authThirdPartyAccount(
+			@PathVariable ThirdPartyService service,
+			@PathVariable String username,
+			@RequestBody ThirdPartyAuthRequestDTO request
+	) {
+		log.info("Auth request for {} from {}", service, username);
+		thirdPartyAuthenticatorFactory.getProvider(service).auth(username, request);
+	}
 }

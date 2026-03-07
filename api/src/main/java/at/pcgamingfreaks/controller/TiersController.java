@@ -17,20 +17,20 @@ import java.util.List;
 @RequestMapping("tiers")
 @RequiredArgsConstructor
 public class TiersController {
-    private final TiersService tiersService;
+	private final TiersService tiersService;
 
-    /**
-     * @return list of tier grades sorted by score
-     */
-    @GetMapping("{username}/{service}/{type}")
-    public ResponseEntity<List<TierDTO>> getTierlist(@PathVariable String username, @PathVariable ThirdPartyService service, @PathVariable ContentType type) {
-        return ResponseEntity.ok(tiersService.getTierlist(username, service, type));
-    }
+	/**
+	 * @return list of tier grades sorted by score
+	 */
+	@GetMapping("{username}/{service}/{type}")
+	public ResponseEntity<List<TierDTO>> getTierlist(@PathVariable String username, @PathVariable ThirdPartyService service, @PathVariable ContentType type) {
+		return ResponseEntity.ok(tiersService.getTierlist(username, service, type));
+	}
 
-    @PostMapping("{username}/{service}/{type}")
-    @PreAuthorize("authentication.principal.username == #username")
-    public void setTierlist(@PathVariable String username, @PathVariable ThirdPartyService service,
-                            @PathVariable ContentType type, @RequestBody List<TierDTO> changedTierlist) {
-        tiersService.updateTierlist(username, service, type, changedTierlist);
-    }
+	@PostMapping("{username}/{service}/{type}")
+	@PreAuthorize("authentication.principal.username == #username")
+	public void setTierlist(@PathVariable String username, @PathVariable ThirdPartyService service,
+							@PathVariable ContentType type, @RequestBody List<TierDTO> changedTierlist) {
+		tiersService.updateTierlist(username, service, type, changedTierlist);
+	}
 }

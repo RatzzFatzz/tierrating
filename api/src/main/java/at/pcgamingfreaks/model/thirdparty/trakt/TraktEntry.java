@@ -17,31 +17,31 @@ import java.time.LocalDateTime;
 @Entity(name = "trakt_entries")
 public class TraktEntry {
 
-    public TraktEntry(long id, ContentType type, @Nullable Integer season, String title, String cover) {
-        this.id = id;
-        this.type = type;
-        this.season = season;
-        this.title = title;
-        this.cover = cover;
-    }
+	public TraktEntry(long id, ContentType type, @Nullable Integer season, String title, String cover) {
+		this.id = id;
+		this.type = type;
+		this.season = season;
+		this.title = title;
+		this.cover = cover;
+	}
 
-    @Id
-    private long id;
+	@Id
+	private long id;
 
-    @Enumerated(EnumType.STRING)
-    private ContentType type;
+	@Enumerated(EnumType.STRING)
+	private ContentType type;
 
-    @Nullable
-    private Integer season;
+	@Nullable
+	private Integer season;
 
-    private String title;
-    private String cover;
+	private String title;
+	private String cover;
 
-    @CreationTimestamp
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
+	@CreationTimestamp
+	@Column(nullable = false)
+	private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
+	@UpdateTimestamp
+	@Column(nullable = false)
+	private LocalDateTime updatedAt;
 }

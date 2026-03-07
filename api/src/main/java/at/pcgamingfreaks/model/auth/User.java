@@ -21,58 +21,58 @@ import java.util.UUID;
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private UUID id;
 
-    @Column(unique = true, nullable = false)
-    private String username;
+	@Column(unique = true, nullable = false)
+	private String username;
 
-    @Column(unique = true, nullable = false)
-    private String email;
+	@Column(unique = true, nullable = false)
+	private String email;
 
-    @Column(nullable = false)
-    private String password;
+	@Column(nullable = false)
+	private String password;
 
-    @CreationTimestamp
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
+	@CreationTimestamp
+	@Column(nullable = false)
+	private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
+	@UpdateTimestamp
+	@Column(nullable = false)
+	private LocalDateTime updatedAt;
 
-    private String bio;
+	private String bio;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "user")
-    @MapKey(name = "service")
-    private Map<ThirdPartyService, ThirdPartyConnection> connections;
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "user")
+	@MapKey(name = "service")
+	private Map<ThirdPartyService, ThirdPartyConnection> connections;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
-    private List<TierList> tierlists;
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
+	private List<TierList> tierlists;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-    }
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return List.of();
+	}
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
 
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
 
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+	@Override
+	public boolean isEnabled() {
+		return true;
+	}
 }

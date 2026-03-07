@@ -23,45 +23,45 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
-    private final HandlerExceptionResolver handlerExceptionResolver;
+	private final JwtService jwtService;
+	private final UserDetailsService userDetailsService;
+	private final HandlerExceptionResolver handlerExceptionResolver;
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        final String authHeader = request.getHeader("Authorization");
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+		final String authHeader = request.getHeader("Authorization");
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            log.debug("JWT Authentication Failed: Header missing");
-            return;
-        }
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			filterChain.doFilter(request, response);
+			log.debug("JWT Authentication Failed: Header missing");
+			return;
+		}
 
-        try {
-            final String jwt = authHeader.substring(7);
-            final String username = jwtService.extractUsername(jwt);
+		try {
+			final String jwt = authHeader.substring(7);
+			final String username = jwtService.extractUsername(jwt);
 
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            if (username != null && authentication == null) {
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+			if (username != null && authentication == null) {
+				UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-                if (jwtService.valid(jwt, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
+				if (jwtService.valid(jwt, userDetails)) {
+					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+							userDetails,
+							null,
+							userDetails.getAuthorities()
+					);
 
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
-            }
+					authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+					SecurityContextHolder.getContext().setAuthentication(authToken);
+				}
+			}
 
-            filterChain.doFilter(request, response);
-            log.debug("JWT Authentication Success for {}", username);
-        } catch (Exception exception) {
-            handlerExceptionResolver.resolveException(request, response, null, exception);
-        }
-    }
+			filterChain.doFilter(request, response);
+			log.debug("JWT Authentication Success for {}", username);
+		} catch (Exception exception) {
+			handlerExceptionResolver.resolveException(request, response, null, exception);
+		}
+	}
 }

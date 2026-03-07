@@ -7,11 +7,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class JwtPayload {
-    private long aud;
-    private String jti;
-    private long iat;
-    private long nbf;
-    private long exp;
-    @JsonProperty("sub")
-    private long userId;
+	private long aud;
+	private String jti;
+	private long iat;
+	private long nbf;
+	private long exp;
+	@JsonProperty("sub")
+	private long userId;
 }

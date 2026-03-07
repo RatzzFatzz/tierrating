@@ -11,5 +11,5 @@ import java.util.UUID;
 
 public interface TierListsRepository extends JpaRepository<TierList, UUID> {
 
-    Optional<TierList> findByUserAndServiceAndType(User user, ThirdPartyService service, ContentType type);
+	Optional<TierList> findByUserAndServiceAndType(User user, ThirdPartyService service, ContentType type);
 }

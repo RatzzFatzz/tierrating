@@ -4,8 +4,8 @@ import at.pcgamingfreaks.model.ContentType;
 import org.springframework.core.convert.converter.Converter;
 
 public class StringToContentTypeConverter implements Converter<String, ContentType> {
-    @Override
-    public ContentType convert(String source) {
-        return ContentType.from(source.toUpperCase());
-    }
+	@Override
+	public ContentType convert(String source) {
+		return ContentType.from(source.toUpperCase());
+	}
 }

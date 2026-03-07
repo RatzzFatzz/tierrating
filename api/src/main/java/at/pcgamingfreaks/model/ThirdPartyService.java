@@ -6,18 +6,18 @@ import lombok.Getter;
 
 @Getter
 public enum ThirdPartyService {
-    ANILIST,
-    TRAKT;
+	ANILIST,
+	TRAKT;
 
-    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static ThirdPartyService from(String text) {
-        for (ThirdPartyService service : ThirdPartyService.values()) {
-            if (service.name().equalsIgnoreCase(text)) return service;
-        }
-        throw new IllegalArgumentException();
-    }
+	@JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+	public static ThirdPartyService from(String text) {
+		for (ThirdPartyService service : ThirdPartyService.values()) {
+			if (service.name().equalsIgnoreCase(text)) return service;
+		}
+		throw new IllegalArgumentException();
+	}
 
-    public static boolean hasUserConnection(User user, ThirdPartyService service) {
-        return user.getConnections().get(service) != null;
-    }
+	public static boolean hasUserConnection(User user, ThirdPartyService service) {
+		return user.getConnections().get(service) != null;
+	}
 }

@@ -13,31 +13,29 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    private final UserRepository userRepository;
-    private final ThirdPartyConnectorFactory thirdPartyConnectorFactory;
+	private final UserRepository userRepository;
+	private final ThirdPartyConnectorFactory thirdPartyConnectorFactory;
 
-    @GetMapping("{username}")
-    public ResponseEntity<UserDTO> user(@PathVariable String username) {
-        return userRepository.findByUsername(username)
-                .map(value -> ResponseEntity.ok(UserDtoMapper.map(value)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
+	@GetMapping("{username}")
+	public ResponseEntity<UserDTO> user(@PathVariable String username) {
+		return userRepository.findByUsername(username)
+				.map(value -> ResponseEntity.ok(UserDtoMapper.map(value)))
+				.orElseGet(() -> ResponseEntity.notFound().build());
+	}
 
-    @PostMapping("{username}/remove/{service}")
-    @PreAuthorize("authentication.principal.username == #username")
-    public ResponseEntity<ThirdPartyRemovalResponseDTO> removeThirdPartyService(@PathVariable String username, @PathVariable ThirdPartyService service) {
-        User user = userRepository.findByUsername(username)
-                .orElse(null);
-        if (user == null) return ResponseEntity.ok(new ThirdPartyRemovalResponseDTO(false, "Unknown user"));
+	@PostMapping("{username}/remove/{service}")
+	@PreAuthorize("authentication.principal.username == #username")
+	public ResponseEntity<ThirdPartyRemovalResponseDTO> removeThirdPartyService(@PathVariable String username, @PathVariable ThirdPartyService service) {
+		User user = userRepository.findByUsername(username)
+				.orElse(null);
+		if (user == null) return ResponseEntity.ok(new ThirdPartyRemovalResponseDTO(false, "Unknown user"));
 
-        return ResponseEntity.ok(thirdPartyConnectorFactory.getProvider(service).removeConnection(user));
-}
+		return ResponseEntity.ok(thirdPartyConnectorFactory.getProvider(service).removeConnection(user));
+	}
 
 }

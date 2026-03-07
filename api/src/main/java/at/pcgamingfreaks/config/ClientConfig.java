@@ -10,10 +10,10 @@ import static io.micrometer.common.util.StringUtils.isNotBlank;
 @Setter
 @Configuration
 public class ClientConfig {
-    private String key;
-    private String secret;
+	private String key;
+	private String secret;
 
-    public boolean isValid() {
-        return isNotBlank(key) && isNotBlank(secret);
-    }
+	public boolean isValid() {
+		return isNotBlank(key) && isNotBlank(secret);
+	}
 }

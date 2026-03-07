@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 public class ErrorResponseDTO {
-    private final String error;
+	private final String error;
 }

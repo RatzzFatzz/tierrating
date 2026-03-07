@@ -11,12 +11,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class AnilistAnimeService extends AnilistDataService {
 
-    public AnilistAnimeService(UserRepository userRepository, AniListEntryScoreRepository aniListEntryScoreRepository, AniListEntryRepository aniListEntryRepository, ThirdPartyConfig thirdPartyConfig, ListEntryDtoMapper listEntryDtoMapper) {
-        super(userRepository, aniListEntryScoreRepository, aniListEntryRepository, thirdPartyConfig, listEntryDtoMapper);
-    }
+	public AnilistAnimeService(UserRepository userRepository, AniListEntryScoreRepository aniListEntryScoreRepository, AniListEntryRepository aniListEntryRepository, ThirdPartyConfig thirdPartyConfig, ListEntryDtoMapper listEntryDtoMapper) {
+		super(userRepository, aniListEntryScoreRepository, aniListEntryRepository, thirdPartyConfig, listEntryDtoMapper);
+	}
 
-    @Override
-    public ContentType getContentType() {
-        return ContentType.ANIME;
-    }
+	@Override
+	public ContentType getContentType() {
+		return ContentType.ANIME;
+	}
 }

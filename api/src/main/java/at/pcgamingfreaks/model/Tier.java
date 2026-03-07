@@ -16,39 +16,39 @@ import java.util.UUID;
 @Entity(name = "tiers")
 public class Tier {
 
-    public Tier(UUID id, String color, String name, double score, double adjustedScore) {
-        this.id = id;
-        this.color = color;
-        this.name = name;
-        this.score = score;
-        this.adjustedScore = adjustedScore;
-    }
+	public Tier(UUID id, String color, String name, double score, double adjustedScore) {
+		this.id = id;
+		this.color = color;
+		this.name = name;
+		this.score = score;
+		this.adjustedScore = adjustedScore;
+	}
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private UUID id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    private TierList tierlist;
+	@ManyToOne(fetch = FetchType.EAGER)
+	private TierList tierlist;
 
-    private String color;
-    private String name;
-    private double score;
-    private double adjustedScore;
+	private String color;
+	private String name;
+	private double score;
+	private double adjustedScore;
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Tier tier = (Tier) o;
-        return Double.compare(score, tier.score) == 0
-                && Double.compare(adjustedScore, tier.adjustedScore) == 0
-                && id.compareTo(tier.id) == 0
-                && color.equals(tier.color)
-                && name.equals(tier.name);
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+		Tier tier = (Tier) o;
+		return Double.compare(score, tier.score) == 0
+				&& Double.compare(adjustedScore, tier.adjustedScore) == 0
+				&& id.compareTo(tier.id) == 0
+				&& color.equals(tier.color)
+				&& name.equals(tier.name);
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, color, name, score, adjustedScore);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, color, name, score, adjustedScore);
+	}
 }
