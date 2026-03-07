@@ -16,27 +16,27 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity(name = "trakt_entry_scores")
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "user_id", "entry_id"})
+		@UniqueConstraint(columnNames = {"user_id", "entry_id"})
 })
 public class TraktEntryScore {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private UUID id;
 
-    @ManyToOne(optional = false, cascade = CascadeType.ALL)
-    private TraktEntry entry;
+	@ManyToOne(optional = false, cascade = CascadeType.ALL)
+	private TraktEntry entry;
 
-    @ManyToOne(optional = false, cascade = CascadeType.ALL)
-    private User user;
+	@ManyToOne(optional = false, cascade = CascadeType.ALL)
+	private User user;
 
-    private int score;
+	private int score;
 
-    @CreationTimestamp
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
+	@CreationTimestamp
+	@Column(nullable = false)
+	private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
+	@UpdateTimestamp
+	@Column(nullable = false)
+	private LocalDateTime updatedAt;
 }

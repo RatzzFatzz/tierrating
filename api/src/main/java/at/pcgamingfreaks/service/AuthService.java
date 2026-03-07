@@ -15,73 +15,72 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class AuthService {
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
+	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
+	private final AuthenticationManager authenticationManager;
+	private final JwtService jwtService;
 
-    public LoginResponseDTO authenticate(String username, String password) {
-        Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        User user = (User) auth.getPrincipal();
-        String token = jwtService.create(user.getUsername());
-        return new LoginResponseDTO(token);
-    }
+	public LoginResponseDTO authenticate(String username, String password) {
+		Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+		User user = (User) auth.getPrincipal();
+		String token = jwtService.create(user.getUsername());
+		return new LoginResponseDTO(token);
+	}
 
-    @Transactional
-    public SignupResponseDTO signup(SignupRequestDTO request) {
-        SignupResponseDTO response = new SignupResponseDTO();
-        response.setUsernameTaken(userRepository.findByUsername(request.getUsername()).isPresent());
-        response.setEmailTaken(userRepository.findByEmail(request.getEmail()).isPresent());
+	@Transactional
+	public SignupResponseDTO signup(SignupRequestDTO request) {
+		SignupResponseDTO response = new SignupResponseDTO();
+		response.setUsernameTaken(userRepository.findByUsername(request.getUsername()).isPresent());
+		response.setEmailTaken(userRepository.findByEmail(request.getEmail()).isPresent());
 
-        if (!(response.isUsernameTaken() || response.isEmailTaken())) {
-            User user = new User();
-            user.setUsername(request.getUsername());
-            user.setEmail(request.getEmail());
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.setCreatedAt(LocalDateTime.now());
-            user.setUpdatedAt(LocalDateTime.now());
-            userRepository.save(user);
-            response.setSignupSuccess(true);
-        }
+		if (!(response.isUsernameTaken() || response.isEmailTaken())) {
+			User user = new User();
+			user.setUsername(request.getUsername());
+			user.setEmail(request.getEmail());
+			user.setPassword(passwordEncoder.encode(request.getPassword()));
+			user.setCreatedAt(LocalDateTime.now());
+			user.setUpdatedAt(LocalDateTime.now());
+			userRepository.save(user);
+			response.setSignupSuccess(true);
+		}
 
-        return response;
-    }
+		return response;
+	}
 
-    public LoginResponseDTO refreshToken(String token) {
-        if (jwtService.isTokenExpired(token)) throw new CredentialsExpiredException("Token expired");
+	public LoginResponseDTO refreshToken(String token) {
+		if (jwtService.isTokenExpired(token)) throw new CredentialsExpiredException("Token expired");
 
-        String username = jwtService.extractUsername(token);
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(username));
+		String username = jwtService.extractUsername(token);
+		User user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException(username));
 
-        String refreshedToken = jwtService.create(user.getUsername());
+		String refreshedToken = jwtService.create(user.getUsername());
 
-        return new LoginResponseDTO(refreshedToken);
-    }
+		return new LoginResponseDTO(refreshedToken);
+	}
 
-    @Transactional
-    public void changePassword(ChangePasswordRequestDTO request) {
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException(request.getUsername()));
+	@Transactional
+	public void changePassword(ChangePasswordRequestDTO request) {
+		User user = userRepository.findByUsername(request.getUsername())
+				.orElseThrow(() -> new UsernameNotFoundException(request.getUsername()));
 
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getOldPassword()));
-        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        userRepository.save(user);
-    }
+		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getOldPassword()));
+		user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+		userRepository.save(user);
+	}
 
-    @Transactional
-    public void deleteAccount(AccountDeletionRequestDTO request) {
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException(request.getUsername()));
+	@Transactional
+	public void deleteAccount(AccountDeletionRequestDTO request) {
+		User user = userRepository.findByUsername(request.getUsername())
+				.orElseThrow(() -> new UsernameNotFoundException(request.getUsername()));
 
-        userRepository.delete(user);
-        log.info("Deleted {} successfully", user.getUsername());
-    }
+		userRepository.delete(user);
+		log.info("Deleted {} successfully", user.getUsername());
+	}
 
 }

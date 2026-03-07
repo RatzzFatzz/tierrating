@@ -10,19 +10,19 @@ import java.util.stream.Collectors;
 
 @Service
 public class ThirdPartyInfoFactory {
-    private final Map<ThirdPartyService, ThirdPartyInfoService> providers;
+	private final Map<ThirdPartyService, ThirdPartyInfoService> providers;
 
-    @Autowired
-    public ThirdPartyInfoFactory(List<ThirdPartyInfoService> providerList) {
-        providers = providerList.stream()
-                .collect(Collectors.toMap(ThirdPartyInfoService::getService, provider -> provider));
-    }
+	@Autowired
+	public ThirdPartyInfoFactory(List<ThirdPartyInfoService> providerList) {
+		providers = providerList.stream()
+				.collect(Collectors.toMap(ThirdPartyInfoService::getService, provider -> provider));
+	}
 
-    public ThirdPartyInfoService getProvider(ThirdPartyService service) {
-        ThirdPartyInfoService provider = providers.get(service);
-        if (provider == null) {
-            throw new IllegalArgumentException("Third party service not found: " + service);
-        }
-        return provider;
-    }
+	public ThirdPartyInfoService getProvider(ThirdPartyService service) {
+		ThirdPartyInfoService provider = providers.get(service);
+		if (provider == null) {
+			throw new IllegalArgumentException("Third party service not found: " + service);
+		}
+		return provider;
+	}
 }

@@ -7,5 +7,5 @@ import java.util.Collection;
 import java.util.List;
 
 public interface TraktEntryRepository extends CrudRepository<TraktEntry, Long> {
-    List<TraktEntry> findAllByIdIn(Collection<Long> ids);
+	List<TraktEntry> findAllByIdIn(Collection<Long> ids);
 }

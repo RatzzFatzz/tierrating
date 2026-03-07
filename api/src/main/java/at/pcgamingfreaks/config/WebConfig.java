@@ -8,8 +8,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-    public void addFormatters(FormatterRegistry registry) {
-        registry.addConverter(new StringToServiceConverter());
-        registry.addConverter(new StringToContentTypeConverter());
-    }
+	public void addFormatters(FormatterRegistry registry) {
+		registry.addConverter(new StringToServiceConverter());
+		registry.addConverter(new StringToContentTypeConverter());
+	}
 }

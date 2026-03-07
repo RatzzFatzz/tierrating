@@ -10,5 +10,5 @@ import lombok.Setter;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class LoginResponseDTO {
-    private String token;
+	private String token;
 }

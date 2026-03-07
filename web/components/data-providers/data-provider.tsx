@@ -1,4 +1,4 @@
-import {TierlistEntry, Tier} from "@/components/model/types";
+import {Tier, TierlistEntry} from "@/components/model/types";
 import {AnilistAnimeProvider} from "@/components/data-providers/anilist/anilist-anime-data-provider";
 import {AnilistMangaProvider} from "@/components/data-providers/anilist/anilist-manga-data-provider";
 import {TraktMoviesDataProvider} from "@/components/data-providers/trakt/trakt-movies-data-provider";
@@ -6,24 +6,24 @@ import {TraktTvShowsDataProvider} from "@/components/data-providers/trakt/trakt-
 import {TraktTvShowsSeasonsDataProvider} from "@/components/data-providers/trakt/trakt-tvshows-seasons-data-provider";
 
 export interface DataProvider {
-    getServiceName: () => string;
-    getTypeName: () => string;
-    fetchData: (token: string | null, username: string, logout: () => void) => Promise<TierlistEntry[]>
-    fetchTierlist: (token: string | null, username: string, logout: () => void) => Promise<Tier[]>
-    updateData: (id: string, rating: number, token: string | null, username: string, logout: () => void) => Promise<void>
-    pullData: (token: string | null, username: string, logout: () => void) => Promise<void>
+	getServiceName: () => string;
+	getTypeName: () => string;
+	fetchData: (token: string | null, username: string, logout: () => void) => Promise<TierlistEntry[]>
+	fetchTierlist: (token: string | null, username: string, logout: () => void) => Promise<Tier[]>
+	updateData: (id: string, rating: number, token: string | null, username: string, logout: () => void) => Promise<void>
+	pullData: (token: string | null, username: string, logout: () => void) => Promise<void>
 }
 
 const providers: Record<string, DataProvider> = {
-    'anilist-anime': new AnilistAnimeProvider(),
-    'anilist-manga': new AnilistMangaProvider(),
-    'trakt-movies': new TraktMoviesDataProvider(),
-    'trakt-tvshows': new TraktTvShowsDataProvider(),
-    'trakt-tvshows-seasons': new TraktTvShowsSeasonsDataProvider(),
+	'anilist-anime': new AnilistAnimeProvider(),
+	'anilist-manga': new AnilistMangaProvider(),
+	'trakt-movies': new TraktMoviesDataProvider(),
+	'trakt-tvshows': new TraktTvShowsDataProvider(),
+	'trakt-tvshows-seasons': new TraktTvShowsSeasonsDataProvider(),
 }
 
-export function getProviderByName(name: string) : DataProvider {
-    const provider = providers[name];
-    if (!provider) throw new Error(`Invalid provider: ${name}`);
-    return provider;
+export function getProviderByName(name: string): DataProvider {
+	const provider = providers[name];
+	if (!provider) throw new Error(`Invalid provider: ${name}`);
+	return provider;
 }

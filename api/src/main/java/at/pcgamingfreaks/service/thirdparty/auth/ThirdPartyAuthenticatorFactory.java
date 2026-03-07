@@ -10,19 +10,19 @@ import java.util.stream.Collectors;
 
 @Service
 public class ThirdPartyAuthenticatorFactory {
-    private final Map<ThirdPartyService, ThirdPartyAuthenticatorService> providers;
+	private final Map<ThirdPartyService, ThirdPartyAuthenticatorService> providers;
 
-    @Autowired
-    public ThirdPartyAuthenticatorFactory(List<ThirdPartyAuthenticatorService> providerList) {
-        providers = providerList.stream()
-                .collect(Collectors.toMap(ThirdPartyAuthenticatorService::getService, provider -> provider));
-    }
+	@Autowired
+	public ThirdPartyAuthenticatorFactory(List<ThirdPartyAuthenticatorService> providerList) {
+		providers = providerList.stream()
+				.collect(Collectors.toMap(ThirdPartyAuthenticatorService::getService, provider -> provider));
+	}
 
-    public ThirdPartyAuthenticatorService getProvider(ThirdPartyService service) {
-        ThirdPartyAuthenticatorService provider = providers.get(service);
-        if (provider == null) {
-            throw new IllegalArgumentException("Third party service not found: " + service);
-        }
-        return provider;
-    }
+	public ThirdPartyAuthenticatorService getProvider(ThirdPartyService service) {
+		ThirdPartyAuthenticatorService provider = providers.get(service);
+		if (provider == null) {
+			throw new IllegalArgumentException("Third party service not found: " + service);
+		}
+		return provider;
+	}
 }

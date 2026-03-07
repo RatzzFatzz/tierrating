@@ -20,23 +20,23 @@ import java.util.regex.Pattern;
 @RequestMapping("/config")
 @RequiredArgsConstructor
 public class ConfigController {
-    private final ThirdPartyConfig thirdPartyConfig;
-    private final Pattern configValidPattern = Pattern.compile("get(?<service>.*)");
+	private final ThirdPartyConfig thirdPartyConfig;
+	private final Pattern configValidPattern = Pattern.compile("get(?<service>.*)");
 
-    @GetMapping("services")
-    public ResponseEntity<List<String>> getAvailableServices() throws InvocationTargetException, IllegalAccessException {
-        List<ThirdPartyService> services = new ArrayList<>();
-        Method[] methods = thirdPartyConfig.getClass().getMethods();
-        for (Method method:  methods) {
-            if (method.getReturnType().equals(ServiceConfig.class)) {
-                ServiceConfig serviceConfig = (ServiceConfig) method.invoke(thirdPartyConfig);
-                Matcher matcher = configValidPattern.matcher(method.getName());
-                if (serviceConfig.isValid() && matcher.find()) {
-                    services.add(ThirdPartyService.from(matcher.group("service")));
-                }
-            }
-        }
-        return ResponseEntity.ok(services.stream().map(s -> s.name().toLowerCase()).toList());
-    }
+	@GetMapping("services")
+	public ResponseEntity<List<String>> getAvailableServices() throws InvocationTargetException, IllegalAccessException {
+		List<ThirdPartyService> services = new ArrayList<>();
+		Method[] methods = thirdPartyConfig.getClass().getMethods();
+		for (Method method : methods) {
+			if (method.getReturnType().equals(ServiceConfig.class)) {
+				ServiceConfig serviceConfig = (ServiceConfig) method.invoke(thirdPartyConfig);
+				Matcher matcher = configValidPattern.matcher(method.getName());
+				if (serviceConfig.isValid() && matcher.find()) {
+					services.add(ThirdPartyService.from(matcher.group("service")));
+				}
+			}
+		}
+		return ResponseEntity.ok(services.stream().map(s -> s.name().toLowerCase()).toList());
+	}
 }
 

@@ -7,6 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TmdbInfoRequest {
-    @JsonProperty("poster_path")
-    private String posterPath;
+	@JsonProperty("poster_path")
+	private String posterPath;
 }

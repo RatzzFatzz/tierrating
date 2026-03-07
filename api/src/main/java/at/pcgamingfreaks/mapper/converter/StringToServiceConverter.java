@@ -4,8 +4,8 @@ import at.pcgamingfreaks.model.ThirdPartyService;
 import org.springframework.core.convert.converter.Converter;
 
 public class StringToServiceConverter implements Converter<String, ThirdPartyService> {
-    @Override
-    public ThirdPartyService convert(String source) {
-        return ThirdPartyService.from(source.toUpperCase());
-    }
+	@Override
+	public ThirdPartyService convert(String source) {
+		return ThirdPartyService.from(source.toUpperCase());
+	}
 }

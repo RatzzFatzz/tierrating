@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AniListListEntry {
-    private float score;
-    private AniListMedia media;
+	private float score;
+	private AniListMedia media;
 }

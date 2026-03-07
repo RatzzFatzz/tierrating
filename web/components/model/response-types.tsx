@@ -1,34 +1,34 @@
 export interface ServerResponse<T> {
-    status: number;
-    error?: string;
-    data?: T;
+	status: number;
+	error?: string;
+	data?: T;
 }
 
 export interface GenericErrorResponse {
-    message: string;
+	message: string;
 }
 
 export interface LoginResponse {
-    token: string;
+	token: string;
 }
 
 export interface SignupResponse {
-    usernameTaken: boolean;
-    emailTaken: boolean;
-    signupSuccess: boolean;
+	usernameTaken: boolean;
+	emailTaken: boolean;
+	signupSuccess: boolean;
 }
 
 export interface UserResponse {
-    id: number;
-    username: string;
-    bio: string;
-    connectedServices: string[];
+	id: number;
+	username: string;
+	bio: string;
+	connectedServices: string[];
 }
 
 export interface ThirdPartyAuthResponse {
-    message: string
+	message: string
 }
 
 export interface ThirdPartyInfoResponse {
-    clientId: string;
+	clientId: string;
 }

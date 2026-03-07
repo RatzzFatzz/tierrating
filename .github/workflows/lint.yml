@@ -1,0 +1,61 @@
+# This workflow runs linting checks on pull requests
+
+name: Lint
+
+on:
+  pull_request:
+    branches: [main, dev, master]
+  push:
+    branches: [main, dev, master]
+
+jobs:
+  lint-api:
+    name: Lint API (Java)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Run Checkstyle
+        run: mvn checkstyle:check --file api/pom.xml
+
+      - name: Run SpotBugs
+        run: mvn spotbugs:check --file api/pom.xml
+
+      - name: Run PMD
+        run: mvn pmd:check --file api/pom.xml
+
+  lint-web:
+    name: Lint Web (TypeScript)
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./web
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Check Prettier formatting
+        run: npm run format:check

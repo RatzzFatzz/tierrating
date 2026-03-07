@@ -11,23 +11,23 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AnilistConnectorService implements ThirdPartyConnectorService {
-    private final ThirdPartyConnectionRepository thirdpartyConnectionRepository;
-    private final UserRepository userRepository;
+	private final ThirdPartyConnectionRepository thirdpartyConnectionRepository;
+	private final UserRepository userRepository;
 
-    @Override
-    public ThirdPartyService getService() {
-        return ThirdPartyService.ANILIST;
-    }
+	@Override
+	public ThirdPartyService getService() {
+		return ThirdPartyService.ANILIST;
+	}
 
-    @Override
-    public ThirdPartyRemovalResponseDTO removeConnection(User user) {
-        try {
-            thirdpartyConnectionRepository.deleteById(user.getConnections().get(ThirdPartyService.ANILIST).getId());
-            user.getConnections().put(ThirdPartyService.ANILIST, null);
-            userRepository.save(user);
-            return new ThirdPartyRemovalResponseDTO(true, "");
-        } catch (Exception e) {
-            return new ThirdPartyRemovalResponseDTO(false, e.getMessage());
-        }
-    }
+	@Override
+	public ThirdPartyRemovalResponseDTO removeConnection(User user) {
+		try {
+			thirdpartyConnectionRepository.deleteById(user.getConnections().get(ThirdPartyService.ANILIST).getId());
+			user.getConnections().put(ThirdPartyService.ANILIST, null);
+			userRepository.save(user);
+			return new ThirdPartyRemovalResponseDTO(true, "");
+		} catch (Exception e) {
+			return new ThirdPartyRemovalResponseDTO(false, e.getMessage());
+		}
+	}
 }

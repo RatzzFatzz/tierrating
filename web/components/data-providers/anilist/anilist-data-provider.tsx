@@ -2,10 +2,10 @@ import {AbstractDataProvider} from "@/components/data-providers/abstract-data-pr
 
 export abstract class AnilistDataProvider extends AbstractDataProvider {
 
-    getServiceName(): string {
-        return "anilist";
-    }
+	getServiceName(): string {
+		return "anilist";
+	}
 
-    abstract getTypeName(): string;
+	abstract getTypeName(): string;
 
 }

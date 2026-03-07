@@ -10,10 +10,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class UpdateScoreRequestDTO {
-    private String username;
-    private ThirdPartyService service;
-    private ContentType type;
+	private String username;
+	private ThirdPartyService service;
+	private ContentType type;
 
-    private long id;
-    private float score;
+	private long id;
+	private float score;
 }

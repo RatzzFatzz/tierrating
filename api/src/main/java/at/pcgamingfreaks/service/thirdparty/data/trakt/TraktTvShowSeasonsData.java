@@ -6,7 +6,6 @@ import at.pcgamingfreaks.model.ContentType;
 import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.auth.User;
 import at.pcgamingfreaks.model.exceptions.ThirdPartySyncException;
-import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
 import at.pcgamingfreaks.model.repo.TraktEntryRepository;
 import at.pcgamingfreaks.model.repo.TraktEntryScoreRepository;
 import at.pcgamingfreaks.model.repo.UserRepository;
@@ -31,77 +30,77 @@ import java.util.Map;
 @Service
 public class TraktTvShowSeasonsData extends TraktDataService {
 
-    public TraktTvShowSeasonsData(UserRepository userRepository, TraktEntryScoreRepository entryScoreRepository, TraktEntryRepository entryRepository, TmdbCoverFinder coverFinder, ThirdPartyConfig thirdPartyConfig, ListEntryDtoMapper listEntryDtoMapper) {
-        super(userRepository, entryScoreRepository, entryRepository, coverFinder, thirdPartyConfig, listEntryDtoMapper);
-    }
+	public TraktTvShowSeasonsData(UserRepository userRepository, TraktEntryScoreRepository entryScoreRepository, TraktEntryRepository entryRepository, TmdbCoverFinder coverFinder, ThirdPartyConfig thirdPartyConfig, ListEntryDtoMapper listEntryDtoMapper) {
+		super(userRepository, entryScoreRepository, entryRepository, coverFinder, thirdPartyConfig, listEntryDtoMapper);
+	}
 
-    @Override
-    public ContentType getContentType() {
-        return ContentType.TVSHOWS_SEASONS;
-    }
+	@Override
+	public ContentType getContentType() {
+		return ContentType.TVSHOWS_SEASONS;
+	}
 
-    @Override
-    protected List<TraktEntryScore> pull(User user) {
-        Map<Long, TraktEntryScore> entries = new HashMap<>();
-        pullRated(user).stream()
-                .map(ratedSeason -> {
-                    TraktEntry entry = new TraktEntry(
-                            ratedSeason.season.ids.trakt,
-                            ContentType.TVSHOWS_SEASONS,
-                            ratedSeason.season.number,
-                            String.format("%s Season %d", ratedSeason.show.title, ratedSeason.season.number),
-                            coverFinder.findSeason(ratedSeason.show.ids.tmdb, ratedSeason.season.number)
-                    );
-                    TraktEntryScore entryScore = new TraktEntryScore();
-                    entryScore.setUser(user);
-                    entryScore.setEntry(entry);
-                    entryScore.setScore(ratedSeason.rating.value);
-                    return entryScore;
-                })
-                .forEach(entry -> entries.put(entry.getEntry().getId(), entry));
-        return entries.values().stream().toList();
-    }
+	@Override
+	protected List<TraktEntryScore> pull(User user) {
+		Map<Long, TraktEntryScore> entries = new HashMap<>();
+		pullRated(user).stream()
+				.map(ratedSeason -> {
+					TraktEntry entry = new TraktEntry(
+							ratedSeason.season.ids.trakt,
+							ContentType.TVSHOWS_SEASONS,
+							ratedSeason.season.number,
+							String.format("%s Season %d", ratedSeason.show.title, ratedSeason.season.number),
+							coverFinder.findSeason(ratedSeason.show.ids.tmdb, ratedSeason.season.number)
+					);
+					TraktEntryScore entryScore = new TraktEntryScore();
+					entryScore.setUser(user);
+					entryScore.setEntry(entry);
+					entryScore.setScore(ratedSeason.rating.value);
+					return entryScore;
+				})
+				.forEach(entry -> entries.put(entry.getEntry().getId(), entry));
+		return entries.values().stream().toList();
+	}
 
-    @Override
-    protected List<RatedSeason> pullRated(User user) {
-        try {
-            Response<List<RatedSeason>> response = new TraktV2(
-                    thirdPartyConfig.getTrakt().getClient().getKey(),
-                    thirdPartyConfig.getTrakt().getClient().getSecret(),
-                    thirdPartyConfig.getTrakt().getRedirectUrl())
-                    .users()
-                    .ratingsSeasons(
-                            UserSlug.fromUsername(user.getConnections().get(ThirdPartyService.TRAKT).getThirdPartyUserId()),
-                            RatingsFilter.ALL,
-                            Extended.FULL)
-                    .execute();
+	@Override
+	protected List<RatedSeason> pullRated(User user) {
+		try {
+			Response<List<RatedSeason>> response = new TraktV2(
+					thirdPartyConfig.getTrakt().getClient().getKey(),
+					thirdPartyConfig.getTrakt().getClient().getSecret(),
+					thirdPartyConfig.getTrakt().getRedirectUrl())
+					.users()
+					.ratingsSeasons(
+							UserSlug.fromUsername(user.getConnections().get(ThirdPartyService.TRAKT).getThirdPartyUserId()),
+							RatingsFilter.ALL,
+							Extended.FULL)
+					.execute();
 
-            if (!response.isSuccessful())
-                throw new ThirdPartySyncException("Error retrieving rated seasons of " + user.getUsername());
+			if (!response.isSuccessful())
+				throw new ThirdPartySyncException("Error retrieving rated seasons of " + user.getUsername());
 
-            return response.body();
-        } catch (IOException e) {
-            throw new ThirdPartySyncException("Error retrieving rated seasons: " + e.getMessage());
-        }
-    }
+			return response.body();
+		} catch (IOException e) {
+			throw new ThirdPartySyncException("Error retrieving rated seasons: " + e.getMessage());
+		}
+	}
 
-    @Override
-    protected List<Object> pullWatched(User user) {
-        return List.of();
-    }
+	@Override
+	protected List<Object> pullWatched(User user) {
+		return List.of();
+	}
 
-    protected void pushSingleChange(long id, float score, User user) {
-        String body = "{\"seasons\":[{\"ids\":{\"trakt\":" + id + "},\"rating\":" + (int) score + "}]}";
-        RestClient.builder()
-                .baseUrl("https://api.trakt.tv")
-                .defaultHeader("Authorization", user.getConnections().get(ThirdPartyService.TRAKT).getAccessToken())
-                .build()
-                .post()
-                .uri("/sync/ratings")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("trakt-api-key", thirdPartyConfig.getTrakt().getClient().getKey())
-                .body(body)
-                .retrieve()
-                .body(String.class);
-    }
+	protected void pushSingleChange(long id, float score, User user) {
+		String body = "{\"seasons\":[{\"ids\":{\"trakt\":" + id + "},\"rating\":" + (int) score + "}]}";
+		RestClient.builder()
+				.baseUrl("https://api.trakt.tv")
+				.defaultHeader("Authorization", user.getConnections().get(ThirdPartyService.TRAKT).getAccessToken())
+				.build()
+				.post()
+				.uri("/sync/ratings")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("trakt-api-key", thirdPartyConfig.getTrakt().getClient().getKey())
+				.body(body)
+				.retrieve()
+				.body(String.class);
+	}
 }

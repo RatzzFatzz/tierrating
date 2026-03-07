@@ -14,16 +14,17 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class TokenRefreshService {
-    private final UserRepository userRepository;
-    private final TraktTokenRefresher traktTokenRefresher;
+	private final UserRepository userRepository;
+	private final TraktTokenRefresher traktTokenRefresher;
 
-    @Scheduled(cron = "0 ${random.int[0,59]} 0 * * *")
-    public void refreshTokens() {
-        List<User> users = userRepository.findAll();
+	@Scheduled(cron = "0 ${random.int[0,59]} 0 * * *")
+	public void refreshTokens() {
+		List<User> users = userRepository.findAll();
 
-        for (User user: users) {
-            if (user.getConnections().get(ThirdPartyService.TRAKT) != null && traktTokenRefresher.isValid()) traktTokenRefresher.refresh(user);
-        }
-        log.info("Refreshed tokens");
-    }
+		for (User user : users) {
+			if (user.getConnections().get(ThirdPartyService.TRAKT) != null && traktTokenRefresher.isValid())
+				traktTokenRefresher.refresh(user);
+		}
+		log.info("Refreshed tokens");
+	}
 }

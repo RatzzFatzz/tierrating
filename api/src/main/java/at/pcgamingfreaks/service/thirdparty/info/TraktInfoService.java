@@ -10,17 +10,17 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class TraktInfoService implements ThirdPartyInfoService {
-    private final ThirdPartyConfig thirdPartyConfig;
+	private final ThirdPartyConfig thirdPartyConfig;
 
-    @Override
-    public ThirdPartyService getService() {
-        return ThirdPartyService.TRAKT;
-    }
+	@Override
+	public ThirdPartyService getService() {
+		return ThirdPartyService.TRAKT;
+	}
 
-    public ThirdPartyInfoResponseDTO info() {
-        if (!thirdPartyConfig.getTrakt().isValid()) throw new ThirdPartyUnconfiguredException(getService());
-        ThirdPartyInfoResponseDTO response = new ThirdPartyInfoResponseDTO();
-        response.setClientId(thirdPartyConfig.getTrakt().getClient().getKey());
-        return response;
-    }
+	public ThirdPartyInfoResponseDTO info() {
+		if (!thirdPartyConfig.getTrakt().isValid()) throw new ThirdPartyUnconfiguredException(getService());
+		ThirdPartyInfoResponseDTO response = new ThirdPartyInfoResponseDTO();
+		response.setClientId(thirdPartyConfig.getTrakt().getClient().getKey());
+		return response;
+	}
 }

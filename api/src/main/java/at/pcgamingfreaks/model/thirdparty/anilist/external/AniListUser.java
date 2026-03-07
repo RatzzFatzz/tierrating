@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AniListUser {
-    long id;
-    String name;
+	long id;
+	String name;
 }
