@@ -33,7 +33,17 @@ function TestComponent() {
   );
 }
 
+function UseAuthOutsideProvider() {
+  useAuth();
+  return null;
+}
+
 describe("AuthContext", () => {
+  it("throws when useAuth is used outside of AuthProvider", () => {
+    expect(() => render(<UseAuthOutsideProvider />)).toThrow(
+      "useAuth must be used within an AuthProvider"
+    );
+  });
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();

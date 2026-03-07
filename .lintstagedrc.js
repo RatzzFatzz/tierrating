@@ -28,6 +28,7 @@ module.exports = {
     return [];
   },
   "web/**/*.{json,css,md}": async (filenames) => {
+    if (filenames.length === 0) return [];
     const relativePaths = filenames
       .map((f) => path.relative(webDir, f))
       .join(" ");
