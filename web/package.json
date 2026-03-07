@@ -6,7 +6,10 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,md}\""
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -64,9 +67,13 @@
     "@types/react-dom": "19.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.0.10",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "prettier": "^3.4.2",
     "tailwindcss": "^4.1.11",
     "tw-animate-css": "^1.3.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "typescript-eslint": "^8.18.2"
   },
   "overrides": {
     "@types/react": "19.2.7",

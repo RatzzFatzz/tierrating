@@ -30,6 +30,12 @@ replay_pid*
 .idea/
 **/*.iml
 
+# Eclipse
+.classpath
+.project
+.settings/
+.factorypath
+
 # Secrets and local configuration
 .env
 .env.*
@@ -62,3 +68,10 @@ yarn-error.log*
 
 # local data
 /data/
+
+# test coverage
+web/coverage/
+# Playwright
+web/playwright-report/
+web/test-results/
+web/playwright/.cache/

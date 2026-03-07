@@ -1,0 +1,25 @@
+{
+  "name": "tierrating",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TierRating - Organize your media ratings in tier lists",
+  "scripts": {
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.2"
+  },
+  "lint-staged": {
+    "api/**/*.java": [
+      "mvn checkstyle:check --file api/pom.xml"
+    ],
+    "web/**/*.{js,jsx,ts,tsx}": [
+      "cd web && npm run lint:fix",
+      "cd web && npm run format"
+    ],
+    "web/**/*.{json,css,md}": [
+      "cd web && npm run format"
+    ]
+  }
+}
