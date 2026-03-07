@@ -116,19 +116,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.21.0</version>
+                <version>3.28.0</version>
                 <configuration>
                     <rulesets>
                         <ruleset>pmd-ruleset.xml</ruleset>
                     </rulesets>
                     <failOnViolation>true</failOnViolation>
                     <printFailingErrors>true</printFailingErrors>
-                    <!--
-                      PMD 6.x (bundled in plugin 3.21) does not recognise Java 21
-                      as a targetJdk value. Override to 17, which covers all
-                      language features used in this codebase.
-                    -->
-                    <targetJdk>17</targetJdk>
                 </configuration>
             </plugin>
         </plugins>
