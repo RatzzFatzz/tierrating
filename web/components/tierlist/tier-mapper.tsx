@@ -27,7 +27,7 @@ export function assignTiersAndGroupEntriesByTier(tiers: Tier[], items: TierlistE
 		}
 	}
 
-	entriesByTier.keys().forEach(key => entriesByTier.set(key, entriesByTier.get(key)!.sort(sortByName)))
+	Array.from(entriesByTier.keys()).forEach((key) => entriesByTier.set(key, entriesByTier.get(key)!.sort(sortByName)));
 
 	return entriesByTier;
 }
