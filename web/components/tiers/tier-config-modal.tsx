@@ -35,7 +35,7 @@ export const DEFAULT_COLORS = [
 export default function TierConfigModal({ initialTiers = [], service, type, onSave, username, decimals }: TierConfigModalProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [tiers, setTiers] = useState<Tier[]>([]);
-	const [queryRunning, setQueryRunning] = useState(false);
+	const [queryRunning, setQueryRunning] = useState(true);
 
 	const { token, isLoading, isAuthenticated, logout } = useAuth();
 	const provider: DataProvider = getProviderByName(`${service}-${type}`);
@@ -45,28 +45,16 @@ export default function TierConfigModal({ initialTiers = [], service, type, onSa
 	// Only fetch data when the modal is opened
 	useEffect(() => {
 		if (isOpen && !dataFetched.current && !isLoading && isAuthenticated) {
-			setQueryRunning(true);
 			provider
 				.fetchTierlist(token, username, logout)
 				.then((data: Tier[]) => {
-					setTiers(data && data.length > 0 ? data : getDefaultTiers());
+					setTiers(data && data.length > 0 ? [...data].sort((a, b) => b.score - a.score) : getDefaultTiers);
 					dataFetched.current = true;
 				})
 				.catch((error) => console.error(error))
 				.finally(() => setQueryRunning(false));
 		}
 	}, [isOpen, isLoading, isAuthenticated, token, type, logout, provider, username]);
-
-	// Sort tiers whenever they change
-	useEffect(() => {
-		if (!tiers || tiers.length === 0) return;
-
-		const sortedTiers = [...tiers].sort((a, b) => b.score - a.score);
-		// Only update if the order has changed to avoid infinite loops
-		if (JSON.stringify(sortedTiers.map((t) => t.id)) !== JSON.stringify(tiers.map((t) => t.id))) {
-			setTiers(sortedTiers);
-		}
-	}, [tiers]);
 
 	const restoreDefaults = () => {
 		setTiers(getDefaultTiers());

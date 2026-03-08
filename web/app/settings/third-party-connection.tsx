@@ -40,6 +40,7 @@ export default function ThirdPartyConnection({
 			<CardContent className={"grid gap-1"}>
 				{types.map((entry) => (
 					<ThirdPartyConnectedButton
+						key={service.id + "." + entry.id}
 						service={service.id}
 						type={entry.id}
 						title={entry.title}

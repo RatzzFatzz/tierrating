@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { extractJwtData } from "@/components/auth/jwt-decoder";
 import { refreshToken } from "@/components/api/user-api";
@@ -20,13 +20,31 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
 	const [token, setToken] = useState<string | null>(null);
+
 	const [user, setUser] = useState<string | null>(null);
+	const [expiration, setExpiration] = useState<Date | null>(null);
+
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [isExpired, setIsExpired] = useState(false);
-	const [expiration, setExpiration] = useState<Date | null>(null);
-	const router = useRouter();
 
 	const [isLoading, setLoading] = useState(true);
+	const router = useRouter();
+
+	const login = useCallback((newToken: string) => {
+		localStorage.setItem("authToken", newToken);
+		setToken(newToken);
+		const extracted = extractJwtData(newToken);
+		if (extracted) setUser(extracted.username);
+		setIsAuthenticated(true);
+	}, []);
+
+	const logout = useCallback(() => {
+		localStorage.removeItem("authToken");
+		setToken(null);
+		setUser(null);
+		setIsAuthenticated(false);
+		router.push("/login");
+	}, [router]);
 
 	// Load token from localStorage on initial render
 	useEffect(() => {
@@ -72,23 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			setLoading(false);
 		};
 		checkAuth();
-	}, []);
-
-	const login = (newToken: string) => {
-		localStorage.setItem("authToken", newToken);
-		setToken(newToken);
-		const extracted = extractJwtData(newToken);
-		if (extracted) setUser(extracted.username);
-		setIsAuthenticated(true);
-	};
-
-	const logout = () => {
-		localStorage.removeItem("authToken");
-		setToken(null);
-		setUser(null);
-		setIsAuthenticated(false);
-		router.push("/login");
-	};
+	}, [login, logout]);
 
 	return (
 		<AuthContext.Provider value={{ token, user, isAuthenticated, isLoading, isExpired, expiration, login, logout }}>

@@ -1,6 +1,8 @@
 import { Tier, TierlistEntry } from "@/components/model/types";
 
-export function assignTiersAndGroupEntriesByTier(tiers: Tier[], items: TierlistEntry[]): Map<string, TierlistEntry[]> {
+export function assignTiersAndGroupEntriesByTier(tiers: Tier[], entries: TierlistEntry[]): Map<string, TierlistEntry[]> {
+	if (!tiers || tiers.length <= 0 || !entries || entries.length <= 0) return new Map<string, TierlistEntry[]>;
+
 	// Proper order (sorted descending by score) is assured by the server
 	let itemsIndex = 0;
 	let tiersIndex = 0;
@@ -9,14 +11,14 @@ export function assignTiersAndGroupEntriesByTier(tiers: Tier[], items: TierlistE
 	const entriesByTier = new Map<string, TierlistEntry[]>();
 	tiers.forEach((tier) => entriesByTier.set(tier.id, []));
 
-	while (itemsIndex < items.length && tiersIndex < tiers.length) {
-		if (items[itemsIndex].score >= tiers[tiersIndex].score) {
-			items[itemsIndex].tier = tiers[tiersIndex];
-			items[itemsIndex].index = positionIndex;
+	while (itemsIndex < entries.length && tiersIndex < tiers.length) {
+		if (entries[itemsIndex].score >= tiers[tiersIndex].score) {
+			entries[itemsIndex].tier = tiers[tiersIndex];
+			entries[itemsIndex].index = positionIndex;
 
 			if (entriesByTier.has(tiers[tiersIndex].id)) {
 				const currentEntries = entriesByTier.get(tiers[tiersIndex].id)!;
-				entriesByTier.set(tiers[tiersIndex].id, [...currentEntries, items[itemsIndex]]);
+				entriesByTier.set(tiers[tiersIndex].id, [...currentEntries, entries[itemsIndex]]);
 			}
 
 			positionIndex++;

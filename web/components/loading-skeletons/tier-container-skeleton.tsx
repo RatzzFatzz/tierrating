@@ -16,6 +16,7 @@ export function TierContainerSkeleton() {
 }
 
 export function TierlistEntrySkeleton({ color, label }: { color: string; label: string }) {
+	const minEntries: number = 2;
 	return (
 		<div
 			className={cn(
@@ -30,13 +31,15 @@ export function TierlistEntrySkeleton({ color, label }: { color: string; label: 
 				{label}
 			</div>
 			<div className="flex-1 min-h-16 bg-background/50 p-2 flex flex-wrap gap-2 transition-colors">
-				{Array(Math.floor(Math.random() * 7 + 2))
+				{/* eslint-disable */}
+				{Array(Math.floor(Math.random() * 7 + minEntries))
 					.fill(0)
 					.map((_, index) => (
 						<div key={`skeleton-tierlist-entry-${index}`}>
 							<Skeleton className="w-20 h-36 bg-card border border-border/40 rounded-md shadow-sm cursor-move flex flex-col items-center justify-center transition-opacity"></Skeleton>
 						</div>
 					))}
+				{/* eslint-enable */}
 			</div>
 		</div>
 	);
