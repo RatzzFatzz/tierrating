@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import {useSearchParams} from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 export function SuccessMessage() {
-	const searchParams = useSearchParams()
-	const signupSuccess = searchParams.get('signup') === 'success'
+	const searchParams = useSearchParams();
+	const signupSuccess = searchParams.get("signup") === "success";
 
 	return (
 		<div>
@@ -14,5 +14,5 @@ export function SuccessMessage() {
 				</div>
 			)}
 		</div>
-	)
+	);
 }
