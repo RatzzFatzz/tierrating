@@ -42,31 +42,20 @@ export default function TierConfigModal({ initialTiers = [], service, type, onSa
 
 	const dataFetched = useRef(false);
 
-	// Only fetch data when the modal is opened
 	useEffect(() => {
 		if (isOpen && !dataFetched.current && !isLoading && isAuthenticated) {
-			setQueryRunning(true);
+			queueMicrotask(() => setQueryRunning(true));
 			provider
 				.fetchTierlist(token, username, logout)
 				.then((data: Tier[]) => {
-					setTiers(data && data.length > 0 ? data : getDefaultTiers());
+					const sortedData = data && data.length > 0 ? [...data].sort((a, b) => b.score - a.score) : getDefaultTiers();
+					setTiers(sortedData);
 					dataFetched.current = true;
 				})
 				.catch((error) => console.error(error))
 				.finally(() => setQueryRunning(false));
 		}
 	}, [isOpen, isLoading, isAuthenticated, token, type, logout, provider, username]);
-
-	// Sort tiers whenever they change
-	useEffect(() => {
-		if (!tiers || tiers.length === 0) return;
-
-		const sortedTiers = [...tiers].sort((a, b) => b.score - a.score);
-		// Only update if the order has changed to avoid infinite loops
-		if (JSON.stringify(sortedTiers.map((t) => t.id)) !== JSON.stringify(tiers.map((t) => t.id))) {
-			setTiers(sortedTiers);
-		}
-	}, [tiers]);
 
 	const restoreDefaults = () => {
 		setTiers(getDefaultTiers());

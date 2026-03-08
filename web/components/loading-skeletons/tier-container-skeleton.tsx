@@ -30,7 +30,7 @@ export function TierlistEntrySkeleton({ color, label }: { color: string; label: 
 				{label}
 			</div>
 			<div className="flex-1 min-h-16 bg-background/50 p-2 flex flex-wrap gap-2 transition-colors">
-				{Array(Math.floor(Math.random() * 7 + 2))
+				{Array(5)
 					.fill(0)
 					.map((_, index) => (
 						<div key={`skeleton-tierlist-entry-${index}`}>

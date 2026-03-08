@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Tier, TierlistEntry } from "@/components/model/types";
 import { getDefaultTiers } from "@/components/model/defaults";
 import { useAuth } from "@/components/contexts/auth-context";
@@ -16,20 +16,34 @@ export default function TierList({ providerName }: { providerName: string }) {
 	const [tiers, setTiers] = useState<Tier[]>([]);
 	const [entries, setEntries] = useState<TierlistEntry[]>([]);
 
-	const [entriesByTierId, setEntriesByTierId] = useState<Map<string, TierlistEntry[]>>(new Map());
-	const [entriesById, setEntriesById] = useState<Map<string, TierlistEntry>>(new Map());
-	const [tiersById, setTiersById] = useState<Map<string, Tier>>(new Map());
-	const [tiersByName, setTiersByName] = useState<Map<string, Tier>>(new Map());
+	const [tiersQueryRunning, setTiersQueryRunning] = useState(true);
+	const [entriesQueryRunning, setEntriesQueryRunning] = useState(true);
 
 	const { user, token, isLoading, isAuthenticated, logout } = useAuth();
 	const username: string = useParams<{ username: string }>().username;
 	const dndDisabled: boolean = user != username;
 
-	const [tiersQueryRunning, setTiersQueryRunning] = useState(true);
-	const [entriesQueryRunning, setEntriesQueryRunning] = useState(true);
-	const [mappingCompleted, setMappingCompleted] = useState(false);
-
 	const provider = getProviderByName(providerName);
+
+	const tiersById = useMemo(() => groupBySingle(tiers, (tier) => tier.id), [tiers]);
+	const tiersByName = useMemo(() => groupBySingle(tiers, (tier) => tier.name), [tiers]);
+	const entriesById = useMemo(() => groupBySingle(entries, (entry) => entry.id), [entries]);
+
+	const initialEntriesByTierId = useMemo(() => {
+		if (tiersQueryRunning || entriesQueryRunning) return new Map<string, TierlistEntry[]>();
+		return assignTiersAndGroupEntriesByTier(tiers, entries);
+	}, [tiers, entries, tiersQueryRunning, entriesQueryRunning]);
+	const [entriesByTierId, setEntriesByTierId] = useState<Map<string, TierlistEntry[]>>(new Map());
+
+	const mappingCompleted = entriesByTierId.size > 0;
+
+	useEffect(() => {
+		if (initialEntriesByTierId.size > 0 && entriesByTierId.size === 0) {
+			queueMicrotask(() => {
+				setEntriesByTierId(initialEntriesByTierId);
+			});
+		}
+	}, [initialEntriesByTierId, entriesByTierId.size]);
 
 	// fetch tiers
 	useEffect(() => {
@@ -52,18 +66,6 @@ export default function TierList({ providerName }: { providerName: string }) {
 				.finally(() => setEntriesQueryRunning(false));
 		}
 	}, [isLoading, isAuthenticated, provider, token, username, logout]);
-
-	// perform mapping
-	useEffect(() => {
-		if (!tiersQueryRunning && !entriesQueryRunning && !mappingCompleted) {
-			const entriesByTier = assignTiersAndGroupEntriesByTier(tiers, entries);
-			setEntriesByTierId(entriesByTier);
-			setEntriesById(groupBySingle(entries, (entry) => entry.id));
-			setTiersById(groupBySingle(tiers, (tier) => tier.id));
-			setTiersByName(groupBySingle(tiers, (tier) => tier.name));
-			setMappingCompleted(true);
-		}
-	}, [tiers, entries, tiersQueryRunning, entriesQueryRunning, mappingCompleted]);
 
 	const onDragEnd = async (event: { canceled: any; operation: { source: any; target: any } }) => {
 		if (event.canceled) return;

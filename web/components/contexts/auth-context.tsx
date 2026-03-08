@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { extractJwtData } from "@/components/auth/jwt-decoder";
 import { refreshToken } from "@/components/api/user-api";
@@ -28,7 +28,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	const [isLoading, setLoading] = useState(true);
 
-	// Load token from localStorage on initial render
+	const login = useCallback((newToken: string) => {
+		localStorage.setItem("authToken", newToken);
+		setToken(newToken);
+		const extracted = extractJwtData(newToken);
+		if (extracted) setUser(extracted.username);
+		setIsAuthenticated(true);
+	}, []);
+
+	const logout = useCallback(() => {
+		localStorage.removeItem("authToken");
+		setToken(null);
+		setUser(null);
+		setIsAuthenticated(false);
+		router.push("/login");
+	}, [router]);
+
 	useEffect(() => {
 		const checkAuth = () => {
 			const storedToken = localStorage.getItem("authToken");
@@ -72,23 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			setLoading(false);
 		};
 		checkAuth();
-	}, []);
-
-	const login = (newToken: string) => {
-		localStorage.setItem("authToken", newToken);
-		setToken(newToken);
-		const extracted = extractJwtData(newToken);
-		if (extracted) setUser(extracted.username);
-		setIsAuthenticated(true);
-	};
-
-	const logout = () => {
-		localStorage.removeItem("authToken");
-		setToken(null);
-		setUser(null);
-		setIsAuthenticated(false);
-		router.push("/login");
-	};
+	}, [login, logout]);
 
 	return (
 		<AuthContext.Provider value={{ token, user, isAuthenticated, isLoading, isExpired, expiration, login, logout }}>
