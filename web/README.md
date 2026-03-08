@@ -13,17 +13,20 @@ Please refer to the [server repo](https://github.com/tierrating/tierrating) for 
 ### Local Development Setup
 
 1. Clone the repository
+
 ```bash
 git clone https://github.com/yourusername/tiersync.git
 cd tiersync
 ```
 
 2. Install dependencies
+
 ```bash
 npm install
 ```
 
 3. Start the development server
+
 ```bash
 npm run dev
 ```
