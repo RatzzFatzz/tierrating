@@ -25,8 +25,8 @@ export default function ThirdPartyConnection({
 	logout: () => void;
 }) {
 	return (
-		<Card className={"gap-1"}>
-			<CardHeader className={"h-9"}>
+		<Card className={"gap-1 py-4"}>
+			<CardHeader className={"h-9 px-4"}>
 				<div className={"w-full flex gap-2 items-center"}>
 					<div className="relative size-7">
 						<Image src={`/icons/${service.id}.svg`} alt={`${service.id} icon`} fill={true} />
