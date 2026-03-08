@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -44,4 +45,21 @@ public class TraktEntry {
 	@UpdateTimestamp
 	@Column(nullable = false)
 	private LocalDateTime updatedAt;
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+
+		TraktEntry that = (TraktEntry) o;
+		return type == that.type && Objects.equals(season, that.season) && Objects.equals(title, that.title) && Objects.equals(cover, that.cover);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = Objects.hashCode(type);
+		result = 31 * result + Objects.hashCode(season);
+		result = 31 * result + Objects.hashCode(title);
+		result = 31 * result + Objects.hashCode(cover);
+		return result;
+	}
 }

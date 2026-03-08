@@ -90,7 +90,7 @@ public abstract class TraktDataService implements DataService {
 
 			// Update existing entry or use the new one
 			TraktEntry entry = existingEntries.getOrDefault(entryId, remoteEntry);
-			if (entry != remoteEntry) {
+			if (!entry.equals(remoteEntry)) {
 				entry.setTitle(remoteEntry.getTitle());
 				entry.setCover(remoteEntry.getCover());
 				entry.setSeason(remoteEntry.getSeason());
