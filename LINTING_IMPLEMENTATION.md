@@ -36,25 +36,3 @@ npm run lint:fix       # Auto-fix ESLint issues
 npm run format         # Format with Prettier
 npm run format:check   # Check Prettier compliance
 ```
-
-## Pre-Commit Hooks
-
-**Tools:**
-- **Husky** - Git hooks manager
-- **lint-staged** - Run linters on staged files only
-
-**Configuration:**
-- `.husky/pre-commit`
-- `.lintstagedrc.js`
-
-**Bypass:**
-```bash
-git commit --no-verify -m "message"
-```
-
-## CI/CD
-
-**Workflow:** `.github/workflows/lint.yml`
-- Runs on PRs to `main`, `dev`, `master`
-- Runs on pushes to `main`, `dev`, `master`
-- Parallel execution for API and Web
