@@ -26,7 +26,7 @@ export interface UserResponse {
 }
 
 export interface ThirdPartyAuthResponse {
-	message: string
+	message: string;
 }
 
 export interface ThirdPartyInfoResponse {

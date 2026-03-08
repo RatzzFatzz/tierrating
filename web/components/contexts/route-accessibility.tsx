@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import {usePathname, useRouter} from "next/navigation"
-import {useEffect} from "react"
-import {useAuth} from "@/components/contexts/auth-context";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useAuth } from "@/components/contexts/auth-context";
 import LoadingPage from "@/components/loading-skeletons/loading-page";
 
-export function ProtectedRoute({children}: { children: React.ReactNode }) {
-	const {user, isAuthenticated, isLoading, isExpired} = useAuth()
-	const router = useRouter()
-	const currentPath = usePathname()
+export function ProtectedRoute({ children }: { children: React.ReactNode }) {
+	const { user, isAuthenticated, isLoading, isExpired } = useAuth();
+	const router = useRouter();
+	const currentPath = usePathname();
 
 	useEffect(() => {
 		console.debug(`User ${user} isAuthenticated: ${isAuthenticated}; isLoading ${isLoading}; isExpired: ${isExpired}`);
@@ -16,43 +16,41 @@ export function ProtectedRoute({children}: { children: React.ReactNode }) {
 			router.push("/login");
 			console.debug(`Redirected from ${currentPath} to /login`);
 		}
-	}, [user, isAuthenticated, isLoading, isExpired, router, currentPath])
+	}, [user, isAuthenticated, isLoading, isExpired, router, currentPath]);
 
-	if (isLoading || !isAuthenticated
-		|| (!isLoading && (!isAuthenticated || isExpired))) {
-		return <LoadingPage/>
+	if (isLoading || !isAuthenticated || (!isLoading && (!isAuthenticated || isExpired))) {
+		return <LoadingPage />;
 	}
 
-	return <>{children}</>
+	return <>{children}</>;
 }
 
-export function AnonymousAllowedRoute({children}: { children: React.ReactNode }) {
-	const {user, isAuthenticated, isLoading, isExpired} = useAuth()
-	const router = useRouter()
-	const currentPath = usePathname()
+export function AnonymousAllowedRoute({ children }: { children: React.ReactNode }) {
+	const { user, isAuthenticated, isLoading, isExpired } = useAuth();
+	const router = useRouter();
+	const currentPath = usePathname();
 
 	useEffect(() => {
 		console.debug(`User ${user} isAuthenticated: ${isAuthenticated}; isLoading ${isLoading}; isExpired: ${isExpired}`);
 		if (!isLoading && isAuthenticated && (currentPath == "/login" || currentPath == "/signup")) {
-			router.push(`/user/${user}`)
-			console.debug(`Redirected from /login to /user/${user}`)
+			router.push(`/user/${user}`);
+			console.debug(`Redirected from /login to /user/${user}`);
 		}
-	}, [user, isAuthenticated, isLoading, isExpired, router, currentPath])
+	}, [user, isAuthenticated, isLoading, isExpired, router, currentPath]);
 
-	if (isLoading
-		|| (!isLoading && isAuthenticated && (currentPath == "/login" || currentPath == "/signup"))) {
-		return <LoadingPage/>
+	if (isLoading || (!isLoading && isAuthenticated && (currentPath == "/login" || currentPath == "/signup"))) {
+		return <LoadingPage />;
 	}
 
-	return <>{children}</>
+	return <>{children}</>;
 }
 
-export function RestrictedRenderingRoute({children}: { children: React.ReactNode }) {
-	const pathname = usePathname()
+export function RestrictedRenderingRoute({ children }: { children: React.ReactNode }) {
+	const pathname = usePathname();
 
 	if (pathname === "/login" || pathname === "/signup") {
-		return null
+		return null;
 	}
 
-	return <>{children}</>
+	return <>{children}</>;
 }
