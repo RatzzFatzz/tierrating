@@ -26,6 +26,8 @@ security:
     # - See: https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/
     expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
 
+sync:
+  interval: "0 0 */4 * * *"
 services:
   anilist:
     client:

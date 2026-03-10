@@ -22,6 +22,14 @@ public class DataFactory {
 						.collect(Collectors.toMap(DataService::getContentType, provider -> provider))));
 	}
 
+	public Map<ContentType, DataService> getProvider(ThirdPartyService service) {
+		Map<ContentType, DataService> dataServices = providers.get(service);
+		if (dataServices == null) {
+			throw new IllegalArgumentException("No provider found for service: " + service);
+		}
+		return dataServices;
+	}
+
 	public DataService getProvider(ThirdPartyService service, ContentType contentType) {
 		DataService provider = providers.containsKey(service) ? providers.get(service).get(contentType) : null;
 		if (provider == null) {
