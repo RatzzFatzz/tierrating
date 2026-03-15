@@ -5,7 +5,7 @@ import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.auth.ThirdPartyConnection;
 import at.pcgamingfreaks.model.auth.User;
 import at.pcgamingfreaks.model.dto.AuthTokenResponseDTO;
-import at.pcgamingfreaks.model.dto.ThirdPartyAuthRequestDTO;
+import at.pcgamingfreaks.model.dto.ThirdPartyOAuthRequestDTO;
 import at.pcgamingfreaks.model.exceptions.ThirdPartyAuthenticationException;
 import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
 import at.pcgamingfreaks.model.repo.ThirdPartyConnectionRepository;
@@ -27,7 +27,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
-public class AniListAuthenticatorService implements ThirdPartyAuthenticatorService {
+public class AniListAuthenticatorService implements ThirdPartyOAuthAuthenticatorService {
 	private final UserRepository userRepository;
 	private final ThirdPartyConnectionRepository thirdPartyConnectionRepository;
 	private final ObjectMapper objectMapper;
@@ -39,12 +39,12 @@ public class AniListAuthenticatorService implements ThirdPartyAuthenticatorServi
 	}
 
 	@Override
-	public void auth(String username, ThirdPartyAuthRequestDTO request) {
+	public void auth(String username, ThirdPartyOAuthRequestDTO request) {
 		if (!thirdPartyConfig.getAnilist().isValid())
-			throw new ThirdPartyUnconfiguredException(ThirdPartyService.ANILIST);
+			throw new ThirdPartyUnconfiguredException(getService());
 
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
-		if (user.getConnections().get(ThirdPartyService.ANILIST) != null)
+		if (user.getConnections().get(getService()) != null)
 			throw new ThirdPartyAuthenticationException("Already authenticated");
 
 		try {
@@ -52,7 +52,7 @@ public class AniListAuthenticatorService implements ThirdPartyAuthenticatorServi
 			AuthTokenResponseDTO tokenResponse = auth(request.getCode());
 
 			ThirdPartyConnection connection = new ThirdPartyConnection();
-			connection.setService(ThirdPartyService.ANILIST);
+			connection.setService(getService());
 			connection.setAccessToken(tokenResponse.getAccessToken());
 			connection.setRefreshToken(tokenResponse.getRefreshToken());
 			connection.setExpiresOn(LocalDateTime.now().plusSeconds(tokenResponse.getExpiresIn()));

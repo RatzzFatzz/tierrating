@@ -7,7 +7,8 @@ import lombok.Getter;
 @Getter
 public enum ThirdPartyService {
 	ANILIST,
-	TRAKT;
+	TRAKT,
+	STEAM;
 
 	@JsonCreator(mode = JsonCreator.Mode.DELEGATING)
 	public static ThirdPartyService from(String text) {

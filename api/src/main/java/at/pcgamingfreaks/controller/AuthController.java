@@ -51,16 +51,29 @@ public class AuthController {
 		authService.deleteAccount(request);
 	}
 
-	@PostMapping("{service}/{username}")
+	@PostMapping("/oauth/{service}/{username}")
 	@PreAuthorize("authentication.principal.username == #username")
 	@Validated
 	@CrossOrigin
-	public void authThirdPartyAccount(
+	public void authThirdPartyOAuthAccount(
 			@PathVariable ThirdPartyService service,
 			@PathVariable String username,
-			@RequestBody ThirdPartyAuthRequestDTO request
+			@RequestBody ThirdPartyOAuthRequestDTO request
 	) {
 		log.info("Auth request for {} from {}", service, username);
-		thirdPartyAuthenticatorFactory.getProvider(service).auth(username, request);
+		thirdPartyAuthenticatorFactory.getOauthProvider(service).auth(username, request);
+	}
+
+	@PostMapping("/openid/{service}/{username}")
+	@PreAuthorize("authentication.principal.username == #username")
+	@Validated
+	@CrossOrigin
+	public void authThirdPartyOpenIdAccount(
+			@PathVariable ThirdPartyService service,
+			@PathVariable String username,
+			@RequestBody ThirdPartyOpenIdAuthRequestDTO request
+	) {
+		log.info("Auth request for {} from {}", service, username);
+		thirdPartyAuthenticatorFactory.getOpenIdProvider(service).auth(username, request);
 	}
 }

@@ -4,6 +4,7 @@ import { AnilistMangaProvider } from "@/components/data-providers/anilist/anilis
 import { TraktMoviesDataProvider } from "@/components/data-providers/trakt/trakt-movies-data-provider";
 import { TraktTvShowsDataProvider } from "@/components/data-providers/trakt/trakt-tv-shows-data-provider";
 import { TraktTvShowsSeasonsDataProvider } from "@/components/data-providers/trakt/trakt-tvshows-seasons-data-provider";
+import { SteamGamesDataProvider } from "@/components/data-providers/steam/steam-games-data-provider";
 
 export interface DataProvider {
 	getServiceName: () => string;
@@ -20,6 +21,7 @@ const providers: Record<string, DataProvider> = {
 	"trakt-movies": new TraktMoviesDataProvider(),
 	"trakt-tvshows": new TraktTvShowsDataProvider(),
 	"trakt-tvshows-seasons": new TraktTvShowsSeasonsDataProvider(),
+	"steam-games": new SteamGamesDataProvider(),
 };
 
 export function getProviderByName(name: string): DataProvider {

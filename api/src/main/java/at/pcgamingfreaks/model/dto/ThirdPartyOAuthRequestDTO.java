@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ThirdPartyAuthRequestDTO {
+public class ThirdPartyOAuthRequestDTO {
 	@NotBlank
 	private String code;
 }

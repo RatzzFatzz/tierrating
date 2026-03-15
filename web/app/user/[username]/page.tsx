@@ -99,6 +99,9 @@ export default function Profile() {
 									username={userResponse.username}
 								/>
 							)}
+							{userResponse.connectedServices.includes("STEAM") && (
+								<TierlistLink service={"steam"} type={"games"} title={"Games"} username={userResponse.username} />
+							)}
 						</div>
 					</CardContent>
 				</Card>

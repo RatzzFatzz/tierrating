@@ -79,7 +79,6 @@ export default function ThirdPartyConfig() {
 			<div className="grid columns-1 gap-2">
 				{configuredServices.includes("anilist") && !userResponse.connectedServices.includes("ANILIST") && (
 					<ThirdPartyLoginButton
-						index={0}
 						title={"Connect AniList"}
 						path={"/auth/anilist"}
 						color={"bg-blue-600 hover:bg-blue-700"}
@@ -88,11 +87,18 @@ export default function ThirdPartyConfig() {
 				)}
 				{configuredServices.includes("trakt") && !userResponse.connectedServices.includes("TRAKT") && (
 					<ThirdPartyLoginButton
-						index={1}
 						title={"Connect Trakt"}
 						path={"/auth/trakt"}
 						color={"bg-red-600 hover:bg-red-700"}
 						service="trakt"
+					/>
+				)}
+				{configuredServices.includes("steam") && !userResponse.connectedServices.includes("STEAM") && (
+					<ThirdPartyLoginButton
+						title={"Connect Steam"}
+						path={"/auth/steam"}
+						color={"bg-red-600 hover:bg-red-700"}
+						service="steam"
 					/>
 				)}
 			</div>
@@ -118,6 +124,19 @@ export default function ThirdPartyConfig() {
 							{ id: "movies", title: "Movies" },
 							{ id: "tvshows", title: "TV Shows" },
 							{ id: "tvshows-seasons", title: "TV Shows - Seasons" },
+						]}
+						removeConnection={removeService}
+						isRemovingService={isRemovingService}
+						username={user}
+						token={token}
+						logout={logout}
+					/>
+				)}
+				{userResponse.connectedServices.includes("STEAM") && (
+					<ThirdPartyConnection
+						service={{ id: "steam", title: "Steam" }}
+						types={[
+							{ id: "games", title: "Games" },
 						]}
 						removeConnection={removeService}
 						isRemovingService={isRemovingService}

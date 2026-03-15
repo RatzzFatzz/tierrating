@@ -7,7 +7,8 @@ public enum ContentType {
 	MANGA,
 	MOVIES,
 	TVSHOWS,
-	TVSHOWS_SEASONS;
+	TVSHOWS_SEASONS,
+	GAMES;
 
 	@JsonCreator(mode = JsonCreator.Mode.DELEGATING)
 	public static ContentType from(String text) {

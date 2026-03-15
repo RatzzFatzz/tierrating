@@ -4,7 +4,7 @@ import at.pcgamingfreaks.config.ThirdPartyConfig;
 import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.auth.ThirdPartyConnection;
 import at.pcgamingfreaks.model.auth.User;
-import at.pcgamingfreaks.model.dto.ThirdPartyAuthRequestDTO;
+import at.pcgamingfreaks.model.dto.ThirdPartyOAuthRequestDTO;
 import at.pcgamingfreaks.model.exceptions.ThirdPartyAuthenticationException;
 import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
 import at.pcgamingfreaks.model.repo.ThirdPartyConnectionRepository;
@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class TraktAuthenticatorService implements ThirdPartyAuthenticatorService {
+public class TraktAuthenticatorService implements ThirdPartyOAuthAuthenticatorService {
 	private final UserRepository userRepository;
 	private final ThirdPartyConnectionRepository thirdPartyConnectionRepository;
 	private final ThirdPartyConfig thirdPartyConfig;
@@ -34,11 +34,11 @@ public class TraktAuthenticatorService implements ThirdPartyAuthenticatorService
 	}
 
 	@Override
-	public void auth(String username, ThirdPartyAuthRequestDTO request) {
-		if (!thirdPartyConfig.getTrakt().isValid()) throw new ThirdPartyUnconfiguredException(ThirdPartyService.TRAKT);
+	public void auth(String username, ThirdPartyOAuthRequestDTO request) {
+		if (!thirdPartyConfig.getTrakt().isValid()) throw new ThirdPartyUnconfiguredException(getService());
 
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
-		if (user.getConnections().get(ThirdPartyService.TRAKT) != null)
+		if (user.getConnections().get(getService()) != null)
 			throw new ThirdPartyAuthenticationException("Already authenticated");
 
 		try {
@@ -52,7 +52,7 @@ public class TraktAuthenticatorService implements ThirdPartyAuthenticatorService
 				throw new ThirdPartyAuthenticationException("Trakt OAuth responded with empty username");
 
 			ThirdPartyConnection connection = new ThirdPartyConnection();
-			connection.setService(ThirdPartyService.TRAKT);
+			connection.setService(getService());
 			connection.setAccessToken(response.body().access_token);
 			connection.setRefreshToken(response.body().refresh_token);
 			connection.setExpiresOn(LocalDateTime.now().plusSeconds(response.body().expires_in));

@@ -3,7 +3,7 @@
 import { API_URL } from "@/components/global-config";
 import { ServerResponse, ThirdPartyAuthResponse, ThirdPartyInfoResponse } from "@/components/model/response-types";
 
-export default async function authorize(
+export async function authorizeOAuth(
 	service: string,
 	username: string | null,
 	token: string | null,
@@ -14,13 +14,41 @@ export default async function authorize(
 	}
 
 	try {
-		const response = await fetch(`${API_URL}/auth/${service}/${username}`, {
+		const response = await fetch(`${API_URL}/auth/oauth/${service}/${username}`, {
 			method: "POST",
 			headers: {
 				Authorization: "Bearer " + token,
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({ code }),
+		});
+
+		const data = await response.json().catch(() => null);
+		return { data, status: response.status };
+	} catch (error) {
+		console.error("API proxy error: ", error);
+		return { error: "Server unavailable", status: 500 };
+	}
+}
+
+export async function authorizeOpenId(
+	service: string,
+	username: string | null,
+	token: string | null,
+	params: Record<string, string>
+): Promise<ServerResponse<ThirdPartyAuthResponse>> {
+	if (!username && !token && !params) {
+		throw new Error("Invalid username, token or code");
+	}
+
+	try {
+		const response = await fetch(`${API_URL}/auth/openid/${service}/${username}`, {
+			method: "POST",
+			headers: {
+				Authorization: "Bearer " + token,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ params: params}),
 		});
 
 		const data = await response.json().catch(() => null);
