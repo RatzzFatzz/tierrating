@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(UsernameNotFoundException.class)
 	public ResponseEntity<ErrorResponseDTO> handleUsernameNotFoundException(UsernameNotFoundException ex) {
 		log.info("User '{}' not found", ex.getMessage());
-		return ResponseEntity.badRequest().body(new ErrorResponseDTO("User not found"));
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponseDTO("User not found"));
 	}
 
 	@ExceptionHandler(AuthenticationException.class)
