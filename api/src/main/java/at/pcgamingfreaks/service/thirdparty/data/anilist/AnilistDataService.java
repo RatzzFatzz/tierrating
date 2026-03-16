@@ -169,14 +169,14 @@ public abstract class AnilistDataService implements DataService {
 	@Override
 	public void update(long id, float score, User user) {
 		if (!thirdPartyConfig.getAnilist().isValid())
-			throw new ThirdPartyUnconfiguredException(ThirdPartyService.ANILIST);
+			throw new ThirdPartyUnconfiguredException(getService());
 
 		AniListEntryScore entryScore = aniListEntryScoreRepository.findByUserAndEntry_Id(user, id)
 				.orElseThrow(() -> new EntryNotFoundException("Anilist entry not found"));
 		entryScore.setScore(score);
 		aniListEntryScoreRepository.save(entryScore);
 
-		if (user.getConnections().get(ThirdPartyService.ANILIST).isAutoUpdateSync()) pushSingleChange(id, score, user);
+		if (user.getConnections().get(getService()).isAutoUpdateSync()) pushSingleChange(id, score, user);
 	}
 
 	protected void pushSingleChange(long id, float score, User user) {

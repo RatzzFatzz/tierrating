@@ -123,13 +123,13 @@ public abstract class TraktDataService implements DataService {
 	@Transactional
 	@Override
 	public void update(long id, float score, User user) {
-		if (!thirdPartyConfig.getTrakt().isValid()) throw new ThirdPartyUnconfiguredException(ThirdPartyService.TRAKT);
+		if (!thirdPartyConfig.getTrakt().isValid()) throw new ThirdPartyUnconfiguredException(getService());
 
 		TraktEntryScore entryScore = entryScoreRepository.findByUserAndEntry_Id(user, id).orElseThrow(() -> new EntryNotFoundException(getContentType(), id));
 		entryScore.setScore((int) score);
 		entryScoreRepository.save(entryScore);
 
-		if (user.getConnections().get(ThirdPartyService.TRAKT).isAutoUpdateSync()) pushSingleChange(id, score, user);
+		if (user.getConnections().get(getService()).isAutoUpdateSync()) pushSingleChange(id, score, user);
 	}
 
 	abstract protected void pushSingleChange(long id, float score, User user);
