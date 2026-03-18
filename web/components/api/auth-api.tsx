@@ -59,7 +59,7 @@ export async function authorizeOpenId(
 	}
 }
 
-export async function info(service: string, token: string | null): Promise<ServerResponse<ThirdPartyInfoResponse>> {
+export async function fetchThirdPartyInfo(service: string, token: string | null): Promise<ServerResponse<ThirdPartyInfoResponse>> {
 	if (!token) {
 		throw new Error("Invalid token");
 	}

@@ -5,6 +5,7 @@ import { AuthProvider } from "@/components/contexts/auth-context";
 import NavBar from "@/components/navbar/navbar";
 import { ThemeProvider } from "@/components/themes/theme-provider";
 import Starfield from "react-starfield";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,6 +23,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 					<AuthProvider>
 						<div className="min-h-screen flex flex-col">
 							<NavBar />
+							<Toaster />
 							<main className="flex-grow pt-24 z-20">{children}</main>
 						</div>
 					</AuthProvider>

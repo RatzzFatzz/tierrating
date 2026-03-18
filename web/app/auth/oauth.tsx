@@ -3,9 +3,10 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/contexts/auth-context";
 import React, { useEffect, useRef } from "react";
-import { authorizeOAuth, info } from "@/components/api/auth-api";
+import { authorizeOAuth, fetchThirdPartyInfo } from "@/components/api/auth-api";
 import LoadingPage from "@/components/loading-skeletons/loading-page";
 import { CLIENT_ID_PLACEHOLDER, REDIRECT_URL_PLACEHOLDER } from "@/components/global-config";
+import { toast } from "sonner";
 
 export function Oauth({ service, authUrl }: { service: string; authUrl: string }) {
 	const searchParams = useSearchParams();
@@ -25,13 +26,13 @@ export function Oauth({ service, authUrl }: { service: string; authUrl: string }
 					}
 				})
 				.catch((err) => {
-					console.error(err);
+					toast.error("Error occurred. Please try again later.");
 				})
 				.finally(() => {
-					router.push(`/user/${user}`);
+					router.push(`/settings`);
 				});
 		} else {
-			info(service, token)
+			fetchThirdPartyInfo(service, token)
 				.then((response) => {
 					if (response.status == 401 || response.status == 403) logout();
 					if (response.error) throw new Error(response.error);
@@ -42,8 +43,8 @@ export function Oauth({ service, authUrl }: { service: string; authUrl: string }
 					router.push(authUrlRef.current);
 				})
 				.catch((err) => {
-					console.error(err);
-					router.push(`/user/${user}`);
+					toast.error("Error occurred. Please try again later.");
+					router.push(`/settings`);
 				});
 		}
 	}, [user, token, logout, router, searchParams, service, host]);
