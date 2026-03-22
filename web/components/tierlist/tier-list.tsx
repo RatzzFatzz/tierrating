@@ -13,12 +13,12 @@ import { ServerResponse } from "@/types/api-response";
 export default function TierList({
 	tiers,
 	entries,
-	modificationAllowed,
+	modificationEnabled,
 	pushEntryUpdateAction,
 }: {
 	tiers: Tier[];
 	entries: TierlistEntry[];
-	modificationAllowed: boolean;
+	modificationEnabled: boolean;
 	pushEntryUpdateAction: (id: string, score: number) => Promise<ServerResponse<unknown>>;
 }) {
 	const tiersById = useMemo(() => groupBySingle(tiers, (tier) => tier.id), [tiers]);
@@ -105,10 +105,10 @@ export default function TierList({
 								id={tier.id}
 								label={tier.name}
 								color={tier.color}
-								disabled={!modificationAllowed}
+								disabled={!modificationEnabled}
 							>
 								{Array.from(entriesByTierId.get(tier.id)!).map((entry) => (
-									<TierlistEntryDraggable key={entry.id} entry={entry} disabled={!modificationAllowed} />
+									<TierlistEntryDraggable key={entry.id} entry={entry} disabled={!modificationEnabled} />
 								))}
 							</TierContainerDroppable>
 						)

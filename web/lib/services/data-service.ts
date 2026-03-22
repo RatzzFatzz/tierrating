@@ -7,4 +7,7 @@ export const dataService = {
 		apiClient.get<TierlistEntry[]>(`/data/fetch/${username}/${service}/${type}`, token),
 
 	updateEntry: (token: string, body: DataUpdateRequest) => apiClient.put(`/data/update/`, token, body),
+
+	pullUpdate: (username: string, service: string, type: string, token: string) =>
+		apiClient.get(`/data/pull/${username}/${service}/${type}`, token),
 };

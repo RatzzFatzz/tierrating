@@ -14,10 +14,13 @@ import { dataService } from "@/lib/services/data-service";
 import { LoadingPage } from "@/components/loading-skeletons/loading-page";
 import { getDefaultTiers } from "@/lib/default-tiers";
 import { ServerResponse } from "@/types/api-response";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 
 export default function TierListPage({ title, username, service, type }: { title: string, username: string; service: string; type: string }) {
 	const { token, user, logout } = useAuth();
-	const { data, errors, isRunning, isSuccess, isError } = useQueries(
+	const { data, errors, isRunning, isSuccess, isError, refetch } = useQueries(
 		{
 			tiers: () => tiersService.get(username, service, type, token!),
 			entries: () => dataService.fetchEntries(username, service, type, token!),
@@ -32,10 +35,26 @@ export default function TierListPage({ title, username, service, type }: { title
 	}, [token, username, service, type]);
 
 	const [isFullWidth, setIsFullWidth] = useState<boolean>(false);
-	const modificationAllowed: boolean = user == username;
+	const [isPullRunning, setIsPullRunning] = useState<boolean>(false);
+	const modificationEnabled: boolean = user == username;
 
-	if (isRunning) return <LoadingPage/>
-	if (!isSuccess) return null;
+	const pullUpdate = () => {
+		setIsPullRunning(true);
+		dataService
+			.pullUpdate(username, service, type, token!)
+			.then((response) => {
+				if (!response.ok) throw new Error(response.error);
+				refetch();
+			})
+			.catch((error) => {
+				toast.error(error.message);
+			})
+			.finally(() => {
+				setIsPullRunning(false);
+			});
+	}
+
+	if (isRunning && !data.tiers && !data.entries) return <LoadingPage />;
 
 	return (
 		<div
@@ -48,24 +67,29 @@ export default function TierListPage({ title, username, service, type }: { title
 			<div className={"grid grid-cols-2"}>
 				<h1 className="text-3xl font-bold mb-6">{title}</h1>
 				<div className={"w-full flex justify-end items-end pb-2"}>
-					{/*{modificationAllowed && (*/}
-					{/*	<Button variant={"ghost"} onClick={() => getProviderByName(provider).pullData(token, username, logout)}>*/}
-					{/*		Pull*/}
-					{/*	</Button>*/}
-					{/*)}*/}
 					<ButtonGroup>
-						<Toggle aria-label={"Toggle full width"} onPressedChange={() => setIsFullWidth(!isFullWidth)}>
-							<ArrowLeftFromLine />
-							Full Width
-							<ArrowRightFromLine />
-						</Toggle>
+						<ButtonGroup>
+							{modificationEnabled && (
+								<Button variant="outline" disabled={isPullRunning} onClick={pullUpdate}>
+									{isPullRunning ? "Pulling" : "Pull"}
+									{isPullRunning && <Spinner data-icon="inline-start" />}
+								</Button>
+							)}
+						</ButtonGroup>
+						<ButtonGroup>
+							<Toggle variant="outline" aria-label={"Toggle full width"} onPressedChange={() => setIsFullWidth(!isFullWidth)}>
+								<ArrowLeftFromLine />
+								Full Width
+								<ArrowRightFromLine />
+							</Toggle>
+						</ButtonGroup>
 					</ButtonGroup>
 				</div>
 			</div>
 			<TierList
 				tiers={tiers}
 				entries={entries}
-				modificationAllowed={modificationAllowed}
+				modificationEnabled={modificationEnabled && !isPullRunning}
 				pushEntryUpdateAction={pushEntryUpdate}
 			/>
 			{service.startsWith("trakt") && <TmdbDisclaimer />}
