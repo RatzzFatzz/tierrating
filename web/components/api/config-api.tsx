@@ -1,6 +1,6 @@
 "use server";
 
-import { ServerResponse } from "@/components/model/response-types";
+import { ServerResponse } from "@/types/response-types";
 import { API_URL } from "@/lib/global-config";
 
 export const fetchConfiguredServices = async (token: string | null): Promise<ServerResponse<string[]>> => {

@@ -1,8 +1,8 @@
 "use server";
 
 import { API_URL } from "@/lib/global-config";
-import { GenericErrorResponse, ServerResponse } from "@/components/model/response-types";
-import { TierlistEntry } from "@/components/model/types";
+import { GenericErrorResponse, ServerResponse } from "@/types/response-types";
+import { TierlistEntry } from "@/types/types";
 
 export const fetchData = async (
 	token: string | null,

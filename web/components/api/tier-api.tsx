@@ -1,8 +1,8 @@
 "use server";
 
 import { API_URL } from "@/lib/global-config";
-import { Tier } from "@/components/model/types";
-import { ServerResponse } from "@/components/model/response-types";
+import { Tier } from "@/types/types";
+import { ServerResponse } from "@/types/response-types";
 
 export const fetchTiers = async (
 	token: string | null,

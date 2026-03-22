@@ -1,72 +1,45 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Tier, TierlistEntry } from "@/components/model/types";
-import { getDefaultTiers } from "@/components/model/defaults";
-import { useAuth } from "@/components/contexts/auth-context";
-import { useParams } from "next/navigation";
-import { getProviderByName } from "@/components/data-providers/data-provider";
-import { TierContainerSkeleton, TierlistEntrySkeleton } from "@/components/loading-skeletons/tier-container-skeleton";
-import { TierlistEntryDraggable, TierlistEntryCard } from "@/components/tierlist/tierlist-entry-draggable";
+import { Tier, TierlistEntry } from "@/types/types";
+import { TierlistEntrySkeleton } from "@/components/loading-skeletons/tier-container-skeleton";
+import { TierlistEntryCard, TierlistEntryDraggable } from "@/components/tierlist/tierlist-entry-draggable";
 import { DragDropProvider, DragOverlay } from "@dnd-kit/react";
 import { assignTiersAndGroupEntriesByTier, groupBySingle, sortByName } from "@/components/tierlist/tier-mapper";
 import TierContainerDroppable from "@/components/tierlist/tier-container-droppable";
+import { toast } from "sonner";
+import { ServerResponse } from "@/types/api-response";
 
-export default function TierList({ providerName }: { providerName: string }) {
-	const [tiers, setTiers] = useState<Tier[]>([]);
-	const [entries, setEntries] = useState<TierlistEntry[]>([]);
-
-	const [entriesByTierId, setEntriesByTierId] = useState<Map<string, TierlistEntry[]>>(new Map());
-	const initialEntriesByTierId = useMemo(() => assignTiersAndGroupEntriesByTier(tiers, entries), [tiers, entries])
-	const entriesById = useMemo(() => groupBySingle(entries, (entry) => entry.id), [entries]);
+export default function TierList({
+	tiers,
+	entries,
+	modificationAllowed,
+	pushEntryUpdateAction,
+}: {
+	tiers: Tier[];
+	entries: TierlistEntry[];
+	modificationAllowed: boolean;
+	pushEntryUpdateAction: (id: string, score: number) => Promise<ServerResponse<unknown>>;
+}) {
 	const tiersById = useMemo(() => groupBySingle(tiers, (tier) => tier.id), [tiers]);
 	const tiersByName = useMemo(() => groupBySingle(tiers, (tier) => tier.name), [tiers]);
+	const entriesById = useMemo(() => groupBySingle(entries, (entry) => entry.id), [entries]);
 
-	const { user, token, isLoading, isAuthenticated, logout } = useAuth();
-	const username: string = useParams<{ username: string }>().username;
-	const dndDisabled: boolean = user != username;
-
-	const [tiersQueryRunning, setTiersQueryRunning] = useState(true);
-	const [entriesQueryRunning, setEntriesQueryRunning] = useState(true);
+	const initialEntriesByTierId = useMemo(() => assignTiersAndGroupEntriesByTier(tiers, entries), [tiers, entries]);
+	const [entriesByTierId, setEntriesByTierId] = useState<Map<string, TierlistEntry[]>>(new Map()); // mutated by user
 	const mappingCompleted = entriesByTierId.size > 0;
 
-	const provider = getProviderByName(providerName);
-
 	useEffect(() => {
-		if (initialEntriesByTierId.size > 0 && entriesByTierId.size === 0) {
-			queueMicrotask(() => {
-				setEntriesByTierId(initialEntriesByTierId);
-			});
-		}
+		queueMicrotask(() => {
+			setEntriesByTierId(initialEntriesByTierId);
+		});
 	}, [initialEntriesByTierId, entriesByTierId.size]);
-
-	// fetch tiers
-	useEffect(() => {
-		if (!isLoading && isAuthenticated && provider) {
-			provider
-				.fetchTierlist(token, username, logout)
-				.then((data: Tier[]) => setTiers(data && data.length > 0 ? data : getDefaultTiers()))
-				.catch((error) => console.error(error))
-				.finally(() => setTiersQueryRunning(false));
-		}
-	}, [isLoading, isAuthenticated, provider, token, username, logout]);
-
-	// fetch entries
-	useEffect(() => {
-		if (!isLoading && isAuthenticated && provider) {
-			provider
-				.fetchData(token, username, logout)
-				.then((data: TierlistEntry[]) => setEntries(data))
-				.catch((error) => console.error(error))
-				.finally(() => setEntriesQueryRunning(false));
-		}
-	}, [isLoading, isAuthenticated, provider, token, username, logout]);
 
 	const onDragEnd = async (event: { canceled: any; operation: { source: any; target: any } }) => {
 		if (event.canceled) return;
 
 		if (!entriesByTierId || !tiersById || !tiersByName || !entriesById) {
-			console.error("Something went wrong while mapping. Refresh page");
+			toast.error("Error occurred. Please refresh the page!");
 			return;
 		}
 
@@ -83,14 +56,15 @@ export default function TierList({ providerName }: { providerName: string }) {
 		// This kinda works for processing changes in the background, but this can only be spawned once.
 		// As soon as a second action is triggered, it is blocked again, until the first one has completed
 		setTimeout(() => {
-			provider
-				.updateData(entryToChange.id, targetTier.adjustedScore, token, username, logout)
-				.then(() => {
+			pushEntryUpdateAction(entryToChange.id, targetTier.adjustedScore)
+				.then(response => {
+					if (!response.ok) throw new Error(response.error);
 					console.debug("Committed changes to third-party service");
 				})
 				.catch((error) => {
 					console.error(error);
 					updateEntry(entryToChange, currentTier!);
+					toast.error(`Couldn't update ${entryToChange.title}. Reverted change.`)
 				});
 		}, 200);
 	};
@@ -115,11 +89,7 @@ export default function TierList({ providerName }: { providerName: string }) {
 		});
 	};
 
-	if (tiersQueryRunning) {
-		return <TierContainerSkeleton />;
-	}
-
-	if (entriesQueryRunning || !mappingCompleted) {
+	if (!mappingCompleted) {
 		return tiers.map((tier) => <TierlistEntrySkeleton key={tier.id} color={tier.color} label={tier.name} />);
 	}
 
@@ -130,9 +100,15 @@ export default function TierList({ providerName }: { providerName: string }) {
 				.map(
 					(tier) =>
 						tier && (
-							<TierContainerDroppable key={tier.id} id={tier.id} label={tier.name} color={tier.color} disabled={dndDisabled}>
+							<TierContainerDroppable
+								key={tier.id}
+								id={tier.id}
+								label={tier.name}
+								color={tier.color}
+								disabled={!modificationAllowed}
+							>
 								{Array.from(entriesByTierId.get(tier.id)!).map((entry) => (
-									<TierlistEntryDraggable key={entry.id} entry={entry} disabled={dndDisabled} />
+									<TierlistEntryDraggable key={entry.id} entry={entry} disabled={!modificationAllowed} />
 								))}
 							</TierContainerDroppable>
 						)

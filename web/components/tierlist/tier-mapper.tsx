@@ -1,4 +1,4 @@
-import { Tier, TierlistEntry } from "@/components/model/types";
+import { Tier, TierlistEntry } from "@/types/types";
 
 export function assignTiersAndGroupEntriesByTier(tiers: Tier[], entries: TierlistEntry[]): Map<string, TierlistEntry[]> {
 	if (!tiers || tiers.length <= 0 || !entries || entries.length <= 0) return new Map<string, TierlistEntry[]>;

@@ -1,8 +1,8 @@
 import { DataProvider } from "@/components/data-providers/data-provider";
-import { Tier, TierlistEntry } from "@/components/model/types";
+import { Tier, TierlistEntry } from "@/types/types";
 import { fetchTiers } from "@/components/api/tier-api";
 import { fetchData, pullData, updateData } from "@/components/api/data-api";
-import { getDefaultTiers } from "@/components/model/defaults";
+import { getDefaultTiers } from "@/lib/default-tiers";
 
 export abstract class AbstractDataProvider implements DataProvider {
 	abstract getServiceName(): string;

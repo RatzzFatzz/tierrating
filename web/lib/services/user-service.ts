@@ -1,4 +1,4 @@
-import { UserResponse } from "@/components/model/response-types";
+import { UserResponse } from "@/types/response-types";
 import { apiClient } from "@/lib/api-client";
 
 export const userService = {

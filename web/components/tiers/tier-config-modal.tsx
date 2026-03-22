@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input";
 import { ArrowUpDown, Palette, Plus, Settings, X } from "lucide-react";
 import { HexColorPicker } from "react-colorful";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Tier } from "@/components/model/types";
+import { Tier } from "@/types/types";
 import { useAuth } from "@/components/contexts/auth-context";
-import { getDefaultTiers } from "@/components/model/defaults";
+import { getDefaultTiers } from "@/lib/default-tiers";
 import { DataProvider, getProviderByName } from "@/components/data-providers/data-provider";
 import { TierConfigTableSkeleton } from "@/components/loading-skeletons/tier-config-table-skeleton";
 

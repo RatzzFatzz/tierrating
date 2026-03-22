@@ -2,7 +2,7 @@
 
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { extractJwtData } from "@/components/auth/jwt-decoder";
+import { extractJwtData } from "@/lib/auth/jwt-decoder";
 import { refreshToken } from "@/components/api/user-api";
 
 interface AuthContextType {

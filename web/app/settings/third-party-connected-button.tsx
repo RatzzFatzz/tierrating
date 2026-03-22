@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import TierConfigModal from "@/components/tiers/tier-config-modal";
-import { Tier } from "@/components/model/types";
+import { Tier } from "@/types/types";
 import React from "react";
 import { updateTiers } from "@/components/api/tier-api";
 import Link from "next/link";

@@ -1,4 +1,4 @@
-import { TierlistEntry, Tier } from "@/components/model/types";
+import { TierlistEntry, Tier } from "@/types/types";
 import { AnilistAnimeProvider } from "@/components/data-providers/anilist/anilist-anime-data-provider";
 import { AnilistMangaProvider } from "@/components/data-providers/anilist/anilist-manga-data-provider";
 import { TraktMoviesDataProvider } from "@/components/data-providers/trakt/trakt-movies-data-provider";

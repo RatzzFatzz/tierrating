@@ -22,3 +22,10 @@ export const THIRD_PARTY_SERVICE_CONFIG = {
 		{ id: "games", name: "Games" }
 	]),
 } as const;
+
+export function getServiceConfig(key: string) {
+	if (key in THIRD_PARTY_SERVICE_CONFIG) {
+		return THIRD_PARTY_SERVICE_CONFIG[key as keyof typeof THIRD_PARTY_SERVICE_CONFIG];
+	}
+	return undefined;
+}
