@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { ProtectedRoute } from "@/components/contexts/route-accessibility";
 import { Oauth } from "@/app/auth/oauth";
-import { CLIENT_ID_PLACEHOLDER, REDIRECT_URL_PLACEHOLDER } from "@/components/global-config";
+import { CLIENT_ID_PLACEHOLDER, REDIRECT_URL_PLACEHOLDER } from "@/lib/global-config";
 
 export default function AuthAniList() {
 	return (

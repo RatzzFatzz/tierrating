@@ -3,13 +3,12 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import React, { useEffect } from "react";
 import { useAuth } from "@/components/contexts/auth-context";
 import { useParams } from "next/navigation";
-import LoadingPage from "@/components/loading-skeletons/loading-page";
+import { LoadingPage } from "@/components/loading-skeletons/loading-page";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { UserResponse } from "@/components/model/response-types";
 import TierlistLink from "@/app/user/[username]/tierlist-link";
-import { apiClient } from "@/lib/api-client";
 import { useQuery } from "@/hooks/useQuery";
+import { userService } from "@/lib/services/user-service";
 
 export default function Profile() {
 	const params = useParams<{ username: string }>();
@@ -17,7 +16,7 @@ export default function Profile() {
 
 	const { token, logout } = useAuth();
 	const { data, error, isRunning, isSuccess, isError } = useQuery(
-		() => apiClient.get<UserResponse>(token, `/user/${username}`),
+		() => userService.get(username, token!),
 		[token, username]
 	);
 

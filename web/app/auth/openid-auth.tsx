@@ -2,10 +2,10 @@
 
 import { ProtectedRoute } from "@/components/contexts/route-accessibility";
 import React, { Suspense, useEffect } from "react";
-import { REDIRECT_URL_PLACEHOLDER } from "@/components/global-config";
+import { REDIRECT_URL_PLACEHOLDER } from "@/lib/global-config";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/contexts/auth-context";
-import LoadingPage from "@/components/loading-skeletons/loading-page";
+import { LoadingPage } from "@/components/loading-skeletons/loading-page";
 import { authorizeOpenId } from "@/components/api/auth-api";
 
 export default function OpenIdAuth({ service, openidUrl, returnToUrl }: { service: string; openidUrl: string; returnToUrl: string }) {

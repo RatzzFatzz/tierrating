@@ -1,5 +1,5 @@
 "use server";
-import { API_URL } from "@/components/global-config";
+import { API_URL } from "@/lib/global-config";
 import { GenericErrorResponse, LoginResponse, ServerResponse, SignupResponse, UserResponse } from "@/components/model/response-types";
 
 export async function requestLogin(username: string, password: string): Promise<ServerResponse<LoginResponse>> {

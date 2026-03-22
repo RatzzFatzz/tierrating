@@ -1,19 +1,20 @@
 import { ServerResponse } from "@/types/api-response";
-import { API_URL } from "@/components/global-config";
+import { API_URL } from "@/lib/global-config";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-async function request<T>(method: HttpMethod, endpoint: string, token: string | null, body?: unknown): Promise<ServerResponse<T>> {
-	if (!token) {
-		return { ok: false, status: 401, error: "No authentication token" };
-	}
+function getAuthHeaders(token?: string): Record<string, string> {
+	return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
+async function request<T>(method: HttpMethod, endpoint: string, token?: string, body?: unknown): Promise<ServerResponse<T>> {
 	try {
-		const response = await fetch(`${API_URL}${endpoint}`, {
+		const response = await fetch(`${API_URL}/api${endpoint}`, {
 			method,
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: `Bearer ${token}`,
+				Accept: "application/json",
+				...getAuthHeaders(token),
 			},
 			body: body ? JSON.stringify(body) : undefined,
 		});
@@ -40,13 +41,13 @@ async function request<T>(method: HttpMethod, endpoint: string, token: string | 
 }
 
 export const apiClient = {
-	get: <T>(token: string | null, endpoint: string) => request<T>("GET", endpoint, token),
+	get: <T>(endpoint: string, token?: string) => request<T>("GET", endpoint, token),
 
-	post: <T>(token: string | null, endpoint: string, body?: unknown) => request<T>("POST", endpoint, token, body),
+	post: <T>(endpoint: string, token?: string, body?: unknown) => request<T>("POST", endpoint, token, body),
 
-	put: <T>(token: string | null, endpoint: string, body?: unknown) => request<T>("PUT", endpoint, token, body),
+	put: <T>(endpoint: string, token?: string, body?: unknown) => request<T>("PUT", endpoint, token, body),
 
-	patch: <T>(token: string | null, endpoint: string, body?: unknown) => request<T>("PATCH", endpoint, token, body),
+	patch: <T>(endpoint: string, token?: string, body?: unknown) => request<T>("PATCH", endpoint, token, body),
 
-	delete: <T>(token: string | null, endpoint: string) => request<T>("DELETE", endpoint, token),
+	delete: <T>(endpoint: string, token?: string) => request<T>("DELETE", endpoint, token),
 };

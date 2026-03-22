@@ -3,20 +3,34 @@
 import { useAuth } from "@/components/contexts/auth-context";
 import { useEffect, useState } from "react";
 
-import { fetchUser, removeConnection } from "@/components/api/user-api";
-import { fetchConfiguredServices } from "@/components/api/config-api";
-import LoadingPage from "@/components/loading-skeletons/loading-page";
+import { removeConnection } from "@/components/api/user-api";
+import { LoadingDiv } from "@/components/loading-skeletons/loading-page";
 import ThirdPartyLoginButton from "@/app/settings/third-party-login-button";
-import { UserResponse } from "@/components/model/response-types";
 import ThirdPartyConnection from "@/app/settings/third-party-connection";
 import { router } from "next/client";
+import { useQueries } from "@/hooks/useQueries";
+import { apiClient } from "@/lib/api-client";
+import { userService } from "@/lib/services/user-service";
+import { THIRD_PARTY_SERVICE_CONFIG } from "@/lib/third-party-services-config";
 
 export default function ThirdPartyConfig() {
-	const { user, token, logout, isLoading, isAuthenticated } = useAuth();
-
+	const { user, token, logout } = useAuth();
 	const [isRemovingService, setIsRemovingService] = useState(false);
-	const [userResponse, setUserResponse] = useState<UserResponse>();
-	const [configuredServices, setConfiguredServices] = useState<string[]>();
+	const { data, errors, isRunning, isError, isSuccess, refetch } = useQueries({
+		user: () => userService.get(user!, token!),
+		services: () => apiClient.get<string[]>("/config/services", token!),
+	});
+
+	useEffect(() => {
+		if (
+			errors?.user?.status === 401 ||
+			errors?.user?.status === 403 ||
+			errors?.services?.status === 401 ||
+			errors?.services?.status === 403
+		) {
+			logout();
+		}
+	}, [errors, logout]);
 
 	const removeService = (service: string) => {
 		setIsRemovingService(true);
@@ -38,112 +52,42 @@ export default function ThirdPartyConfig() {
 			});
 	};
 
-	useEffect(() => {
-		if (!isLoading && isAuthenticated && user) {
-			fetchUser(token, user)
-				.then((response) => {
-					if (response.status === 401 || response.status === 403) {
-						logout();
-						throw new Error("Session expired");
-					}
+	if (isRunning) return <LoadingDiv className={"min-h-30"} />;
 
-					if (response.error) throw new Error(`API error: ${response.status}`);
-					if (!response.data) throw new Error("Faulty response");
-					setUserResponse(response.data);
-				})
-				.catch((error) => console.error(error));
-		}
-	}, [isLoading, isAuthenticated, user, token, logout]);
-
-	useEffect(() => {
-		if (!isLoading && isAuthenticated) {
-			fetchConfiguredServices(token)
-				.then((response) => {
-					if (response.status === 401 || response.status === 403) {
-						logout();
-						throw new Error("Session expired");
-					}
-
-					if (response.error) throw new Error(`API error: ${response.status}`);
-					if (!response.data) throw new Error("Faulty response");
-					setConfiguredServices(response.data);
-				})
-				.catch((error) => console.error(error));
-		}
-	}, [isAuthenticated, isLoading, logout, token]);
-
-	if (!userResponse || !configuredServices || !user) return <LoadingPage />;
+	if (!isSuccess) return null;
+	const configuredServices = data.services!;
+	const userResponse = data.user!;
 
 	return (
 		<div className={"w-full grid gap-4"}>
 			<div className="grid columns-1 gap-2">
-				{configuredServices.includes("anilist") && !userResponse.connectedServices.includes("ANILIST") && (
-					<ThirdPartyLoginButton
-						title={"Connect AniList"}
-						path={"/auth/anilist"}
-						color={"bg-blue-600 hover:bg-blue-700"}
-						service="anilist"
-					/>
-				)}
-				{configuredServices.includes("trakt") && !userResponse.connectedServices.includes("TRAKT") && (
-					<ThirdPartyLoginButton
-						title={"Connect Trakt"}
-						path={"/auth/trakt"}
-						color={"bg-red-600 hover:bg-red-700"}
-						service="trakt"
-					/>
-				)}
-				{configuredServices.includes("steam") && !userResponse.connectedServices.includes("STEAM") && (
-					<ThirdPartyLoginButton
-						title={"Connect Steam"}
-						path={"/auth/steam"}
-						color={"bg-red-600 hover:bg-red-700"}
-						service="steam"
-					/>
+				{Object.entries(THIRD_PARTY_SERVICE_CONFIG).map(([key, config]) =>
+					configuredServices.includes(key) &&
+					!userResponse.connectedServices.includes(key) ? (
+						<ThirdPartyLoginButton
+							key={config.service.id}
+							title={config.connectTitle}
+							path={config.authPath}
+							color={config.connectColor}
+							service={config.service.id}
+						/>
+					) : null
 				)}
 			</div>
 			<div className="grid columns-1 gap-2">
-				{userResponse.connectedServices.includes("ANILIST") && (
-					<ThirdPartyConnection
-						service={{ id: "anilist", title: "Anilist" }}
-						types={[
-							{ id: "anime", title: "Anime" },
-							{ id: "manga", title: "Manga" },
-						]}
-						removeConnection={removeService}
-						isRemovingService={isRemovingService}
-						username={user}
-						token={token}
-						logout={logout}
-					/>
-				)}
-				{userResponse.connectedServices.includes("TRAKT") && (
-					<ThirdPartyConnection
-						service={{ id: "trakt", title: "Trakt" }}
-						types={[
-							{ id: "movies", title: "Movies" },
-							{ id: "tvshows", title: "TV Shows" },
-							{ id: "tvshows-seasons", title: "TV Shows - Seasons" },
-						]}
-						removeConnection={removeService}
-						isRemovingService={isRemovingService}
-						username={user}
-						token={token}
-						logout={logout}
-					/>
-				)}
-				{userResponse.connectedServices.includes("STEAM") && (
-					<ThirdPartyConnection
-						service={{ id: "steam", title: "Steam" }}
-						types={[
-							{ id: "games", title: "Games" },
-						]}
-						removeConnection={removeService}
-						isRemovingService={isRemovingService}
-						username={user}
-						token={token}
-						logout={logout}
-					/>
+				{Object.entries(THIRD_PARTY_SERVICE_CONFIG).map(([key, config]) =>
+					userResponse.connectedServices.includes(key) ? (
+						<ThirdPartyConnection
+							key={config.service.id}
+							service={{ id: config.service.id, title: config.service.name }}
+							types={config.types.map((t) => ({ id: t.id, title: t.name }))}
+							removeConnection={removeService}
+							isRemovingService={isRemovingService}
+							username={user!}
+							token={token}
+							logout={logout}
+						/>
+					) : null
 				)}
 			</div>
 		</div>

@@ -3,7 +3,7 @@
 import { useAuth } from "@/components/contexts/auth-context";
 import { useRouter } from "next/navigation";
 import { ProtectedRoute } from "@/components/contexts/route-accessibility";
-import LoadingPage from "@/components/loading-skeletons/loading-page";
+import { LoadingPage } from "@/components/loading-skeletons/loading-page";
 import { useEffect } from "react";
 
 export default function RedirectToUser() {

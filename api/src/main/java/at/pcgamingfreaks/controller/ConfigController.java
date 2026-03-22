@@ -36,7 +36,7 @@ public class ConfigController {
 				}
 			}
 		}
-		return ResponseEntity.ok(services.stream().map(s -> s.name().toLowerCase()).toList());
+		return ResponseEntity.ok(services.stream().map(ThirdPartyService::name).toList());
 	}
 }
 

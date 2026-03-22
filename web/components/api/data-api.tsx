@@ -1,6 +1,6 @@
 "use server";
 
-import { API_URL } from "@/components/global-config";
+import { API_URL } from "@/lib/global-config";
 import { GenericErrorResponse, ServerResponse } from "@/components/model/response-types";
 import { TierlistEntry } from "@/components/model/types";
 

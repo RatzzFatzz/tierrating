@@ -4,8 +4,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/contexts/auth-context";
 import React, { useEffect, useRef } from "react";
 import { authorizeOAuth, fetchThirdPartyInfo } from "@/components/api/auth-api";
-import LoadingPage from "@/components/loading-skeletons/loading-page";
-import { CLIENT_ID_PLACEHOLDER, REDIRECT_URL_PLACEHOLDER } from "@/components/global-config";
+import { LoadingPage } from "@/components/loading-skeletons/loading-page";
+import { CLIENT_ID_PLACEHOLDER, REDIRECT_URL_PLACEHOLDER } from "@/lib/global-config";
 import { toast } from "sonner";
 
 export function Oauth({ service, authUrl }: { service: string; authUrl: string }) {

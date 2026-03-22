@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "@/components/contexts/auth-context";
-import LoadingPage from "@/components/loading-skeletons/loading-page";
+import { LoadingPage } from "@/components/loading-skeletons/loading-page";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 	const { user, isAuthenticated, isLoading, isExpired } = useAuth();
