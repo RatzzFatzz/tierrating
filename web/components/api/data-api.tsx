@@ -1,7 +1,7 @@
 "use server";
 
 import { API_URL } from "@/lib/global-config";
-import { GenericErrorResponse, ServerResponse } from "@/types/response-types";
+import { ErrorResponseDTO, ServerResponse } from "@/types/response-types";
 import { TierlistEntry } from "@/types/types";
 
 export const fetchData = async (
@@ -36,7 +36,7 @@ export async function updateData(
 	type: string,
 	token: string | null,
 	username: string
-): Promise<ServerResponse<GenericErrorResponse>> {
+): Promise<ServerResponse<ErrorResponseDTO>> {
 	if (!token) throw new Error("No authentication token");
 
 	try {
@@ -68,7 +68,7 @@ export async function pullData(
 	username: string,
 	service: string,
 	type: string
-): Promise<ServerResponse<GenericErrorResponse>> {
+): Promise<ServerResponse<ErrorResponseDTO>> {
 	if (!token) throw new Error("No authentication token");
 
 	try {

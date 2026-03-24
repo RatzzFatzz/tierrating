@@ -1,53 +1,63 @@
-import { ServerResponse } from "@/types/api-response";
 import { API_URL } from "@/lib/global-config";
+import { ErrorResponseDTO } from "@/types/response-types";
 
-type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
-function getAuthHeaders(token?: string): Record<string, string> {
-	return token ? { Authorization: `Bearer ${token}` } : {};
+export interface ApiRequestOptions {
+	method?: HttpMethod;
+	body?: unknown;
+	token?: string;
 }
 
-async function request<T>(method: HttpMethod, endpoint: string, token?: string, body?: unknown): Promise<ServerResponse<T>> {
-	try {
-		const response = await fetch(`${API_URL}/api${endpoint}`, {
-			method,
-			headers: {
-				"Content-Type": "application/json",
-				Accept: "application/json",
-				...getAuthHeaders(token),
-			},
-			body: body ? JSON.stringify(body) : undefined,
-		});
+export class ApiRequestError extends Error {
+	status: number;
+	backendError?: string;
 
-		if (response.status === 204) {
-			return { ok: true, status: 204, data: undefined as T };
-		}
-
-		const json = await response.json().catch(() => null);
-		console.log(json);
-
-		if (response.ok) {
-			return { ok: true, status: response.status, data: json as T };
-		}
-
-		return {
-			ok: false,
-			status: response.status,
-			error: json?.message || json?.error || `Request failed (${response.status})`,
-		};
-	} catch {
-		return { ok: false, status: 0, error: "Server unavailable" };
+	constructor(status: number, message: string, backendError?: string) {
+		super(message);
+		this.name = "ApiRequestError";
+		this.status = status;
+		this.backendError = backendError;
 	}
 }
 
-export const apiClient = {
-	get: <T>(endpoint: string, token?: string) => request<T>("GET", endpoint, token),
+export async function apiClient<T>(endpoint: string, options: ApiRequestOptions = {}): Promise<T> {
+	const { method = "GET", body, token } = options;
 
-	post: <T>(endpoint: string, token?: string, body?: unknown) => request<T>("POST", endpoint, token, body),
+	const headers: HeadersInit = {
+		"Content-Type": "application/json",
+	};
 
-	put: <T>(endpoint: string, token?: string, body?: unknown) => request<T>("PUT", endpoint, token, body),
+	if (token) {
+		headers["Authorization"] = `Bearer ${token}`;
+	}
 
-	patch: <T>(endpoint: string, token?: string, body?: unknown) => request<T>("PATCH", endpoint, token, body),
+	try {
+		const response = await fetch(`${API_URL}/api${endpoint}`, {
+			method,
+			headers,
+			body: body ? JSON.stringify(body) : undefined,
+		});
 
-	delete: <T>(endpoint: string, token?: string) => request<T>("DELETE", endpoint, token),
-};
+		// Handle non-OK responses
+		if (!response.ok) {
+			let backendErrorMessage: string | undefined;
+
+			try {
+				const errorResponse: ErrorResponseDTO = await response.json();
+				backendErrorMessage = errorResponse.error;
+			} catch {
+				backendErrorMessage = response.statusText || "Unknown error";
+			}
+
+			throw new ApiRequestError(response.status, backendErrorMessage || response.statusText, backendErrorMessage);
+		}
+
+		return response.json() as Promise<T>;
+	} catch (error) {
+		if (error instanceof ApiRequestError) {
+			throw error;
+		}
+		throw new ApiRequestError(0, error instanceof Error ? error.message : "Network error");
+	}
+}

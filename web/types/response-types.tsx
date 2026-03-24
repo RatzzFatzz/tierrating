@@ -4,8 +4,8 @@ export interface ServerResponse<T> {
 	data?: T;
 }
 
-export interface GenericErrorResponse {
-	message: string;
+export interface ErrorResponseDTO {
+	error: string;
 }
 
 export interface LoginResponse {

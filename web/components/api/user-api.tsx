@@ -1,10 +1,10 @@
 "use server";
 import { API_URL } from "@/lib/global-config";
-import { GenericErrorResponse, LoginResponse, ServerResponse, SignupResponse, UserResponse } from "@/components/model/response-types";
+import { ErrorResponseDTO, LoginResponse, ServerResponse, SignupResponse, UserResponse } from "@/types/response-types";
 
 export async function requestLogin(username: string, password: string): Promise<ServerResponse<LoginResponse>> {
 	try {
-		const response = await fetch(`${API_URL}/auth/login`, {
+		const response = await fetch(`${API_URL}/api/auth/login`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -65,7 +65,7 @@ export async function changePassword(
 	newPassword: string,
 	username: string | null,
 	token: string | null
-): Promise<ServerResponse<GenericErrorResponse>> {
+): Promise<ServerResponse<ErrorResponseDTO>> {
 	if (!username || !token) throw new Error("Invalid user or authentication token");
 
 	try {
@@ -86,7 +86,7 @@ export async function changePassword(
 	}
 }
 
-export async function deleteAccount(username: string | null, token: string | null): Promise<ServerResponse<GenericErrorResponse>> {
+export async function deleteAccount(username: string | null, token: string | null): Promise<ServerResponse<ErrorResponseDTO>> {
 	if (!username || !token) throw new Error("Invalid user or authentication token");
 
 	try {
@@ -111,7 +111,7 @@ export async function removeConnection(
 	service: string,
 	username: string | null,
 	token: string | null
-): Promise<ServerResponse<GenericErrorResponse>> {
+): Promise<ServerResponse<ErrorResponseDTO>> {
 	if (!username || !token) throw new Error("Invalid user or authentication token");
 
 	try {

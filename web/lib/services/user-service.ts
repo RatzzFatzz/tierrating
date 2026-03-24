@@ -1,6 +1,6 @@
 import { UserResponse } from "@/types/response-types";
-import { apiClient } from "@/lib/api-client";
+import { useApi } from "@/lib/use-api";
 
-export const userService = {
-	get: (username: string, token?: string) => apiClient.get<UserResponse>(`/user/${username}`, token),
-};
+export function useUser(username: string, token?: string) {
+	return useApi<UserResponse>(`/user/${username}`, { token });
+}

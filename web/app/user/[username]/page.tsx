@@ -6,19 +6,15 @@ import { useParams } from "next/navigation";
 import { LoadingPage } from "@/components/loading-skeletons/loading-page";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import TierlistLink from "@/app/user/[username]/tierlist-link";
-import { useQuery } from "@/hooks/useQuery";
-import { userService } from "@/lib/services/user-service";
+import { TierlistLink } from "@/app/user/[username]/tierlist-link";
+import { useUser } from "@/lib/services/user-service";
 
 export default function Profile() {
 	const params = useParams<{ username: string }>();
 	const username: string = params.username;
 
 	const { token, logout } = useAuth();
-	const { data, error, isRunning, isSuccess, isError } = useQuery(
-		() => userService.get(username, token!),
-		[token, username]
-	);
+	const { data, error, isValidating } = useUser(username, token!);
 
 	useEffect(() => {
 		if (error?.status === 401 || error?.status === 403) {
@@ -26,9 +22,9 @@ export default function Profile() {
 		}
 	}, [error, logout]);
 
-	if (isRunning) return <LoadingPage />;
+	if (isValidating) return <LoadingPage />;
 
-	if (!isSuccess) return null;
+	if (error) return null;
 	const userData = data!;
 
 	return (
