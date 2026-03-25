@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 
 import { removeConnection } from "@/components/api/user-api";
 import { LoadingDiv } from "@/components/loading-skeletons/loading-page";
-import ThirdPartyLoginButton from "@/app/settings/third-party-login-button";
-import ThirdPartyConnection from "@/app/settings/third-party-connection";
+import ThirdPartyLoginButton from "@/app/settings/_components/third-party-login-button";
+import ThirdPartyConnection from "@/app/settings/_components/third-party-connection";
 import { router } from "next/client";
 import { useQueries } from "@/hooks/useQueries";
 import { apiClient } from "@/lib/api-client";

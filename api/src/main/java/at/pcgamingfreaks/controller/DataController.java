@@ -55,13 +55,16 @@ public class DataController {
 	 *
 	 * @param request
 	 */
-	@PostMapping("update")
-	@PreAuthorize("authentication.principal.username == #request.username")
-	public void update(@RequestBody UpdateScoreRequestDTO request) {
-		User user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new UsernameNotFoundException(request.getUsername()));
-		if (!hasUserConnection(user, request.getService()))
-			throw new ThirdPartyUnconfiguredException(request.getService());
-		dataFactory.getProvider(request.getService(), request.getType()).update(request.getId(), request.getScore(), user);
+	@PostMapping("update/{username}/{service}/{type}")
+	@PreAuthorize("authentication.principal.username == #username")
+	public void update(@PathVariable String username,
+					   @PathVariable ThirdPartyService service,
+					   @PathVariable ContentType type,
+					   @RequestBody UpdateScoreRequestDTO request) {
+		User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
+		if (!hasUserConnection(user, service))
+			throw new ThirdPartyUnconfiguredException(service);
+		dataFactory.getProvider(service, type).update(request.getId(), request.getScore(), user);
 	}
 
 	/**

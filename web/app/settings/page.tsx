@@ -1,7 +1,7 @@
-import ChangePassword from "@/app/settings/change-password";
+import ChangePassword from "@/app/settings/_components/change-password";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import AccountModification from "@/app/settings/account-modification";
-import ThirdPartyConfig from "@/app/settings/third-party-config";
+import AccountModification from "@/app/settings/_components/account-modification";
+import ThirdPartyConfig from "@/app/settings/_components/third-party-config";
 import { ProtectedRoute } from "@/components/contexts/route-accessibility";
 
 export default function Settings() {

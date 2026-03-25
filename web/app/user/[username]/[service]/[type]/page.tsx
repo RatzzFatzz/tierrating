@@ -1,4 +1,4 @@
-import TierListPage from "@/components/tierlist/tier-list-page";
+import TierListPage from "@/app/user/[username]/[service]/[type]/_components/tier-list-page";
 import { getServiceConfig } from "@/lib/third-party-services-config";
 import { notFound } from "next/navigation";
 

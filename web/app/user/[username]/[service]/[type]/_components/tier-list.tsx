@@ -3,24 +3,43 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Tier, TierlistEntry } from "@/types/types";
 import { TierlistEntrySkeleton } from "@/components/loading-skeletons/tier-container-skeleton";
-import { TierlistEntryCard, TierlistEntryDraggable } from "@/components/tierlist/tierlist-entry-draggable";
+import { TierlistEntryCard, TierlistEntryDraggable } from "@/app/user/[username]/[service]/[type]/_components/tierlist-entry-draggable";
 import { DragDropProvider, DragOverlay } from "@dnd-kit/react";
 import { assignTiersAndGroupEntriesByTier, groupBySingle, sortByName } from "@/components/tierlist/tier-mapper";
-import TierContainerDroppable from "@/components/tierlist/tier-container-droppable";
+import TierContainerDroppable from "@/app/user/[username]/[service]/[type]/_components/tier-container-droppable";
 import { toast } from "sonner";
-import { ServerResponse } from "@/types/api-response";
+import { useTiers } from "@/lib/services/tiers-service";
+import { useScoreMutation, useTierlistEntries } from "@/lib/services/data-service";
+import { useAuth } from "@/components/contexts/auth-context";
+import { getDefaultTiers } from "@/lib/default-tiers";
+import { LoadingPage } from "@/components/loading-skeletons/loading-page";
 
 export default function TierList({
-	tiers,
-	entries,
+	username,
+	service,
+	type,
 	modificationEnabled,
-	pushEntryUpdateAction,
 }: {
-	tiers: Tier[];
-	entries: TierlistEntry[];
+	username: string;
+	service: string;
+	type: string;
 	modificationEnabled: boolean;
-	pushEntryUpdateAction: (id: string, score: number) => Promise<ServerResponse<unknown>>;
 }) {
+	const { token, user, logout } = useAuth();
+
+	const { trigger: pushEntryUpdate, error, isMutating } = useScoreMutation(username, service, type, token!);
+	const { data: tiersData, error: tiersError, isValidating: tiersIsLoading } = useTiers(username, service, type, token!);
+	const {
+		data: entriesData,
+		error: entriesError,
+		mutate: entriesMutate,
+		isValidating: entriesIsLoading,
+	} = useTierlistEntries(username, service, type, token!);
+	const isLoading = tiersIsLoading || entriesIsLoading;
+	const tiers = useMemo(() => (tiersData?.length ? tiersData : getDefaultTiers()), [tiersData]);
+	const entries = useMemo(() => entriesData ?? [], [entriesData]);
+
+
 	const tiersById = useMemo(() => groupBySingle(tiers, (tier) => tier.id), [tiers]);
 	const tiersByName = useMemo(() => groupBySingle(tiers, (tier) => tier.name), [tiers]);
 	const entriesById = useMemo(() => groupBySingle(entries, (entry) => entry.id), [entries]);
@@ -56,16 +75,16 @@ export default function TierList({
 		// This kinda works for processing changes in the background, but this can only be spawned once.
 		// As soon as a second action is triggered, it is blocked again, until the first one has completed
 		setTimeout(() => {
-			pushEntryUpdateAction(entryToChange.id, targetTier.adjustedScore)
-				.then(response => {
-					if (!response.ok) throw new Error(response.error);
-					console.debug("Committed changes to third-party service");
-				})
-				.catch((error) => {
-					console.error(error);
-					updateEntry(entryToChange, currentTier!);
-					toast.error(`Couldn't update ${entryToChange.title}. Reverted change.`)
-				});
+			pushEntryUpdate({ id: entryToChange.id, score: targetTier.adjustedScore });
+				// .then((response) => {
+				// 	// if (!response.ok) throw new Error(response.error);
+				// 	console.debug("Committed changes to third-party service");
+				// })
+				// .catch((error) => {
+				// 	console.error(error);
+				// 	updateEntry(entryToChange, currentTier!);
+				// 	toast.error(`Couldn't update ${entryToChange.title}. Reverted change.`);
+				// });
 		}, 200);
 	};
 
@@ -89,30 +108,30 @@ export default function TierList({
 		});
 	};
 
+	if (isLoading && !entriesData && !tiersData) return <LoadingPage />;
+
 	if (!mappingCompleted) {
 		return tiers.map((tier) => <TierlistEntrySkeleton key={tier.id} color={tier.color} label={tier.name} />);
 	}
 
 	return (
 		<DragDropProvider onDragEnd={onDragEnd}>
-			{Array.from(entriesByTierId.keys())
-				.map((tierId) => tiersById.get(tierId))
-				.map(
-					(tier) =>
-						tier && (
-							<TierContainerDroppable
-								key={tier.id}
-								id={tier.id}
-								label={tier.name}
-								color={tier.color}
-								disabled={!modificationEnabled}
-							>
-								{Array.from(entriesByTierId.get(tier.id)!).map((entry) => (
-									<TierlistEntryDraggable key={entry.id} entry={entry} disabled={!modificationEnabled} />
-								))}
-							</TierContainerDroppable>
-						)
-				)}
+			{tiers.map(
+				(tier) =>
+					tier && (
+						<TierContainerDroppable
+							key={tier.id}
+							id={tier.id}
+							label={tier.name}
+							color={tier.color}
+							disabled={!modificationEnabled}
+						>
+							{Array.from(entriesByTierId.get(tier.id)!).map((entry) => (
+								<TierlistEntryDraggable key={entry.id} entry={entry} disabled={!modificationEnabled} />
+							))}
+						</TierContainerDroppable>
+					)
+			)}
 			<DragOverlay>
 				{(source) => (
 					// @ts-expect-error - Type mismatch in drag overlay source data

@@ -1,13 +1,20 @@
-import { apiClient } from "@/lib/api-client";
 import { TierlistEntry } from "@/types/types";
-import { DataUpdateRequest } from "@/types/data-types";
+import { useApi, useApiMutation } from "@/lib/use-api";
 
-export const dataService = {
-	fetchEntries: (username: string, service: string, type: string, token?: string) =>
-		apiClient.get<TierlistEntry[]>(`/data/fetch/${username}/${service}/${type}`, token),
+// export const dataService = {
+// 	pullUpdate: (username: string, service: string, type: string, token: string) =>
+// 		apiClient.get(`/data/pull/${username}/${service}/${type}`, token),
+// };
 
-	updateEntry: (token: string, body: DataUpdateRequest) => apiClient.put(`/data/update/`, token, body),
+export function useTierlistEntries(username: string, service: string, type: string, token?: string) {
+	return useApi<TierlistEntry[]>(`/data/fetch/${username}/${service}/${type}`, { token });
+}
 
-	pullUpdate: (username: string, service: string, type: string, token: string) =>
-		apiClient.get(`/data/pull/${username}/${service}/${type}`, token),
-};
+export function useScoreMutation(username: string, service: string, type: string, token: string) {
+	return useApiMutation<void, { id: string; score: number }>(
+		`/data/update/${username}/${service}/${type}`,
+		{
+			token,
+		}
+	);
+}

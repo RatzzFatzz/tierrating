@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
 import Image from "next/image";
-import ThirdPartyConnectedButton from "@/app/settings/third-party-connected-button";
+import ThirdPartyConnectedButton from "@/app/settings/_components/third-party-connected-button";
 
 export default function ThirdPartyConnection({
 	service,
