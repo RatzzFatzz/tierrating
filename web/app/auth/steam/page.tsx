@@ -1,4 +1,4 @@
-import { ProtectedRoute } from "@/components/contexts/route-accessibility";
+import { ProtectedRoute } from "@/contexts/route-accessibility";
 import React, { Suspense } from "react";
 import { REDIRECT_URL_PLACEHOLDER } from "@/lib/global-config";
 import OpenIdAuth from "@/app/auth/openid-auth";

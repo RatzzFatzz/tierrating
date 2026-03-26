@@ -1,10 +1,10 @@
 "use client";
 
-import { ProtectedRoute } from "@/components/contexts/route-accessibility";
+import { ProtectedRoute } from "@/contexts/route-accessibility";
 import React, { Suspense, useEffect } from "react";
 import { REDIRECT_URL_PLACEHOLDER } from "@/lib/global-config";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "@/components/contexts/auth-context";
+import { useAuth } from "@/contexts/auth-context";
 import { LoadingPage } from "@/components/loading-skeletons/loading-page";
 import { authorizeOpenId } from "@/components/api/auth-api";
 

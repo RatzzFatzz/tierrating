@@ -1,5 +1,6 @@
 import { API_URL } from "@/lib/global-config";
 import { ErrorResponseDTO } from "@/types/response-types";
+import { ApiRequestError } from "@/types/api-response";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
@@ -7,18 +8,6 @@ export interface ApiRequestOptions {
 	method?: HttpMethod;
 	body?: unknown;
 	token?: string;
-}
-
-export class ApiRequestError extends Error {
-	status: number;
-	backendError?: string;
-
-	constructor(status: number, message: string, backendError?: string) {
-		super(message);
-		this.name = "ApiRequestError";
-		this.status = status;
-		this.backendError = backendError;
-	}
 }
 
 export async function apiClient<T>(endpoint: string, options: ApiRequestOptions = {}): Promise<T> {

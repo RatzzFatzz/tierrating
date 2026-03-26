@@ -7,7 +7,7 @@ import { Toggle } from "@/components/ui/toggle";
 import { ArrowLeftFromLine, ArrowRightFromLine } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ButtonGroup } from "@/components/ui/button-group";
-import { useAuth } from "@/components/contexts/auth-context";
+import { useAuth } from "@/contexts/auth-context";
 import { useTiers } from "@/lib/services/tiers-service";
 import { useScoreMutation, useThirdPartyDataPull, useTierlistEntries } from "@/lib/services/data-service";
 import { LoadingPage } from "@/components/loading-skeletons/loading-page";

@@ -1,11 +1,6 @@
 import { TierlistEntry } from "@/types/types";
 import { useApi, useApiMutation } from "@/lib/use-api";
 
-// export const dataService = {
-// 	pullUpdate: (username: string, service: string, type: string, token: string) =>
-// 		apiClient.get(`/data/pull/${username}/${service}/${type}`, token),
-// };
-
 export function useTierlistEntries(username: string, service: string, type: string, token?: string) {
 	return useApi<TierlistEntry[]>(`/data/fetch/${username}/${service}/${type}`, { token });
 }

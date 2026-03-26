@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/components/contexts/auth-context";
+import { useAuth } from "@/contexts/auth-context";
 import { useEffect, useState } from "react";
 
 import { removeConnection } from "@/components/api/user-api";

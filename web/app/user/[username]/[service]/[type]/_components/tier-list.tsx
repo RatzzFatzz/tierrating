@@ -5,12 +5,12 @@ import { Tier, TierlistEntry } from "@/types/types";
 import { TierlistEntrySkeleton } from "@/components/loading-skeletons/tier-container-skeleton";
 import { TierlistEntryCard, TierlistEntryDraggable } from "@/app/user/[username]/[service]/[type]/_components/tierlist-entry-draggable";
 import { DragDropProvider, DragOverlay } from "@dnd-kit/react";
-import { assignTiersAndGroupEntriesByTier, groupBySingle, sortByName } from "@/components/tierlist/tier-mapper";
+import { assignTiersAndGroupEntriesByTier, groupBySingle, sortByName } from "@/lib/mapper/tier-mapper";
 import TierContainerDroppable from "@/app/user/[username]/[service]/[type]/_components/tier-container-droppable";
 import { toast } from "sonner";
 import { useTiers } from "@/lib/services/tiers-service";
 import { useScoreMutation, useTierlistEntries } from "@/lib/services/data-service";
-import { useAuth } from "@/components/contexts/auth-context";
+import { useAuth } from "@/contexts/auth-context";
 import { getDefaultTiers } from "@/lib/default-tiers";
 import { LoadingPage } from "@/components/loading-skeletons/loading-page";
 

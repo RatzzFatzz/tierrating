@@ -1,4 +1,4 @@
-import { ProtectedRoute } from "@/components/contexts/route-accessibility";
+import { ProtectedRoute } from "@/contexts/route-accessibility";
 import React, { Suspense } from "react";
 import { Oauth } from "@/app/auth/oauth";
 import { CLIENT_ID_PLACEHOLDER, REDIRECT_URL_PLACEHOLDER } from "@/lib/global-config";

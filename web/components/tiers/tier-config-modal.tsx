@@ -7,7 +7,7 @@ import { ArrowUpDown, Palette, Plus, Settings, X } from "lucide-react";
 import { HexColorPicker } from "react-colorful";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tier } from "@/types/types";
-import { useAuth } from "@/components/contexts/auth-context";
+import { useAuth } from "@/contexts/auth-context";
 import { getDefaultTiers } from "@/lib/default-tiers";
 import { DataProvider, getProviderByName } from "@/components/data-providers/data-provider";
 import { TierConfigTableSkeleton } from "@/components/loading-skeletons/tier-config-table-skeleton";

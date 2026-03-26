@@ -1,7 +1,7 @@
 "use client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import React, { useEffect } from "react";
-import { useAuth } from "@/components/contexts/auth-context";
+import { useAuth } from "@/contexts/auth-context";
 import { useParams } from "next/navigation";
 import { LoadingPage } from "@/components/loading-skeletons/loading-page";
 import { cn } from "@/lib/utils";
