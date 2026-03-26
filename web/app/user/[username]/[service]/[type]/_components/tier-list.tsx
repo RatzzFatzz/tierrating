@@ -108,6 +108,17 @@ export default function TierList({
 
 	if (isLoading && !entriesData && !tiersData) return <LoadingPage />;
 
+	if (tiersError || entriesError) {
+		if (tiersError?.status === 404 || entriesError?.status === 404) {
+			return (
+				<div>Tierlist of user does not exist or is private.</div>
+			)
+		}
+		return (
+			<div>Error occurred while fetching your data. Please try again later. If the error persists contact the server admin.</div>
+		)
+	}
+
 	if (!mappingCompleted) {
 		return tiers.map((tier) => <TierlistEntrySkeleton key={tier.id} color={tier.color} label={tier.name} />);
 	}

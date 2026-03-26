@@ -74,7 +74,8 @@ public class DataController {
 	 * @param service
 	 * @param type
 	 */
-	@GetMapping("pull/{username}/{service}/{type}")
+	@PostMapping("pull/{username}/{service}/{type}")
+	@PreAuthorize("authentication.principal.username == #username")
 	public void pull(@PathVariable String username, @PathVariable ThirdPartyService service, @PathVariable ContentType type) {
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
 		if (!hasUserConnection(user, service)) throw new ThirdPartyUnconfiguredException(service);
