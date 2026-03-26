@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { startTransition, useEffect, useMemo, useState } from "react";
 import { Tier, TierlistEntry } from "@/types/types";
 import { TierlistEntrySkeleton } from "@/components/loading-skeletons/tier-container-skeleton";
 import { TierlistEntryCard, TierlistEntryDraggable } from "@/app/user/[username]/[service]/[type]/_components/tierlist-entry-draggable";
@@ -72,15 +72,13 @@ export default function TierList({
 
 		updateEntry(entryToChange, targetTier, sourceTier);
 
-		// This kinda works for processing changes in the background, but this can only be spawned once.
-		// As soon as a second action is triggered, it is blocked again, until the first one has completed
-		setTimeout(() => {
+		startTransition(() => {
 			pushEntryUpdate({ id: entryToChange.id, score: targetTier.adjustedScore })
 				.catch((error) => {
 					toast.error(`Couldn't update ${entryToChange.title}. Reverted change.\n Error: ${error.message}`);
 					updateEntry(entryToChange, sourceTier!, targetTier);
 				});
-		}, 200);
+		});
 	};
 
 	const updateEntry = (entryToChange: TierlistEntry, targetTier: Tier, sourceTier: Tier) => {
