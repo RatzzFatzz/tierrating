@@ -53,7 +53,12 @@ export async function apiClient<T>(endpoint: string, options: ApiRequestOptions 
 			throw new ApiRequestError(response.status, backendErrorMessage || response.statusText, backendErrorMessage);
 		}
 
-		return response.json() as Promise<T>;
+		if (response.status === 204) {
+			return undefined as T;
+		}
+
+		const text = await response.text();
+		return text ? JSON.parse(text) : (undefined as T);
 	} catch (error) {
 		if (error instanceof ApiRequestError) {
 			throw error;
