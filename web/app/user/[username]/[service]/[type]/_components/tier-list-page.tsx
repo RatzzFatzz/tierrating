@@ -8,11 +8,7 @@ import { ArrowLeftFromLine, ArrowRightFromLine } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { useAuth } from "@/contexts/auth-context";
-import { useTiers } from "@/lib/services/tiers-service";
-import { useScoreMutation, useThirdPartyDataPull, useTierlistEntries } from "@/lib/services/data-service";
-import { LoadingPage } from "@/components/loading-skeletons/loading-page";
-import { getDefaultTiers } from "@/lib/default-tiers";
-import { ServerResponse } from "@/types/api-response";
+import { useThirdPartyDataPull, useTierlistEntries } from "@/lib/services/data-service";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
@@ -34,13 +30,6 @@ export default function TierListPage({ title, username, service, type }: { title
 			.catch((error) => toast.error(error.message))
 			.finally(() => setIsPullRunning(false));
 	}
-
-	// if (isError) {
-	// 	if (errors.entries?.status === 404) notFound();
-	// 	if (errors.entries?.status === 401 || errors.tiers?.status === 401) return <div>private profile</div>;
-	// 	if (errors.entries?.status === 500) return <div>{errors.entries?.error}</div>;
-	// 	if (errors.tiers?.status === 500) return <div>{errors.tiers?.error}</div>;
-	// }
 
 	return (
 		<div className={cn("max-w-full px-4")}>

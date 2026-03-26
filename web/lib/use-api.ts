@@ -1,6 +1,7 @@
 import useSWR, { SWRConfiguration } from "swr";
 import useSWRMutation from "swr/mutation";
-import { apiClient, ApiRequestError, ApiRequestOptions } from "./api-client";
+import { apiClient, ApiRequestOptions } from "./api-client";
+import { ApiRequestError } from "@/types/api-request-error";
 
 export function useApi<T>(key: string | null, options: ApiRequestOptions = {}, swrConfig: SWRConfiguration = {}) {
 	return useSWR<T, ApiRequestError>(

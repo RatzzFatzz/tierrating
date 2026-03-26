@@ -7,33 +7,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
-import { requestLogin } from "@/components/api/user-api";
+import { useLogin } from "@/lib/services/user-service";
+import { ApiRequestError } from "@/types/api-request-error";
 
-export function InputForm() {
+export function LoginForm() {
 	const [showPassword, setShowPassword] = useState(false);
-	const [isLoading, setIsLoading] = useState(false);
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [errorMessage, setErrorMessage] = useState("");
 	const { login } = useAuth();
 
+	const { trigger, isMutating } = useLogin();
+
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		setIsLoading(true);
 		setErrorMessage("");
 
-		requestLogin(username, password)
-			.then((response) => {
-				if (response.status === 401) throw new Error("Invalid credentials");
-				if (response.error) throw new Error(response.error);
-				if (!response.data) throw new Error("Faulty response");
-				login(response.data.token);
+		trigger({ username, password })
+			.then((result) => {
+				login(result.token);
 			})
 			.catch((error) => {
-				setErrorMessage(error instanceof Error ? error.message : "Login failed. Please try again.");
-			})
-			.finally(() => {
-				setTimeout(() => setIsLoading(false), 1000);
+				setErrorMessage(error instanceof ApiRequestError ? error.backendError! : "Login failed. Please try again.");
 			});
 	};
 
@@ -84,8 +79,8 @@ export function InputForm() {
 						</Link>
 					</div>
 				</div>
-				<Button type="submit" className="w-full" disabled={isLoading}>
-					{isLoading ? "Signing in..." : "Sign in"}
+				<Button type="submit" className="w-full" disabled={isMutating}>
+					{isMutating ? "Signing in..." : "Sign in"}
 				</Button>
 			</form>
 		</div>

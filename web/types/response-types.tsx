@@ -8,10 +8,6 @@ export interface ErrorResponseDTO {
 	error: string;
 }
 
-export interface LoginResponse {
-	token: string;
-}
-
 export interface SignupResponse {
 	usernameTaken: boolean;
 	emailTaken: boolean;
