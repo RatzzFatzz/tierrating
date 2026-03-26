@@ -18,3 +18,7 @@ export function useScoreMutation(username: string, service: string, type: string
 		}
 	);
 }
+
+export function useThirdPartyDataPull(username: string, service: string, type: string, token: string) {
+	return useApiMutation<void, void>(`/data/pull/${username}/${service}/${type}`, { token });
+}

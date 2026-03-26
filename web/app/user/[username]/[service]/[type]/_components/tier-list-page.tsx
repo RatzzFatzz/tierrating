@@ -9,35 +9,30 @@ import { cn } from "@/lib/utils";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { useAuth } from "@/components/contexts/auth-context";
 import { useTiers } from "@/lib/services/tiers-service";
-import { useScoreMutation, useTierlistEntries } from "@/lib/services/data-service";
+import { useScoreMutation, useThirdPartyDataPull, useTierlistEntries } from "@/lib/services/data-service";
 import { LoadingPage } from "@/components/loading-skeletons/loading-page";
 import { getDefaultTiers } from "@/lib/default-tiers";
 import { ServerResponse } from "@/types/api-response";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 
 export default function TierListPage({ title, username, service, type }: { title: string, username: string; service: string; type: string }) {
-	const { user } = useAuth();
+	const { user, token } = useAuth();
 	const [isFullWidth, setIsFullWidth] = useState<boolean>(false);
 	const [isPullRunning, setIsPullRunning] = useState<boolean>(false);
 
 	const modificationEnabled: boolean = user == username;
 
+	const { mutate: entriesMutate} = useTierlistEntries(username, service, type, token!);
+	const { trigger: pullThirdPartyData, error, isMutating } = useThirdPartyDataPull(username, service, type, token!);
 
 	const pullUpdate = () => {
 		setIsPullRunning(true);
-		// dataService
-		// 	.pullUpdate(username, service, type, token!)
-		// 	.then((response) => {
-		// 		if (!response.ok) throw new Error(response.error);
-		// 		entriesMutate();
-		// 	})
-		// 	.catch((error) => {
-		// 		toast.error(error.message);
-		// 	})
-		// 	.finally(() => {
-		// 		setIsPullRunning(false);
-		// 	});
+		pullThirdPartyData()
+			.then(() => entriesMutate())
+			.catch((error) => toast.error(error.message))
+			.finally(() => setIsPullRunning(false));
 	}
 
 	// if (isError) {
@@ -77,7 +72,6 @@ export default function TierListPage({ title, username, service, type }: { title
 					service={service}
 					type={type}
 					modificationEnabled={modificationEnabled && !isPullRunning}
-					fullWidth={isFullWidth}
 				/>
 			</div>
 			{service.startsWith("trakt") && <TmdbDisclaimer />}

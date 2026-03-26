@@ -63,47 +63,47 @@ export default function TierList({
 		}
 
 		const { source, target } = event.operation;
-		const targetTier = tiersById.get(target.id);
-		const entryToChange = entriesById.get(source.id);
-		const currentTier = entryToChange?.tier;
+		const entryToChange = entriesById.get(source.id)!;
+		const sourceTier = entryToChange.tier!;
+		const targetTier = tiersById.get(target.id)!;
 
-		if (!(entryToChange?.tier && targetTier?.name)) return;
+		if (!(entryToChange.tier && targetTier.name)) return;
 		if (entryToChange.tier === targetTier) return; // entry already in desired tier
 
-		updateEntry(entryToChange, targetTier);
+		updateEntry(entryToChange, targetTier, sourceTier);
 
 		// This kinda works for processing changes in the background, but this can only be spawned once.
 		// As soon as a second action is triggered, it is blocked again, until the first one has completed
 		setTimeout(() => {
-			pushEntryUpdate({ id: entryToChange.id, score: targetTier.adjustedScore });
-				// .then((response) => {
-				// 	// if (!response.ok) throw new Error(response.error);
-				// 	console.debug("Committed changes to third-party service");
-				// })
-				// .catch((error) => {
-				// 	console.error(error);
-				// 	updateEntry(entryToChange, currentTier!);
-				// 	toast.error(`Couldn't update ${entryToChange.title}. Reverted change.`);
-				// });
+			pushEntryUpdate({ id: entryToChange.id, score: targetTier.adjustedScore })
+				.catch((error) => {
+					toast.error(`Couldn't update ${entryToChange.title}. Reverted change.\n Error: ${error.message}`);
+					updateEntry(entryToChange, sourceTier!, targetTier);
+				});
 		}, 200);
 	};
 
-	const updateEntry = (entryToChange: TierlistEntry, targetTier: Tier) => {
-		console.debug(`${entryToChange.title}: ${entryToChange.tier.name} -> ${targetTier.name}`);
+	const updateEntry = (entryToChange: TierlistEntry, targetTier: Tier, sourceTier: Tier) => {
+		console.debug(`${entryToChange.title}: ${sourceTier.name} -> ${targetTier.name}`);
 
-		const prevTier = entryToChange.tier;
+		const updatedEntry = {
+			...entryToChange,
+			tier: targetTier,
+			score: targetTier.adjustedScore,
+		}
 
-		entryToChange.tier = targetTier;
-		entryToChange.score = targetTier?.adjustedScore;
-
-		// add entryToChange to new tier
-		entriesByTierId.set(targetTier.id, [...entriesByTierId.get(targetTier.id)!, entryToChange].sort(sortByName));
-		// remove entryToChange from its current tier
 		setEntriesByTierId((prevMap) => {
-			const currentEntries = prevMap.get(prevTier.id)!;
 			const newMap = new Map(prevMap);
-			const updatedEntries = currentEntries.filter((entry) => entry.id !== entryToChange.id);
-			newMap.set(prevTier.id, updatedEntries);
+			if (sourceTier.id !== targetTier.id) {
+				// add entryToChange to new tier
+				const targetEntries = [...newMap.get(targetTier.id)!, updatedEntry].sort(sortByName);
+				newMap.set(targetTier.id, targetEntries);
+				// remove entryToChange from its current tier
+				const updatedEntries = [...newMap.get(sourceTier.id)!.filter((entry) => entry.id !== entryToChange.id)];
+				newMap.set(sourceTier.id, updatedEntries);
+				// update element to avoid stale data
+				entriesById.set(updatedEntry.id, updatedEntry);
+			}
 			return newMap;
 		});
 	};
@@ -116,22 +116,19 @@ export default function TierList({
 
 	return (
 		<DragDropProvider onDragEnd={onDragEnd}>
-			{tiers.map(
-				(tier) =>
-					tier && (
-						<TierContainerDroppable
-							key={tier.id}
-							id={tier.id}
-							label={tier.name}
-							color={tier.color}
-							disabled={!modificationEnabled}
-						>
-							{Array.from(entriesByTierId.get(tier.id)!).map((entry) => (
-								<TierlistEntryDraggable key={entry.id} entry={entry} disabled={!modificationEnabled} />
-							))}
-						</TierContainerDroppable>
-					)
-			)}
+			{tiers.map((tier) => (
+				<TierContainerDroppable
+					key={tier.id}
+					id={tier.id}
+					label={tier.name}
+					color={tier.color}
+					disabled={!modificationEnabled}
+				>
+					{entriesByTierId.get(tier.id)!.map((entry) => (
+						<TierlistEntryDraggable key={entry.id} entry={entry} disabled={!modificationEnabled} />
+					))}
+				</TierContainerDroppable>
+			))}
 			<DragOverlay>
 				{(source) => (
 					// @ts-expect-error - Type mismatch in drag overlay source data
