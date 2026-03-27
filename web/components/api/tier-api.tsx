@@ -4,31 +4,6 @@ import { API_URL } from "@/lib/global-config";
 import { Tier } from "@/types/types";
 import { ServerResponse } from "@/types/response-types";
 
-export const fetchTiers = async (
-	token: string | null,
-	username: string,
-	service: string,
-	type: string
-): Promise<ServerResponse<Tier[]>> => {
-	if (!token) throw new Error("No authentication token");
-
-	try {
-		const response = await fetch(`${API_URL}/tiers/${username}/${service}/${type.toLowerCase()}`, {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${token}`,
-			},
-		});
-
-		const data = await response.json().catch(() => null);
-		return { data, status: response.status };
-	} catch (error) {
-		console.error("API proxy error: ", error);
-		return { error: "Server unavailable", status: 500 };
-	}
-};
-
 export async function updateTiers(
 	token: string | null,
 	username: string,

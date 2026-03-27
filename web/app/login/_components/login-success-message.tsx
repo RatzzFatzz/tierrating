@@ -7,7 +7,7 @@ export function SuccessMessage() {
 	const signupSuccess = searchParams.get("signup") === "success";
 
 	return (
-		<div>
+		<div className={'mb-4'}>
 			{signupSuccess && (
 				<div className="bg-green-500/15 text-green-500 text-sm p-3 rounded-md">
 					Account created successfully! You can now log in.

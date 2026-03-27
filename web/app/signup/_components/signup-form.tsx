@@ -7,10 +7,10 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { submitSignup } from "@/components/api/user-api";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { useSignup } from "@/lib/services/user-service";
 
 const FormSchema = z
 	.object({
@@ -27,9 +27,10 @@ const FormSchema = z
 export function SignUpForm() {
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-	const [isSubmitLoading, setSubmitLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState("");
 	const router = useRouter();
+
+	const { trigger: submitSignup, isMutating } = useSignup();
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
@@ -42,22 +43,16 @@ export function SignUpForm() {
 	});
 
 	function onSubmit(data: z.infer<typeof FormSchema>) {
-		setSubmitLoading(true);
-		submitSignup(data.username, data.email, data.password)
+		submitSignup({username: data.username, email: data.email, password: data.password})
 			.then((response) => {
-				if (response.error) throw new Error(response.error);
-				if (!response.data) throw new Error("Faulty response");
-				if (response.data.usernameTaken) throw new Error("Username already taken");
-				if (response.data.emailTaken) throw new Error("Email already associated with a different account");
-				if (!response.data.signupSuccess) throw new Error("Signup failed. Please try again");
+				if (response.usernameTaken) throw new Error("Username already taken");
+				if (response.emailTaken) throw new Error("Email already associated with a different account");
+				if (!response.signupSuccess) throw new Error("Signup failed. Please try again");
 				setErrorMessage("");
 				router.push("/login?signup=success");
 			})
 			.catch((error) => {
 				setErrorMessage(error.message);
-			})
-			.finally(() => {
-				setTimeout(() => setSubmitLoading(false), 1000);
 			});
 	}
 
@@ -142,8 +137,8 @@ export function SignUpForm() {
 							</FormItem>
 						)}
 					/>
-					<Button type="submit" className="w-full" disabled={isSubmitLoading}>
-						{isSubmitLoading ? "Creating account..." : "Create account"}
+					<Button type="submit" className="w-full" disabled={isMutating}>
+						{isMutating ? "Creating account..." : "Create account"}
 					</Button>
 				</form>
 			</Form>

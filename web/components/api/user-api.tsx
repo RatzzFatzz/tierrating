@@ -1,43 +1,8 @@
 "use server";
 import { API_URL } from "@/lib/global-config";
-import { ErrorResponseDTO, LoginResponse, ServerResponse, SignupResponse, UserResponse } from "@/types/response-types";
+import { ErrorResponseDTO, ServerResponse, UserResponse } from "@/types/response-types";
+import { LoginResponse } from "@/types/api-responses";
 
-export async function requestLogin(username: string, password: string): Promise<ServerResponse<LoginResponse>> {
-	try {
-		const response = await fetch(`${API_URL}/api/auth/login`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				Accept: "application/json",
-			},
-			body: JSON.stringify({ username, password }),
-		});
-
-		const data = await response.json().catch(() => null);
-		return { data, status: response.status };
-	} catch (error) {
-		console.error("API proxy error: ", error);
-		return { error: "Server unavailable", status: 500 };
-	}
-}
-
-export async function submitSignup(username: string, email: string, password: string): Promise<ServerResponse<SignupResponse>> {
-	try {
-		const response = await fetch(`${API_URL}/auth/signup`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ username, email, password }),
-		});
-
-		const data = await response.json().catch(() => null);
-		return { data, status: response.status };
-	} catch (error) {
-		console.error("API proxy error: ", error);
-		return { error: "Server unavailable", status: 500 };
-	}
-}
 
 export async function refreshToken(token: string | null): Promise<ServerResponse<LoginResponse>> {
 	if (!token) throw new Error("No authentication token");
@@ -117,26 +82,6 @@ export async function removeConnection(
 	try {
 		const response = await fetch(`${API_URL}/user/${username}/remove/${service}`, {
 			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${token}`,
-			},
-		});
-
-		const data = await response.json().catch(() => null);
-		return { data, status: response.status };
-	} catch (error) {
-		console.error("API proxy error: ", error);
-		return { error: "Server unavailable", status: 500 };
-	}
-}
-
-export async function fetchUser(token: string | null, username: string): Promise<ServerResponse<UserResponse>> {
-	if (!token) throw new Error("No authentication token");
-
-	try {
-		const response = await fetch(`${API_URL}/user/${username}`, {
-			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
 				Authorization: `Bearer ${token}`,

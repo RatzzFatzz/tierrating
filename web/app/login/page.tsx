@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { AnonymousAllowedRoute } from "@/contexts/route-accessibility";
-import { LoginForm } from "@/app/login/login-form";
-import { SuccessMessage } from "@/app/login/login-success-message";
+import { LoginForm } from "@/app/login/_components/login-form";
+import { SuccessMessage } from "@/app/login/_components/login-success-message";
 import { cn } from "@/lib/utils";
 
 export default function LoginPage() {

@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { SignUpForm } from "@/app/signup/signup-form";
+import { SignUpForm } from "@/app/signup/_components/signup-form";
 import { AnonymousAllowedRoute } from "@/contexts/route-accessibility";
 
 export default function SignupPage() {

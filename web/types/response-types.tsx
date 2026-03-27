@@ -8,11 +8,7 @@ export interface ErrorResponseDTO {
 	error: string;
 }
 
-export interface SignupResponse {
-	usernameTaken: boolean;
-	emailTaken: boolean;
-	signupSuccess: boolean;
-}
+
 
 export interface UserResponse {
 	id: number;
