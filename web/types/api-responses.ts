@@ -8,6 +8,13 @@ export interface SignupResponse {
 	signupSuccess: boolean;
 }
 
+export interface UserResponse {
+	id: number;
+	username: string;
+	bio: string;
+	connectedServices: string[];
+}
+
 export interface ThirdPartyInfoResponse {
 	clientId: string;
 }

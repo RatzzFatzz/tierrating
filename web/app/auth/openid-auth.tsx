@@ -1,18 +1,20 @@
 "use client";
 
-import { ProtectedRoute } from "@/contexts/route-accessibility";
-import React, { Suspense, useEffect } from "react";
+import React, { useEffect } from "react";
 import { REDIRECT_URL_PLACEHOLDER } from "@/lib/config/global-config";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { LoadingPage } from "@/components/loading-skeletons/loading-page";
-import { authorizeOpenId } from "@/components/api/auth-api";
+import { useOpenId } from "@/lib/services/auth-service";
+import { toast } from "sonner";
 
 export default function OpenIdAuth({ service, openidUrl, returnToUrl }: { service: string; openidUrl: string; returnToUrl: string }) {
-	const searchParams = useSearchParams();
-	const router = useRouter();
 	const { user, token, logout } = useAuth();
+	const searchParams = useSearchParams();
 
+	const { trigger: authorizeOpenId } = useOpenId(user!, service, token!);
+
+	const router = useRouter();
 
 	useEffect(() => {
 		if (searchParams.size == 0) {
@@ -31,28 +33,15 @@ export default function OpenIdAuth({ service, openidUrl, returnToUrl }: { servic
 				console.debug(`params for ${name}: ${value}`);
 				params[name] = value;
 			});
-			authorizeOpenId(service, user, token, params)
-				.then((response) => {
-					if (response.status == 401 || response.status == 403) logout();
-					if (response.error) throw new Error(response.error);
-					if (response.data) {
-						return Promise.reject(response.data.message);
-					}
-				})
+			authorizeOpenId({ params })
 				.catch((err) => {
-					console.error(err);
+					toast.error("Error occurred. Please try again later.");
 				})
 				.finally(() => {
-					router.push(`/user/${user}`);
+					router.push(`/settings`);
 				});
 		}
-	}, [user, token, logout, router, searchParams, returnToUrl, openidUrl, service]);
+	}, [user, token, logout, router, searchParams, returnToUrl, openidUrl, authorizeOpenId]);
 
-	return (
-		<ProtectedRoute>
-			<Suspense>
-				<LoadingPage />
-			</Suspense>
-		</ProtectedRoute>
-	);
+	return <LoadingPage />;
 }
