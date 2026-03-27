@@ -7,3 +7,8 @@ export interface SignupResponse {
 	emailTaken: boolean;
 	signupSuccess: boolean;
 }
+
+export interface ThirdPartyInfoResponse {
+	clientId: string;
+}
+

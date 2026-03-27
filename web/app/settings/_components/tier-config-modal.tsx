@@ -9,7 +9,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Tier } from "@/types/types";
 import { useAuth } from "@/contexts/auth-context";
 import { getDefaultTiers } from "@/lib/config/default-tiers";
-import { DataProvider, getProviderByName } from "@/components/data-providers/data-provider";
 import { TierConfigTableSkeleton } from "@/components/loading-skeletons/tier-config-table-skeleton";
 
 interface TierConfigModalProps {
@@ -38,7 +37,6 @@ export default function TierConfigModal({ initialTiers = [], service, type, onSa
 	const [queryRunning, setQueryRunning] = useState(true);
 
 	const { token, isLoading, isAuthenticated, logout } = useAuth();
-	const provider: DataProvider = getProviderByName(`${service}-${type}`);
 
 	const dataFetched = useRef(false);
 
@@ -54,7 +52,7 @@ export default function TierConfigModal({ initialTiers = [], service, type, onSa
 				.catch((error) => console.error(error))
 				.finally(() => setQueryRunning(false));
 		}
-	}, [isOpen, isLoading, isAuthenticated, token, type, logout, provider, username]);
+	}, [isOpen, isLoading, isAuthenticated, token, type, logout, username]);
 
 	const restoreDefaults = () => {
 		setTiers(getDefaultTiers());

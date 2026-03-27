@@ -1,69 +1,46 @@
 "use client";
 
 import { useAuth } from "@/contexts/auth-context";
-import { useEffect, useState } from "react";
-
-import { removeConnection } from "@/components/api/user-api";
+import { useState } from "react";
 import { LoadingDiv } from "@/components/loading-skeletons/loading-page";
 import ThirdPartyLoginButton from "@/app/settings/_components/third-party-login-button";
 import ThirdPartyConnection from "@/app/settings/_components/third-party-connection";
-import { router } from "next/client";
-import { useQueries } from "@/hooks/useQueries";
-import { apiClient } from "@/lib/api-client";
-import { userService } from "@/lib/services/user-service";
+import { useRemoveThirdPartyService, useUser } from "@/lib/services/user-service";
 import { THIRD_PARTY_SERVICE_CONFIG } from "@/lib/config/third-party-services-config";
+import { toast } from "sonner";
+import { useThirdPartyServices } from "@/lib/services/third-party-info-service";
 
 export default function ThirdPartyConfig() {
 	const { user, token, logout } = useAuth();
 	const [isRemovingService, setIsRemovingService] = useState(false);
-	const { data, errors, isRunning, isError, isSuccess, refetch } = useQueries({
-		user: () => userService.get(user!, token!),
-		services: () => apiClient.get<string[]>("/config/services", token!),
-	});
-
-	useEffect(() => {
-		if (
-			errors?.user?.status === 401 ||
-			errors?.user?.status === 403 ||
-			errors?.services?.status === 401 ||
-			errors?.services?.status === 403
-		) {
-			logout();
-		}
-	}, [errors, logout]);
+	const { data: userData, error: userError, isValidating: isValidatingUser, mutate: reloadUser } = useUser(user!, token!);
+	const {
+		data: services,
+		error: servicesError,
+		isValidating: isValidatingService,
+	} = useThirdPartyServices(token!);
+	const { trigger: removeConnection, error: removalError, isMutating } = useRemoveThirdPartyService(user!, token!);
+	const isValidating: boolean = (isValidatingUser || isValidatingService) && (!userData || !services);
 
 	const removeService = (service: string) => {
-		setIsRemovingService(true);
-		removeConnection(service, user, token)
-			.then((response) => {
-				if (response.status === 401 || response.status === 403) {
-					logout();
-					throw new Error("Session expired or unauthorized");
-				}
-				if (response.status != 200) throw new Error(response.data ? response.data.message : `API error: ${response.status}`);
-				console.debug(`${service} connection removed`);
-				router.reload();
+		removeConnection({ service })
+			.then(() => {
+				reloadUser();
 			})
 			.catch((error) => {
-				console.error(error.message);
-			})
-			.finally(() => {
-				setIsRemovingService(false);
+				toast.error(`Error occurred deleting ${service} connection. Please try again later.`);
 			});
 	};
 
-	if (isRunning) return <LoadingDiv className={"min-h-30"} />;
+	if (isValidating) return <LoadingDiv className={"min-h-30"} />;
 
-	if (!isSuccess) return null;
-	const configuredServices = data.services!;
-	const userResponse = data.user!;
+	if (userError || servicesError) return <div>error occurred</div>;
 
 	return (
 		<div className={"w-full grid gap-4"}>
 			<div className="grid columns-1 gap-2">
 				{Object.entries(THIRD_PARTY_SERVICE_CONFIG).map(([key, service]) =>
-					configuredServices.includes(key) &&
-					!userResponse.connectedServices.includes(key) ? (
+					services!.includes(key) && !userData!.connectedServices.includes(key) ? (
 						<ThirdPartyLoginButton
 							key={service.id}
 							title={`Connect ${service.name}`}
@@ -75,7 +52,7 @@ export default function ThirdPartyConfig() {
 			</div>
 			<div className="grid columns-1 gap-2">
 				{Object.entries(THIRD_PARTY_SERVICE_CONFIG).map(([key, service]) =>
-					userResponse.connectedServices.includes(key) ? (
+					userData!.connectedServices.includes(key) ? (
 						<ThirdPartyConnection
 							key={service.id}
 							service={{ id: service.id, title: service.name }}

@@ -8,7 +8,7 @@ export default async function ServiceTypeTierlist({ params }: { params: Promise<
 	const thirdPartyService = getServiceConfig(service);
 	const thirdPartyContentType = thirdPartyService?.types.find((t) => t.id === type);
 	if (!thirdPartyService || !thirdPartyContentType) notFound();
-	const title = `${thirdPartyService.service.name} ${thirdPartyContentType.name} Tierlist`;
+	const title = `${thirdPartyService.name} ${thirdPartyContentType.name} Tierlist`;
 
 	return <TierListPage title={title} username={username} service={service} type={type} />;
 }

@@ -21,6 +21,4 @@ export interface ThirdPartyAuthResponse {
 	message: string;
 }
 
-export interface ThirdPartyInfoResponse {
-	clientId: string;
-}
+

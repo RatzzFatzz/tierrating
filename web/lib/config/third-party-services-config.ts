@@ -42,9 +42,7 @@ export const THIRD_PARTY_SERVICE_CONFIG: Record<ThirdPartyService, ThirdPartySer
 	},
 } as const;
 
-export function getServiceConfig(key: string) {
-	if (key.toUpperCase() in THIRD_PARTY_SERVICE_CONFIG) {
-		return THIRD_PARTY_SERVICE_CONFIG[key as keyof typeof THIRD_PARTY_SERVICE_CONFIG];
-	}
-	return undefined;
+export function getServiceConfig(key: string): ThirdPartyServiceConfig | undefined {
+	const upperKey = key.toUpperCase() as ThirdPartyService;
+	return THIRD_PARTY_SERVICE_CONFIG[upperKey] ?? undefined;
 }

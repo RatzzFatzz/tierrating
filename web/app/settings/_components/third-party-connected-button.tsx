@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import TierConfigModal from "@/components/tiers/tier-config-modal";
+import TierConfigModal from "@/app/settings/_components/tier-config-modal";
 import { Tier } from "@/types/types";
 import React from "react";
 import { updateTiers } from "@/components/api/tier-api";
