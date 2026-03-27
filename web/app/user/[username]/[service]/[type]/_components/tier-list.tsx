@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { useTiers } from "@/lib/services/tiers-service";
 import { useScoreMutation, useTierlistEntries } from "@/lib/services/data-service";
 import { useAuth } from "@/contexts/auth-context";
-import { getDefaultTiers } from "@/lib/default-tiers";
+import { getDefaultTiers } from "@/lib/config/default-tiers";
 import { LoadingPage } from "@/components/loading-skeletons/loading-page";
 
 export default function TierList({

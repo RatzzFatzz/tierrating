@@ -1,6 +1,6 @@
 "use server";
 
-import { API_URL } from "@/lib/global-config";
+import { API_URL } from "@/lib/config/global-config";
 import { Tier } from "@/types/types";
 import { ServerResponse } from "@/types/response-types";
 

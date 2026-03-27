@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import { LoadingPage } from "@/components/loading-skeletons/loading-page";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { TierlistLink } from "@/app/user/[username]/tierlist-link";
+import { TierlistLink } from "@/app/user/[username]/[service]/_components/tierlist-link";
 import { useUser } from "@/lib/services/user-service";
 
 export default function Profile() {

@@ -11,7 +11,7 @@ import { router } from "next/client";
 import { useQueries } from "@/hooks/useQueries";
 import { apiClient } from "@/lib/api-client";
 import { userService } from "@/lib/services/user-service";
-import { THIRD_PARTY_SERVICE_CONFIG } from "@/lib/third-party-services-config";
+import { THIRD_PARTY_SERVICE_CONFIG } from "@/lib/config/third-party-services-config";
 
 export default function ThirdPartyConfig() {
 	const { user, token, logout } = useAuth();
@@ -61,26 +61,25 @@ export default function ThirdPartyConfig() {
 	return (
 		<div className={"w-full grid gap-4"}>
 			<div className="grid columns-1 gap-2">
-				{Object.entries(THIRD_PARTY_SERVICE_CONFIG).map(([key, config]) =>
+				{Object.entries(THIRD_PARTY_SERVICE_CONFIG).map(([key, service]) =>
 					configuredServices.includes(key) &&
 					!userResponse.connectedServices.includes(key) ? (
 						<ThirdPartyLoginButton
-							key={config.service.id}
-							title={config.connectTitle}
-							path={config.authPath}
-							color={config.connectColor}
-							service={config.service.id}
+							key={service.id}
+							title={`Connect ${service.name}`}
+							path={`/auth/${service.id}`}
+							service={service.id}
 						/>
 					) : null
 				)}
 			</div>
 			<div className="grid columns-1 gap-2">
-				{Object.entries(THIRD_PARTY_SERVICE_CONFIG).map(([key, config]) =>
+				{Object.entries(THIRD_PARTY_SERVICE_CONFIG).map(([key, service]) =>
 					userResponse.connectedServices.includes(key) ? (
 						<ThirdPartyConnection
-							key={config.service.id}
-							service={{ id: config.service.id, title: config.service.name }}
-							types={config.types.map((t) => ({ id: t.id, title: t.name }))}
+							key={service.id}
+							service={{ id: service.id, title: service.name }}
+							types={service.types.map((type) => ({ id: type.id, title: type.name }))}
 							removeConnection={removeService}
 							isRemovingService={isRemovingService}
 							username={user!}

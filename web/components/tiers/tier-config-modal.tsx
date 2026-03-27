@@ -8,7 +8,7 @@ import { HexColorPicker } from "react-colorful";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tier } from "@/types/types";
 import { useAuth } from "@/contexts/auth-context";
-import { getDefaultTiers } from "@/lib/default-tiers";
+import { getDefaultTiers } from "@/lib/config/default-tiers";
 import { DataProvider, getProviderByName } from "@/components/data-providers/data-provider";
 import { TierConfigTableSkeleton } from "@/components/loading-skeletons/tier-config-table-skeleton";
 

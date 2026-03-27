@@ -1,4 +1,4 @@
-import { API_URL } from "@/lib/global-config";
+import { API_URL } from "@/lib/config/global-config";
 import { ErrorResponseDTO } from "@/types/response-types";
 import { ApiRequestError } from "@/types/api-request-error";
 

@@ -1,5 +1,5 @@
 "use server";
-import { API_URL } from "@/lib/global-config";
+import { API_URL } from "@/lib/config/global-config";
 import { ErrorResponseDTO, ServerResponse, UserResponse } from "@/types/response-types";
 import { LoginResponse } from "@/types/api-responses";
 

@@ -2,7 +2,7 @@
 
 import { ProtectedRoute } from "@/contexts/route-accessibility";
 import React, { Suspense, useEffect } from "react";
-import { REDIRECT_URL_PLACEHOLDER } from "@/lib/global-config";
+import { REDIRECT_URL_PLACEHOLDER } from "@/lib/config/global-config";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { LoadingPage } from "@/components/loading-skeletons/loading-page";

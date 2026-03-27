@@ -6,12 +6,10 @@ import React from "react";
 export default function ThirdPartyLoginButton({
 	title,
 	path,
-	color: _color,
 	service,
 }: {
 	title: string;
 	path: string;
-	color: string;
 	service: string;
 }) {
 	return (

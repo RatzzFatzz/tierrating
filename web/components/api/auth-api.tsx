@@ -1,6 +1,6 @@
 "use server";
 
-import { API_URL } from "@/lib/global-config";
+import { API_URL } from "@/lib/config/global-config";
 import { ServerResponse, ThirdPartyAuthResponse, ThirdPartyInfoResponse } from "@/types/response-types";
 
 export async function authorizeOAuth(
