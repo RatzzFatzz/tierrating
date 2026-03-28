@@ -4,12 +4,13 @@ import { z } from "zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { changePassword } from "@/components/api/user-api";
 import { useAuth } from "@/contexts/auth-context";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { useChangePassword } from "@/lib/services/user-service";
+import { toast } from "sonner";
 
 const FormSchema = z
 	.object({
@@ -26,9 +27,9 @@ export default function ChangePassword() {
 	const [showOld, setShowOld] = useState(false);
 	const [showNew, setShowNew] = useState(false);
 	const [showConfirmNew, setShowConfirmNew] = useState(false);
-	const [isSubmitLoading, setSubmitLoading] = useState(false);
-	const [errorMessage, setErrorMessage] = useState("");
 	const { user, token, logout } = useAuth();
+
+	const {trigger: changePassword, error, isMutating } = useChangePassword(token!);
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
@@ -40,29 +41,18 @@ export default function ChangePassword() {
 	});
 
 	function onSubmit(data: z.infer<typeof FormSchema>) {
-		setSubmitLoading(true);
-		changePassword(data.old, data.new, user, token)
-			.then((response) => {
-				if (response.status === 401 || response.status === 403) {
-					logout();
-					throw new Error("Session expired or unauthorized");
-				}
-				if (response.status != 200) throw new Error(response.data ? response.data.message : `API error: ${response.status}`);
-
-				setTimeout(() => logout(), 1000);
-				setErrorMessage("");
+		changePassword({username: user!, oldPassword: data.old, newPassword: data.new})
+			.then(() => {
+				toast.success("Successfully changed password. Please login again.")
+				logout()
 			})
 			.catch((error) => {
-				setErrorMessage(error.message);
-			})
-			.finally(() => {
-				setSubmitLoading(false);
+				toast.error(`Error occurred changing password: ${error.message}`)
 			});
 	}
 
 	return (
 		<div className={"w-full"}>
-			{errorMessage && <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md mb-4">{errorMessage}</div>}
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
 					<FormField
@@ -140,8 +130,8 @@ export default function ChangePassword() {
 							</FormItem>
 						)}
 					/>
-					<Button type="submit" className="w-full" disabled={isSubmitLoading}>
-						{isSubmitLoading ? "Changing password..." : "Change password"}
+					<Button type="submit" className="w-full" disabled={isMutating}>
+						{isMutating ? "Changing password..." : "Change password"}
 					</Button>
 				</form>
 			</Form>

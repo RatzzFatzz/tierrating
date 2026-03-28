@@ -1,6 +1,6 @@
 import { useApi, useApiMutation } from "@/lib/use-api";
 import { LoginResponse, SignupResponse, UserResponse } from "@/types/api-responses";
-import { LoginRequest, SignupRequest } from "@/types/api-requests";
+import { ChangePasswordReqest, LoginRequest, SignupRequest } from "@/types/api-requests";
 import useSWRMutation from "swr/mutation";
 import { ApiRequestError } from "@/types/api-request-error";
 import { apiClient } from "@/lib/api-client";
@@ -25,4 +25,8 @@ export function useRemoveThirdPartyService(username: string, token:  string)  {
 			token
 		});
 	});
+}
+
+export function useChangePassword(token: string) {
+	return useApiMutation<void, ChangePasswordReqest>("/auth/change-password", { token })
 }

@@ -8,3 +8,9 @@ export interface SignupRequest {
 	email: string;
 	password: string;
 }
+
+export interface ChangePasswordReqest {
+	username: string;
+	newPassword: string;
+	oldPassword: string;
+}
