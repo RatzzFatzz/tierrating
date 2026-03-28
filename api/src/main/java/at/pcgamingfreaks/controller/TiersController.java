@@ -3,6 +3,7 @@ package at.pcgamingfreaks.controller;
 import at.pcgamingfreaks.model.ContentType;
 import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.dto.TierDTO;
+import at.pcgamingfreaks.model.dto.TiersUpdateRequest;
 import at.pcgamingfreaks.service.TiersService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class TiersController {
 	@PostMapping("{username}/{service}/{type}")
 	@PreAuthorize("authentication.principal.username == #username")
 	public void setTierlist(@PathVariable String username, @PathVariable ThirdPartyService service,
-							@PathVariable ContentType type, @RequestBody List<TierDTO> changedTierlist) {
-		tiersService.updateTierlist(username, service, type, changedTierlist);
+							@PathVariable ContentType type, @RequestBody TiersUpdateRequest request) {
+		tiersService.updateTierlist(username, service, type, request.getTiers());
 	}
 }

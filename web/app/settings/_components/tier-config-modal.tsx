@@ -1,21 +1,22 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowUpDown, Palette, Plus, Settings, X } from "lucide-react";
+import { ArrowUpDown, Palette, Plus, Settings, X, XIcon } from "lucide-react";
 import { HexColorPicker } from "react-colorful";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tier } from "@/types/types";
 import { useAuth } from "@/contexts/auth-context";
 import { getDefaultTiers } from "@/lib/config/default-tiers";
 import { TierConfigTableSkeleton } from "@/components/loading-skeletons/tier-config-table-skeleton";
+import { useTiersOnDemand, useTiersUpdate } from "@/lib/services/tiers-service";
+import { toast } from "sonner";
+import * as React from "react";
 
 interface TierConfigModalProps {
-	initialTiers?: Tier[];
 	service: string;
 	type: string;
-	onSave: (tiers: Tier[]) => void;
 	username: string;
 	decimals: string;
 }
@@ -31,32 +32,16 @@ export const DEFAULT_COLORS = [
 	"#FF7FBF", // F - Pink
 ];
 
-export default function TierConfigModal({ initialTiers = [], service, type, onSave, username, decimals }: TierConfigModalProps) {
+export default function TierConfigModal({ service, type, username, decimals }: TierConfigModalProps) {
+	const { token } = useAuth();
 	const [isOpen, setIsOpen] = useState(false);
-	const [tiers, setTiers] = useState<Tier[]>([]);
-	const [queryRunning, setQueryRunning] = useState(true);
-
-	const { token, isLoading, isAuthenticated, logout } = useAuth();
-
-	const dataFetched = useRef(false);
-
-	// Only fetch data when the modal is opened
+	const { data: tiersData, error: tiersError, isValidating, mutate: refreshTiers} = useTiersOnDemand(!isOpen, username, service, type, token!);
+	const { trigger: updateTiers, error, isMutating } = useTiersUpdate(username, service, type, token!);
+	const [tiers, setTiers] = useState<Tier[]>(tiersData?.length ? tiersData : getDefaultTiers());
 	useEffect(() => {
-		if (isOpen && !dataFetched.current && !isLoading && isAuthenticated) {
-			provider
-				.fetchTierlist(token, username, logout)
-				.then((data: Tier[]) => {
-					setTiers(data && data.length > 0 ? [...data].sort((a, b) => b.score - a.score) : getDefaultTiers);
-					dataFetched.current = true;
-				})
-				.catch((error) => console.error(error))
-				.finally(() => setQueryRunning(false));
-		}
-	}, [isOpen, isLoading, isAuthenticated, token, type, logout, username]);
-
-	const restoreDefaults = () => {
-		setTiers(getDefaultTiers());
-	};
+		// eslint-disable-next-line react-hooks/set-state-in-effect
+		setTiers(tiersData?.length ? tiersData : getDefaultTiers());
+	}, [tiersData]);
 
 	const addTier = () => {
 		if (!tiers) return;
@@ -96,34 +81,18 @@ export default function TierConfigModal({ initialTiers = [], service, type, onSa
 	};
 
 	const handleSave = () => {
-		// Ensure tiers are sorted before saving
 		const sortedTiers = [...tiers].sort((a, b) => b.score - a.score);
-		onSave(sortedTiers);
+		updateTiers({tiers: sortedTiers})
+			.catch((error) => {
+				toast.error('Something went wrong while saving tiers.');
+			});
 		setIsOpen(false);
 	};
 
 	const handleOpenChange = (open: boolean) => {
-		setIsOpen(open);
+		setTimeout(() => setIsOpen(open), open ? 0  : 200);
+	}
 
-		// If opening the dialog, reset the data fetched flag if it was previously closed
-		if (open && !isOpen) {
-			dataFetched.current = false;
-		}
-
-		// Reset to initial tiers if dialog is closed without saving
-		if (!open) {
-			if (initialTiers.length > 0) {
-				setTiers(initialTiers);
-			}
-		}
-	};
-
-	// Trigger the dialog to open
-	const handleOpenTrigger = () => {
-		setIsOpen(true);
-	};
-
-	// Helper function to format and validate number inputs
 	const formatNumberInput = (value: string): number => {
 		const parsed = parseFloat(value);
 		if (isNaN(parsed)) return 0;
@@ -132,14 +101,13 @@ export default function TierConfigModal({ initialTiers = [], service, type, onSa
 		return Math.min(10, Math.max(0, formatted)); // Cap between 0 and 10
 	};
 
-	// Helper function to validate hex color
 	const isValidHex = (color: string): boolean => {
 		return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
 	};
 
 	return (
 		<Dialog open={isOpen} onOpenChange={handleOpenChange}>
-			<DialogTrigger asChild className="p-0 cursor-pointer" onClick={handleOpenTrigger}>
+			<DialogTrigger asChild className="p-0 cursor-pointer">
 				<Button variant={"outline"}>
 					<Settings />
 				</Button>
@@ -167,7 +135,7 @@ export default function TierConfigModal({ initialTiers = [], service, type, onSa
 								<div></div>
 							</div>
 							<div className="max-h-[41vh] pr-1 overflow-y-auto">
-								{queryRunning ? (
+								{isValidating ? (
 									<TierConfigTableSkeleton />
 								) : (
 									tiers &&
@@ -259,18 +227,19 @@ export default function TierConfigModal({ initialTiers = [], service, type, onSa
 							</div>
 						</div>
 					</div>
-					<Button variant="outline" className="w-full flex items-center gap-2 h-9" onClick={addTier} disabled={queryRunning}>
+					<Button variant="outline" className="w-full flex items-center gap-2 h-9" onClick={addTier} disabled={isMutating}>
 						<Plus className="h-4 w-4" /> Add Tier
 					</Button>
 				</div>
 				<DialogFooter className="flex gap-2">
-					<Button variant="secondary" onClick={restoreDefaults} className="mr-auto">
+					<Button variant="secondary" onClick={() => setTiers(getDefaultTiers())} className="mr-auto">
 						Restore defaults
 					</Button>
+					<Button onClick={() => refreshTiers()}>Reset</Button>
 					<Button variant="outline" onClick={() => setIsOpen(false)}>
 						Cancel
 					</Button>
-					<Button onClick={handleSave} disabled={queryRunning}>
+					<Button onClick={handleSave} disabled={isMutating}>
 						Save Changes
 					</Button>
 				</DialogFooter>
