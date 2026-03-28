@@ -13,4 +13,6 @@ public interface SteamEntryScoreRepository extends CrudRepository<SteamEntryScor
 	Optional<SteamEntryScore> findByUserAndEntry_Id(User user, long id);
 
 	List<SteamEntryScore> findAllByUserAndEntryIdIn(User user, Collection<Long> ids);
+
+	void deleteAllByUser(User user);
 }

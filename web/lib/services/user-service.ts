@@ -30,3 +30,13 @@ export function useRemoveThirdPartyService(username: string, token:  string)  {
 export function useChangePassword(token: string) {
 	return useApiMutation<void, ChangePasswordReqest>("/auth/change-password", { token })
 }
+
+export function useAccountDeletion(token: string) {
+	// direct usage os useSWRMutation to allow the usage of a dynamic url
+	return useSWRMutation<void, ApiRequestError, string, { username: string }>(`/auth/delete-account`, async (url, { arg }) => {
+		return apiClient<void>(`${url}/${arg.username}`, {
+			method: "DELETE",
+			token,
+		});
+	});
+}

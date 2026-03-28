@@ -24,10 +24,10 @@ public class SteamEntryScore {
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
 
-	@ManyToOne(optional = false, cascade = CascadeType.REMOVE)
+	@ManyToOne(optional = false)
 	private SteamEntry entry;
 
-	@ManyToOne(optional = false, cascade = CascadeType.REMOVE)
+	@ManyToOne(optional = false)
 	private User user;
 
 	private float score;

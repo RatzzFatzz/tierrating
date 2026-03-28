@@ -14,4 +14,6 @@ public interface AniListEntryScoreRepository extends CrudRepository<AniListEntry
 	Optional<AniListEntryScore> findByUserAndEntry_Id(User user, long id);
 
 	List<AniListEntryScore> findAllByUserAndEntryIdIn(User user, Collection<Long> ids);
+
+	void deleteAllByUser(User user);
 }

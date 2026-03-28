@@ -44,11 +44,11 @@ public class AuthController {
 		authService.changePassword(request);
 	}
 
-	@PostMapping("/delete-account")
-	@PreAuthorize("authentication.principal.username == #request.username")
-	public void deleteAccount(@RequestBody AccountDeletionRequestDTO request) {
-		log.debug("Account deletion request from {}", request.getUsername());
-		authService.deleteAccount(request);
+	@DeleteMapping("/delete-account/{username}")
+	@PreAuthorize("authentication.principal.username == #username")
+	public void deleteAccount(@PathVariable String username) {
+		log.debug("Account deletion request from {}", username);
+		authService.deleteAccount(username);
 	}
 
 	@PostMapping("/oauth/{service}/{username}")

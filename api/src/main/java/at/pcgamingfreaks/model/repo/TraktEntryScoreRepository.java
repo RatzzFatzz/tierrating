@@ -14,4 +14,6 @@ public interface TraktEntryScoreRepository extends CrudRepository<TraktEntryScor
 	Optional<TraktEntryScore> findByUserAndEntry_Id(User user, long id);
 
 	List<TraktEntryScore> findAllByUserAndEntryIdIn(User user, Collection<Long> ids);
+
+	void deleteAllByUser(User user);
 }

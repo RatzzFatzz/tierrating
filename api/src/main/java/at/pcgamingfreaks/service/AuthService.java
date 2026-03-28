@@ -2,7 +2,10 @@ package at.pcgamingfreaks.service;
 
 import at.pcgamingfreaks.model.auth.User;
 import at.pcgamingfreaks.model.dto.*;
-import at.pcgamingfreaks.model.repo.UserRepository;
+import at.pcgamingfreaks.model.repo.*;
+import at.pcgamingfreaks.model.thirdparty.anilist.AniListEntryScore;
+import at.pcgamingfreaks.model.thirdparty.steam.SteamEntryScore;
+import at.pcgamingfreaks.model.thirdparty.trakt.TraktEntryScore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +27,10 @@ public class AuthService {
 	private final PasswordEncoder passwordEncoder;
 	private final AuthenticationManager authenticationManager;
 	private final JwtService jwtService;
+
+	private final AniListEntryScoreRepository aniListEntryScoreRepository;
+	private final TraktEntryScoreRepository traktEntryScoreRepository;
+	private final SteamEntryScoreRepository steamEntryScoreRepository;
 
 	public LoginResponseDTO authenticate(String username, String password) {
 		Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
@@ -75,10 +82,13 @@ public class AuthService {
 	}
 
 	@Transactional
-	public void deleteAccount(AccountDeletionRequestDTO request) {
-		User user = userRepository.findByUsername(request.getUsername())
-				.orElseThrow(() -> new UsernameNotFoundException(request.getUsername()));
+	public void deleteAccount(String username) {
+		User user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException(username));
 
+		aniListEntryScoreRepository.deleteAllByUser(user);
+		traktEntryScoreRepository.deleteAllByUser(user);
+		steamEntryScoreRepository.deleteAllByUser(user);
 		userRepository.delete(user);
 		log.info("Deleted {} successfully", user.getUsername());
 	}
