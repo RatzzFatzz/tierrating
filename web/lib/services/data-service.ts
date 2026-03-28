@@ -6,12 +6,7 @@ export function useTierlistEntries(username: string, service: string, type: stri
 }
 
 export function useScoreMutation(username: string, service: string, type: string, token: string) {
-	return useApiMutation<void, { id: string; score: number }>(
-		`/data/update/${username}/${service}/${type}`,
-		{
-			token,
-		}
-	);
+	return useApiMutation<void, { id: string; score: number }>(`/data/update/${username}/${service}/${type}`, { token });
 }
 
 export function useThirdPartyDataPull(username: string, service: string, type: string, token: string) {

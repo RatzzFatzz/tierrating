@@ -18,7 +18,7 @@ export function useSignup() {
 }
 
 export function useRemoveThirdPartyService(username: string, token:  string)  {
-	// direct usage os useSWRMutation to allow the usage of a dynamic url
+	// direct usage of useSWRMutation to allow the usage of a dynamic url
 	return useSWRMutation<void, ApiRequestError, string, { service: string }>(`/user/${username}/remove`, async (url, { arg }) => {
 		return apiClient<void>(`${url}/${arg.service}`, {
 			method: "DELETE",
@@ -32,7 +32,7 @@ export function useChangePassword(token: string) {
 }
 
 export function useAccountDeletion(token: string) {
-	// direct usage os useSWRMutation to allow the usage of a dynamic url
+	// direct usage of useSWRMutation to allow the usage of a dynamic url
 	return useSWRMutation<void, ApiRequestError, string, { username: string }>(`/auth/delete-account`, async (url, { arg }) => {
 		return apiClient<void>(`${url}/${arg.username}`, {
 			method: "DELETE",

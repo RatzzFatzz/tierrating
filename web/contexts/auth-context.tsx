@@ -3,7 +3,8 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { extractJwtData } from "@/lib/auth/jwt-decoder";
-import { refreshToken } from "@/components/api/user-api";
+import { useRefreshToken } from "@/lib/services/auth-service";
+import { toast } from "sonner";
 
 interface AuthContextType {
 	token: string | null;
@@ -29,6 +30,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	const [isLoading, setLoading] = useState(true);
 	const router = useRouter();
+
+	const { trigger: refreshToken, error, isMutating: isRefreshingToken } = useRefreshToken();
 
 	const login = useCallback((newToken: string) => {
 		localStorage.setItem("authToken", newToken);
@@ -69,28 +72,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			setExpiration(decodedJwt.expiration);
 			setIsAuthenticated(true);
 
+
 			if (
 				!decodedJwt.isExpired &&
 				decodedJwt.expiration &&
 				decodedJwt.expiration.getTime() - new Date().getTime() - 15 * 60 * 1000 <= 0
 			) {
-				refreshToken(storedToken)
+				refreshToken({ token: storedToken })
 					.then((response) => {
-						if (response.status === 401) throw new Error("Invalid credentials");
-						if (response.error) throw new Error(response.error);
-						if (!response.data) throw new Error("Faulty response");
-						login(response.data.token);
-						console.debug("Token refreshed");
+						login(response.token);
 					})
 					.catch((error) => {
-						console.debug(error);
+						toast.error("Error refreshing token");
 					});
 			}
 
 			setLoading(false);
 		};
 		checkAuth();
-	}, [login, logout]);
+	}, [login, logout, refreshToken]);
 
 	return (
 		<AuthContext.Provider value={{ token, user, isAuthenticated, isLoading, isExpired, expiration, login, logout }}>
