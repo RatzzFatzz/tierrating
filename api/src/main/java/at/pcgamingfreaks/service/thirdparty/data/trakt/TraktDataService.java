@@ -82,6 +82,7 @@ public abstract class TraktDataService implements DataService {
 				.stream()
 				.collect(Collectors.toMap(s -> s.getEntry().getId(), Function.identity()));
 
+		List<TraktEntry> entriesToSave = new ArrayList<>();
 		List<TraktEntryScore> scoresToSave = new ArrayList<>();
 
 		for (TraktEntryScore remoteScore : remoteScores) {
@@ -89,12 +90,14 @@ public abstract class TraktDataService implements DataService {
 			long entryId = remoteEntry.getId();
 
 			// Update existing entry or use the new one
-			TraktEntry entry = existingEntries.getOrDefault(entryId, remoteEntry);
+			TraktEntry entry = existingEntries.getOrDefault(entryId, new TraktEntry());
 			if (!entry.equals(remoteEntry)) {
+				entry.setId(remoteEntry.getId());
 				entry.setTitle(remoteEntry.getTitle());
 				entry.setCover(remoteEntry.getCover());
 				entry.setSeason(remoteEntry.getSeason());
 				entry.setType(remoteEntry.getType());
+				entriesToSave.add(entry);
 			}
 
 			// Update existing score or create a new one
@@ -105,6 +108,7 @@ public abstract class TraktDataService implements DataService {
 			scoresToSave.add(entryScore);
 		}
 
+		entryRepository.saveAll(entriesToSave);
 		entryScoreRepository.saveAll(scoresToSave);
 
 		log.info("Synced {} {} for {} in {}s",

@@ -130,6 +130,7 @@ public abstract class AnilistDataService implements DataService {
 				.stream()
 				.collect(Collectors.toMap(s -> s.getEntry().getId(), Function.identity()));
 
+		List<AniListEntry> entriesToSave = new ArrayList<>();
 		List<AniListEntryScore> scoresToSave = new ArrayList<>();
 
 		for (AniListListEntry queryResult : anilistQueryResult) {
@@ -142,11 +143,16 @@ public abstract class AnilistDataService implements DataService {
 
 			// Update existing entry or create a new one
 			AniListEntry entry = existingEntries.getOrDefault(mediaId, new AniListEntry());
-			entry.setId(mediaId);
-			entry.setTitle(title.getEnglish());
-			entry.setTitleRomaji(title.getRomaji());
-			entry.setCover(resolvedCover);
-			entry.setType(getContentType());
+			if (!(entry.getId() == mediaId && entry.getTitle().equals(title.getEnglish())
+					&& entry.getTitleRomaji().equals(title.getRomaji()) && entry.getCover().equals(resolvedCover)
+					&& entry.getType().equals(getContentType()))) {
+				entry.setId(mediaId);
+				entry.setTitle(title.getEnglish());
+				entry.setTitleRomaji(title.getRomaji());
+				entry.setCover(resolvedCover);
+				entry.setType(getContentType());
+				entriesToSave.add(entry);
+			}
 
 			// Update existing score or create a new one
 			AniListEntryScore entryScore = existingScores.getOrDefault(mediaId, new AniListEntryScore());
@@ -156,6 +162,7 @@ public abstract class AnilistDataService implements DataService {
 			scoresToSave.add(entryScore);
 		}
 
+		aniListEntryRepository.saveAll(entriesToSave);
 		aniListEntryScoreRepository.saveAll(scoresToSave);
 
 		log.info("Synced {} {} for {} in {}s",
