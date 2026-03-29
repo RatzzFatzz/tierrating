@@ -235,7 +235,6 @@ export default function TierConfigModal({ service, type, username, decimals }: T
 					<Button variant="secondary" onClick={() => setTiers(getDefaultTiers())} className="mr-auto">
 						Restore defaults
 					</Button>
-					<Button onClick={() => refreshTiers()}>Reset</Button>
 					<Button variant="outline" onClick={() => setIsOpen(false)}>
 						Cancel
 					</Button>
