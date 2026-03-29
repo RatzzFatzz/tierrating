@@ -7,7 +7,6 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 export function TierlistEntryDraggable({ entry, disabled }: { entry: TierlistEntry; disabled: boolean }) {
 	const { ref } = useDraggable({
 		id: entry.id,
-		data: entry,
 		disabled: disabled,
 	});
 

@@ -45,8 +45,6 @@ export default function ThirdPartyConnection({
 						type={entry.id}
 						title={entry.title}
 						username={username}
-						token={token}
-						logout={logout}
 					/>
 				))}
 			</CardContent>

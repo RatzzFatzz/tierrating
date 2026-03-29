@@ -141,7 +141,7 @@ export default function TierList({
 			<DragOverlay>
 				{(source) => (
 					// @ts-expect-error - Type mismatch in drag overlay source data
-					<TierlistEntryCard key={source.id} entry={source.data} />
+					<TierlistEntryCard key={source.id} entry={entriesById.get(source.id)} />
 				)}
 			</DragOverlay>
 		</DragDropProvider>
