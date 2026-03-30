@@ -22,6 +22,7 @@ import org.springframework.web.client.RestClient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -47,7 +48,14 @@ public abstract class SteamDataService implements DataService {
 	public List<ListEntryDTO> fetch(String username) {
 		if (!thirdPartyConfig.getSteam().isValid()) throw new ThirdPartyUnconfiguredException(getService());
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
-		return steamEntryScoreRepository.findAllByUserOrderByScoreDesc(user).stream()
+		Set<SteamEntryScore> existingScores = steamEntryScoreRepository.findAllByUserOrderByScoreDesc(user);
+
+		if (existingScores.isEmpty()) {
+			pull(username);
+			existingScores = steamEntryScoreRepository.findAllByUserOrderByScoreDesc(user);
+		}
+
+		return existingScores.stream()
 				.map(entry -> {
 					ListEntryDTO dto = new ListEntryDTO();
 					dto.setId(entry.getEntry().getId());
