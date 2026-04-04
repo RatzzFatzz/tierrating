@@ -13,7 +13,7 @@ export default function Profile() {
 	const params = useParams<{ username: string }>();
 	const username: string = params.username;
 
-	const { token, logout } = useAuth();
+	const { token, logout, user } = useAuth();
 	const { data, error, isValidating } = useUser(username, token!);
 
 	useEffect(() => {
@@ -48,6 +48,17 @@ export default function Profile() {
 				</CardHeader>
 
 				<CardContent className="space-y-4">
+					{ userData.connectedServices.length == 0 && (user && user === username) &&
+						<div>
+							You have no third-party services connected yet.
+							Go to <a className={"font-bold"} href={"/settings"}>settings</a> and configure them.
+						</div>
+					}
+					{ userData.connectedServices.length == 0 && (!user || user !== username) &&
+						<div>
+							This user does not have any services configured yet.
+						</div>
+					}
 					<div className="grid columns-1 gap-4">
 						{userData.connectedServices.includes("ANILIST") && (
 							<TierlistLink service={"anilist"} type={"anime"} title={"Anime"} username={userData.username} />
