@@ -20,7 +20,7 @@ public class TraktInfoService implements ThirdPartyInfoService {
 	public ThirdPartyInfoResponseDTO info() {
 		if (!thirdPartyConfig.getTrakt().isValid()) throw new ThirdPartyUnconfiguredException(getService());
 		ThirdPartyInfoResponseDTO response = new ThirdPartyInfoResponseDTO();
-		response.setClientId(thirdPartyConfig.getTrakt().getClient().getKey());
+		response.setClientId(thirdPartyConfig.getTrakt().getKey());
 		return response;
 	}
 }

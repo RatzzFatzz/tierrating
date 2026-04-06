@@ -12,5 +12,6 @@ import org.springframework.context.annotation.Configuration;
 public class ThirdPartyConfig {
 	private ServiceConfig anilist;
 	private ServiceConfig trakt;
-	private ServiceConfig steam;
+	private ApiKeyConfig steam;
+	private ApiKeyConfig tmdb;
 }

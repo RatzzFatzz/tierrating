@@ -20,7 +20,7 @@ public class AniListInfoService implements ThirdPartyInfoService {
 	public ThirdPartyInfoResponseDTO info() {
 		if (!thirdPartyConfig.getAnilist().isValid()) throw new ThirdPartyUnconfiguredException(getService());
 		ThirdPartyInfoResponseDTO response = new ThirdPartyInfoResponseDTO();
-		response.setClientId(thirdPartyConfig.getAnilist().getClient().getKey());
+		response.setClientId(thirdPartyConfig.getAnilist().getKey());
 		return response;
 	}
 }

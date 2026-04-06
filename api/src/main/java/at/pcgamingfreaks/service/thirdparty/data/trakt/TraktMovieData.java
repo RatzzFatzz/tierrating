@@ -79,8 +79,8 @@ public class TraktMovieData extends TraktDataService {
 	protected List<RatedMovie> pullRated(User user) {
 		try {
 			Response<List<RatedMovie>> response = new TraktV2(
-					thirdPartyConfig.getTrakt().getClient().getKey(),
-					thirdPartyConfig.getTrakt().getClient().getSecret(),
+					thirdPartyConfig.getTrakt().getKey(),
+					thirdPartyConfig.getTrakt().getSecret(),
 					thirdPartyConfig.getTrakt().getRedirectUrl())
 					.users()
 					.ratingsMovies(
@@ -102,8 +102,8 @@ public class TraktMovieData extends TraktDataService {
 	protected List<BaseMovie> pullWatched(User user) {
 		try {
 			Response<List<BaseMovie>> response = new TraktV2(
-					thirdPartyConfig.getTrakt().getClient().getKey(),
-					thirdPartyConfig.getTrakt().getClient().getSecret(),
+					thirdPartyConfig.getTrakt().getKey(),
+					thirdPartyConfig.getTrakt().getSecret(),
 					thirdPartyConfig.getTrakt().getRedirectUrl())
 					.users()
 					.watchedMovies(
@@ -122,7 +122,7 @@ public class TraktMovieData extends TraktDataService {
 
 	protected void pushSingleChange(long id, float score, User user) {
 		try {
-			new TraktV2(thirdPartyConfig.getTrakt().getClient().getKey(), thirdPartyConfig.getTrakt().getClient().getSecret(), thirdPartyConfig.getTrakt().getRedirectUrl())
+			new TraktV2(thirdPartyConfig.getTrakt().getKey(), thirdPartyConfig.getTrakt().getSecret(), thirdPartyConfig.getTrakt().getRedirectUrl())
 					.accessToken(user.getConnections().get(ThirdPartyService.TRAKT).getAccessToken())
 					.sync()
 					.addRatings(new SyncItems().movies(new SyncMovie()

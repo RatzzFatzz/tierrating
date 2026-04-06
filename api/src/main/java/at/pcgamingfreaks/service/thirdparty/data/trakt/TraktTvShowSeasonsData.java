@@ -65,8 +65,8 @@ public class TraktTvShowSeasonsData extends TraktDataService {
 	protected List<RatedSeason> pullRated(User user) {
 		try {
 			Response<List<RatedSeason>> response = new TraktV2(
-					thirdPartyConfig.getTrakt().getClient().getKey(),
-					thirdPartyConfig.getTrakt().getClient().getSecret(),
+					thirdPartyConfig.getTrakt().getKey(),
+					thirdPartyConfig.getTrakt().getSecret(),
 					thirdPartyConfig.getTrakt().getRedirectUrl())
 					.users()
 					.ratingsSeasons(
@@ -98,7 +98,7 @@ public class TraktTvShowSeasonsData extends TraktDataService {
 				.post()
 				.uri("/sync/ratings")
 				.contentType(MediaType.APPLICATION_JSON)
-				.header("trakt-api-key", thirdPartyConfig.getTrakt().getClient().getKey())
+				.header("trakt-api-key", thirdPartyConfig.getTrakt().getKey())
 				.body(body)
 				.retrieve()
 				.body(String.class);

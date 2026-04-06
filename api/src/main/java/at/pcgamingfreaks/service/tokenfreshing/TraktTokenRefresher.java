@@ -33,7 +33,7 @@ public class TraktTokenRefresher implements TokenRefresher {
 		ThirdPartyConnection connection = user.getConnections().get(ThirdPartyService.TRAKT);
 		if (connection.getExpiresOn().isBefore(LocalDateTime.now().plusDays(2))) {
 			try {
-				TraktV2 trakt = new TraktV2(thirdPartyConfig.getTrakt().getClient().getKey(), thirdPartyConfig.getTrakt().getClient().getSecret(), thirdPartyConfig.getTrakt().getRedirectUrl());
+				TraktV2 trakt = new TraktV2(thirdPartyConfig.getTrakt().getKey(), thirdPartyConfig.getTrakt().getSecret(), thirdPartyConfig.getTrakt().getRedirectUrl());
 				Response<AccessToken> response = trakt.refreshAccessToken(connection.getRefreshToken());
 
 				if (!response.isSuccessful())

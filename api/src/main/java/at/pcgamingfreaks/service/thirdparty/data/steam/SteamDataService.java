@@ -74,7 +74,7 @@ public abstract class SteamDataService implements DataService {
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
 
 		String url = GET_OWNED_GAMES_URL.formatted(
-				thirdPartyConfig.getSteam().getClient().getSecret(),
+				thirdPartyConfig.getSteam().getKey(),
 				user.getConnections().get(getService()).getThirdPartyUserId());
 
 		SteamOwnedGamesResponse result = restClientBuilder.build().get().uri(url).retrieve().body(SteamOwnedGamesResponse.class);

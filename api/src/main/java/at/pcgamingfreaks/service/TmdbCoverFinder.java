@@ -1,29 +1,27 @@
 package at.pcgamingfreaks.service;
 
+import at.pcgamingfreaks.config.ThirdPartyConfig;
 import at.pcgamingfreaks.model.dto.TmdbInfoRequest;
+import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
 import at.pcgamingfreaks.model.repo.TmdbCoverCacheRepository;
 import at.pcgamingfreaks.model.thirdparty.TmdbCoverCache;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import static at.pcgamingfreaks.model.ThirdPartyService.TMDB;
+
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TmdbCoverFinder {
 	private static final String TMDB_API_URL = "https://api.themoviedb.org/3";
 	private static final String TMDB_IMAGE_API_URL = "https://image.tmdb.org/t/p/w185";
-	private final String tmdbApiKey;
 	private final TmdbCoverCacheRepository tmdbCoverCacheRepository;
-
-	public TmdbCoverFinder(
-			@Value("${tmdb.api.key:}") String tmdbApiKey,
-			TmdbCoverCacheRepository tmdbCoverCacheRepository) {
-		this.tmdbApiKey = tmdbApiKey;
-		this.tmdbCoverCacheRepository = tmdbCoverCacheRepository;
-	}
+	private final ThirdPartyConfig thirdPartyConfig;
 
 	/**
 	 * Find cover image for movies from TMDB
@@ -67,13 +65,14 @@ public class TmdbCoverFinder {
 	 * @return cover url
 	 */
 	private String find(String urlExtension, long id, Long season) {
+		if (!thirdPartyConfig.getTmdb().isValid()) throw new ThirdPartyUnconfiguredException(TMDB);
 		TmdbCoverCache tmdbCoverCache = tmdbCoverCacheRepository.findByIdAndSeason(id, season != null && season > 0 ? season : null).orElse(null);
 		if (tmdbCoverCache != null) return tmdbCoverCache.getCoverUrl();
 
 		try {
 			TmdbInfoRequest response = RestClient.builder()
 					.baseUrl(TMDB_API_URL)
-					.defaultHeader("Authorization", "Bearer " + tmdbApiKey)
+					.defaultHeader("Authorization", "Bearer " + thirdPartyConfig.getTmdb().getKey())
 					.build()
 					.get()
 					.uri(urlExtension.formatted(id))

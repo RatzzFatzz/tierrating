@@ -67,8 +67,8 @@ public class AniListAuthenticatorService implements ThirdPartyOAuthAuthenticator
 	private AuthTokenResponseDTO auth(String code) {
 		Map<String, String> requestBody = new HashMap<>();
 		requestBody.put("grant_type", "authorization_code");
-		requestBody.put("client_id", thirdPartyConfig.getAnilist().getClient().getKey());
-		requestBody.put("client_secret", thirdPartyConfig.getAnilist().getClient().getSecret());
+		requestBody.put("client_id", thirdPartyConfig.getAnilist().getKey());
+		requestBody.put("client_secret", thirdPartyConfig.getAnilist().getSecret());
 		requestBody.put("redirect_uri", thirdPartyConfig.getAnilist().getRedirectUrl());
 		requestBody.put("code", code);
 

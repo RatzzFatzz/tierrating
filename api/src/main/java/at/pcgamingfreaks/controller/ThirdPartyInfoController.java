@@ -2,6 +2,7 @@ package at.pcgamingfreaks.controller;
 
 import at.pcgamingfreaks.config.ServiceConfig;
 import at.pcgamingfreaks.config.ThirdPartyConfig;
+import at.pcgamingfreaks.config.ThirdPartyServiceConfig;
 import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.dto.ThirdPartyInfoResponseDTO;
 import at.pcgamingfreaks.service.thirdparty.info.ThirdPartyInfoFactory;
@@ -40,13 +41,14 @@ public class ThirdPartyInfoController {
 		Method[] methods = thirdPartyConfig.getClass().getMethods();
 		for (Method method : methods) {
 			if (method.getReturnType().equals(ServiceConfig.class)) {
-				ServiceConfig serviceConfig = (ServiceConfig) method.invoke(thirdPartyConfig);
+				ThirdPartyServiceConfig serviceConfig = (ThirdPartyServiceConfig) method.invoke(thirdPartyConfig);
 				Matcher matcher = configValidPattern.matcher(method.getName());
 				if (serviceConfig.isValid() && matcher.find()) {
 					services.add(ThirdPartyService.from(matcher.group("service")));
 				}
 			}
 		}
+		services.remove(ThirdPartyService.TMDB); // only cover image provider and should therefore not be included
 		return ResponseEntity.ok(services.stream().map(ThirdPartyService::name).toList());
 	}
 }

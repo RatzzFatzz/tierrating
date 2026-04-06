@@ -1,0 +1,44 @@
+name: tierrating
+
+services:
+  server:
+    image: ghcr.io/RatzzFatzz/tierrating:latest
+    restart: unless-stopped
+    ports:
+      - 8080
+    depends_on:
+      - db
+    environment:
+      SECRET_KEY: ${SECRET_KEY:?secret key can't be empty}
+      TOKEN_EXPIRATION: ${TOKEN_EXPIRATION:-80}
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USERNAME: ${DB_USERNAME:-tierrating}
+      DB_PASSWORD: ${DB_PASSWORD:?database password can't be empty}
+      ANILIST_CLIENT_KEY: ${ANILIST_CLIENT_KEY}
+      ANILIST_CLIENT_SECRET: ${ANILIST_CLIENT_SECRET}
+      ANILIST_REDIRECT_URL: ${ANILIST_REDIRECT_URL}
+      TRAKT_CLIENT_KEY: ${TRAKT_CLIENT_KEY}
+      TRAKT_CLIENT_SECRET: ${TRAKT_CLIENT_SECRET}
+      TRAKT_REDIRECT_URL: ${TRAKT_REDIRECT_URL}
+      TMDB_API_KEY: ${TMDB_API_KEY}
+      STEAM_API_KEY: ${STEAM_API_KEY}
+
+  ui:
+    build: ../tierrating-ui
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    environment:
+      API_URL: ${API_URL:?api url needs to be defined}
+
+  db:
+    image: postgres
+    restart: unless-stopped
+    ports:
+      - 5432
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-tierrating}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?database password can't be empty}

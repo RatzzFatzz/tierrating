@@ -18,27 +18,29 @@ security:
   jwt:
     # JWT secret key - MUST be changed in production!
     # Use a strong, random string of at least 256 bits
-    secret-key: ${JWT_SECRET_KEY:please-change-this-secret-key-in-production}
+    secret-key: ${SECRET_KEY:please-change-this-secret-key-in-production}
     # Token expiration in minutes (default: 60 minutes = 1 hour)
     # Consider implementing refresh token rotation for better security:
     # - Short-lived access tokens (15-30 min) + long-lived refresh tokens
     # - Refresh tokens should be rotated on each use and stored securely
     # - See: https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/
-    expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
+    expiration-minutes: ${TOKEN_EXPIRATION:60}
 
 sync:
-  interval: "0 0 */4 * * *"
+  interval: ${SYNC_INTERVAL:0 0 */4 * * *}
+
 services:
   anilist:
     client:
       key: ${ANILIST_CLIENT_KEY:}
       secret: ${ANILIST_CLIENT_SECRET:}
-    url: ${ANILIST_REDIRECT_URL:}
+    redirectUrl: ${ANILIST_REDIRECT_URL:}
   trakt:
     client:
       key: ${TRAKT_CLIENT_KEY:}
       secret: ${TRAKT_CLIENT_SECRET:}
-    url: ${TRAKT_REDIRECT_URL:}
-tmdb:
-  api:
+    redirectUrl: ${TRAKT_REDIRECT_URL:}
+  steam:
+    key: ${STEAM_API_KEY}
+  tmdb:
     key: ${TMDB_API_KEY:}

@@ -79,8 +79,8 @@ public class TraktTvShowData extends TraktDataService {
 	protected List<RatedShow> pullRated(User user) {
 		try {
 			Response<List<RatedShow>> response = new TraktV2(
-					thirdPartyConfig.getTrakt().getClient().getKey(),
-					thirdPartyConfig.getTrakt().getClient().getSecret(),
+					thirdPartyConfig.getTrakt().getKey(),
+					thirdPartyConfig.getTrakt().getSecret(),
 					thirdPartyConfig.getTrakt().getRedirectUrl())
 					.users()
 					.ratingsShows(
@@ -102,8 +102,8 @@ public class TraktTvShowData extends TraktDataService {
 	protected List<BaseShow> pullWatched(User user) {
 		try {
 			Response<List<BaseShow>> response = new TraktV2(
-					thirdPartyConfig.getTrakt().getClient().getKey(),
-					thirdPartyConfig.getTrakt().getClient().getSecret(),
+					thirdPartyConfig.getTrakt().getKey(),
+					thirdPartyConfig.getTrakt().getSecret(),
 					thirdPartyConfig.getTrakt().getRedirectUrl())
 					.users()
 					.watchedShows(
@@ -122,7 +122,7 @@ public class TraktTvShowData extends TraktDataService {
 
 	protected void pushSingleChange(long id, float score, User user) {
 		try {
-			new TraktV2(thirdPartyConfig.getTrakt().getClient().getKey(), thirdPartyConfig.getTrakt().getClient().getSecret(), thirdPartyConfig.getTrakt().getRedirectUrl())
+			new TraktV2(thirdPartyConfig.getTrakt().getKey(), thirdPartyConfig.getTrakt().getSecret(), thirdPartyConfig.getTrakt().getRedirectUrl())
 					.accessToken(user.getConnections().get(ThirdPartyService.TRAKT).getAccessToken())
 					.sync()
 					.addRatings(new SyncItems().shows(new SyncShow()

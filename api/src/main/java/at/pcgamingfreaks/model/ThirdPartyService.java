@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum ThirdPartyService {
 	ANILIST,
 	TRAKT,
+	TMDB,
 	STEAM;
 
 	@JsonCreator(mode = JsonCreator.Mode.DELEGATING)

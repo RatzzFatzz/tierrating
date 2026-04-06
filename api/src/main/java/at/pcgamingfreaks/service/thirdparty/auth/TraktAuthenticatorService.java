@@ -42,7 +42,7 @@ public class TraktAuthenticatorService implements ThirdPartyOAuthAuthenticatorSe
 			throw new ThirdPartyAuthenticationException("Already authenticated");
 
 		try {
-			TraktV2 trakt = new TraktV2(thirdPartyConfig.getTrakt().getClient().getKey(), thirdPartyConfig.getTrakt().getClient().getSecret(), thirdPartyConfig.getTrakt().getRedirectUrl());
+			TraktV2 trakt = new TraktV2(thirdPartyConfig.getTrakt().getKey(), thirdPartyConfig.getTrakt().getSecret(), thirdPartyConfig.getTrakt().getRedirectUrl());
 			Response<AccessToken> response = trakt.exchangeCodeForAccessToken(request.getCode());
 			if (!response.isSuccessful())
 				throw new ThirdPartyAuthenticationException("Trakt OAuth responded with empty body");
