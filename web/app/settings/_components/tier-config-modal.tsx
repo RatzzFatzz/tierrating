@@ -1,9 +1,10 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import * as React from "react";
+import { useEffect, useState } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowUpDown, Palette, Plus, Settings, X, XIcon } from "lucide-react";
+import { ArrowUpDown, Palette, Plus, Settings, X } from "lucide-react";
 import { HexColorPicker } from "react-colorful";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tier } from "@/types/types";
@@ -12,7 +13,6 @@ import { getDefaultTiers } from "@/lib/config/default-tiers";
 import { TierConfigTableSkeleton } from "@/components/loading-skeletons/tier-config-table-skeleton";
 import { useTiersOnDemand, useTiersUpdate } from "@/lib/services/tiers-service";
 import { toast } from "sonner";
-import * as React from "react";
 
 interface TierConfigModalProps {
 	service: string;
@@ -35,7 +35,12 @@ export const DEFAULT_COLORS = [
 export default function TierConfigModal({ service, type, username, decimals }: TierConfigModalProps) {
 	const { token } = useAuth();
 	const [isOpen, setIsOpen] = useState(false);
-	const { data: tiersData, error: tiersError, isValidating, mutate: refreshTiers} = useTiersOnDemand(!isOpen, username, service, type, token!);
+	const {
+		data: tiersData,
+		error: tiersError,
+		isValidating,
+		mutate: refreshTiers,
+	} = useTiersOnDemand(!isOpen, username, service, type, token!);
 	const { trigger: updateTiers, error, isMutating } = useTiersUpdate(username, service, type, token!);
 	const [tiers, setTiers] = useState<Tier[]>(tiersData?.length ? tiersData : getDefaultTiers());
 	useEffect(() => {
@@ -82,16 +87,15 @@ export default function TierConfigModal({ service, type, username, decimals }: T
 
 	const handleSave = () => {
 		const sortedTiers = [...tiers].sort((a, b) => b.score - a.score);
-		updateTiers({tiers: sortedTiers})
-			.catch((error) => {
-				toast.error('Something went wrong while saving tiers.');
-			});
+		updateTiers({ tiers: sortedTiers }).catch((error) => {
+			toast.error("Something went wrong while saving tiers.");
+		});
 		setIsOpen(false);
 	};
 
 	const handleOpenChange = (open: boolean) => {
-		setTimeout(() => setIsOpen(open), open ? 0  : 200);
-	}
+		setTimeout(() => setIsOpen(open), open ? 0 : 200);
+	};
 
 	const formatNumberInput = (value: string): number => {
 		const parsed = parseFloat(value);

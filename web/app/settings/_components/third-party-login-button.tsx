@@ -3,15 +3,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import React from "react";
 
-export default function ThirdPartyLoginButton({
-	title,
-	path,
-	service,
-}: {
-	title: string;
-	path: string;
-	service: string;
-}) {
+export default function ThirdPartyLoginButton({ title, path, service }: { title: string; path: string; service: string }) {
 	return (
 		<Link key={service} href={path} className="block w-full">
 			<Button variant="outline" className={`cursor-pointer w-full rounded-full`}>

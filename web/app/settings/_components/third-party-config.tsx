@@ -14,11 +14,7 @@ export default function ThirdPartyConfig() {
 	const { user, token, logout } = useAuth();
 	const [isRemovingService, setIsRemovingService] = useState(false);
 	const { data: userData, error: userError, isValidating: isValidatingUser, mutate: reloadUser } = useUser(user!, token!);
-	const {
-		data: services,
-		error: servicesError,
-		isValidating: isValidatingService,
-	} = useThirdPartyServices(token!);
+	const { data: services, error: servicesError, isValidating: isValidatingService } = useThirdPartyServices(token!);
 	const { trigger: removeConnection, error: removalError, isMutating } = useRemoveThirdPartyService(user!, token!);
 	const isValidating: boolean = (isValidatingUser || isValidatingService) && (!userData || !services);
 

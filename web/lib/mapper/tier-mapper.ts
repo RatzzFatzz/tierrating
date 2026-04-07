@@ -1,7 +1,7 @@
 import { Tier, TierlistEntry } from "@/types/types";
 
 export function assignTiersAndGroupEntriesByTier(tiers: Tier[], entries: TierlistEntry[]): Map<string, TierlistEntry[]> {
-	if (!tiers || tiers.length <= 0 || !entries || entries.length <= 0) return new Map<string, TierlistEntry[]>;
+	if (!tiers || tiers.length <= 0 || !entries || entries.length <= 0) return new Map<string, TierlistEntry[]>();
 
 	// Proper order (sorted descending by score) is assured by the server
 	let itemsIndex = 0;

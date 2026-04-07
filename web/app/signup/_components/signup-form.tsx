@@ -43,7 +43,7 @@ export function SignUpForm() {
 	});
 
 	function onSubmit(data: z.infer<typeof FormSchema>) {
-		submitSignup({username: data.username, email: data.email, password: data.password})
+		submitSignup({ username: data.username, email: data.email, password: data.password })
 			.then((response) => {
 				if (response.usernameTaken) throw new Error("Username already taken");
 				if (response.emailTaken) throw new Error("Email already associated with a different account");

@@ -18,7 +18,7 @@ export function useRefreshToken() {
 		return apiClient<LoginResponse>(url, {
 			method: "POST",
 			token: arg.token,
-			body: arg
+			body: arg,
 		});
 	});
 }

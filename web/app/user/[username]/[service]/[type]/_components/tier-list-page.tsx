@@ -13,14 +13,24 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 
-export default function TierListPage({ title, username, service, type }: { title: string, username: string; service: string; type: string }) {
+export default function TierListPage({
+	title,
+	username,
+	service,
+	type,
+}: {
+	title: string;
+	username: string;
+	service: string;
+	type: string;
+}) {
 	const { user, token } = useAuth();
 	const [isFullWidth, setIsFullWidth] = useState<boolean>(false);
 	const [isPullRunning, setIsPullRunning] = useState<boolean>(false);
 
 	const modificationEnabled: boolean = user == username;
 
-	const { mutate: entriesMutate} = useTierlistEntries(username, service, type, token!);
+	const { mutate: entriesMutate } = useTierlistEntries(username, service, type, token!);
 	const { trigger: pullThirdPartyData, error, isMutating } = useThirdPartyDataPull(username, service, type, token!);
 
 	const pullUpdate = () => {
@@ -29,7 +39,7 @@ export default function TierListPage({ title, username, service, type }: { title
 			.then(() => entriesMutate())
 			.catch((error) => toast.error(error.message))
 			.finally(() => setIsPullRunning(false));
-	}
+	};
 
 	return (
 		<div className={cn("max-w-full px-4")}>
@@ -56,12 +66,7 @@ export default function TierListPage({ title, username, service, type }: { title
 				</div>
 			</div>
 			<div className={cn("m-auto transition-all duration-400 ease-in-out", isFullWidth ? "w-full" : "w-[1514px] ")}>
-				<TierList
-					username={username}
-					service={service}
-					type={type}
-					modificationEnabled={modificationEnabled && !isPullRunning}
-				/>
+				<TierList username={username} service={service} type={type} modificationEnabled={modificationEnabled && !isPullRunning} />
 			</div>
 			{service.startsWith("trakt") && <TmdbDisclaimer />}
 		</div>

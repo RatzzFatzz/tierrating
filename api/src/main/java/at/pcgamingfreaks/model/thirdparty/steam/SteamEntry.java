@@ -1,7 +1,8 @@
 package at.pcgamingfreaks.model.thirdparty.steam;
 
-import at.pcgamingfreaks.model.ContentType;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

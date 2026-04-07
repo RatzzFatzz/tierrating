@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { LoadingPage } from "@/components/loading-skeletons/loading-page";
 import { CLIENT_ID_PLACEHOLDER, REDIRECT_URL_PLACEHOLDER } from "@/lib/config/global-config";
 import { toast } from "sonner";
@@ -14,7 +14,7 @@ export function Oauth({ service, authUrl }: { service: string; authUrl: string }
 	const searchParams = useSearchParams();
 	const code = searchParams.get("code");
 
-	const { trigger: authorizeOAuth } = useOauth(user!, service, token!)
+	const { trigger: authorizeOAuth } = useOauth(user!, service, token!);
 	const { data: thirdPartyInfo, error, isValidating } = useThirdPartyServiceInfo(!!code, service, token!);
 
 	const router = useRouter();

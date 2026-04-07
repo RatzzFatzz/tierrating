@@ -1,11 +1,14 @@
 package at.pcgamingfreaks.service;
 
 import at.pcgamingfreaks.model.auth.User;
-import at.pcgamingfreaks.model.dto.*;
-import at.pcgamingfreaks.model.repo.*;
-import at.pcgamingfreaks.model.thirdparty.anilist.AniListEntryScore;
-import at.pcgamingfreaks.model.thirdparty.steam.SteamEntryScore;
-import at.pcgamingfreaks.model.thirdparty.trakt.TraktEntryScore;
+import at.pcgamingfreaks.model.dto.ChangePasswordRequestDTO;
+import at.pcgamingfreaks.model.dto.LoginResponseDTO;
+import at.pcgamingfreaks.model.dto.SignupRequestDTO;
+import at.pcgamingfreaks.model.dto.SignupResponseDTO;
+import at.pcgamingfreaks.model.repo.AniListEntryScoreRepository;
+import at.pcgamingfreaks.model.repo.SteamEntryScoreRepository;
+import at.pcgamingfreaks.model.repo.TraktEntryScoreRepository;
+import at.pcgamingfreaks.model.repo.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;

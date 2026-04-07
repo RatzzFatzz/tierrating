@@ -72,7 +72,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			setExpiration(decodedJwt.expiration);
 			setIsAuthenticated(true);
 
-
 			if (
 				!decodedJwt.isExpired &&
 				decodedJwt.expiration &&

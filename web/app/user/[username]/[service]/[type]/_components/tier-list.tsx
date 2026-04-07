@@ -39,7 +39,6 @@ export default function TierList({
 	const tiers = useMemo(() => (tiersData?.length ? tiersData : getDefaultTiers()), [tiersData]);
 	const entries = useMemo(() => entriesData ?? [], [entriesData]);
 
-
 	const tiersById = useMemo(() => groupBySingle(tiers, (tier) => tier.id), [tiers]);
 	const tiersByName = useMemo(() => groupBySingle(tiers, (tier) => tier.name), [tiers]);
 	const entriesById = useMemo(() => groupBySingle(entries, (entry) => entry.id), [entries]);
@@ -73,11 +72,10 @@ export default function TierList({
 		updateEntry(entryToChange, targetTier, sourceTier);
 
 		startTransition(() => {
-			pushEntryUpdate({ id: entryToChange.id, score: targetTier.adjustedScore })
-				.catch((error) => {
-					toast.error(`Couldn't update ${entryToChange.title}. Reverted change.\n Error: ${error.message}`);
-					updateEntry(entryToChange, sourceTier!, targetTier);
-				});
+			pushEntryUpdate({ id: entryToChange.id, score: targetTier.adjustedScore }).catch((error) => {
+				toast.error(`Couldn't update ${entryToChange.title}. Reverted change.\n Error: ${error.message}`);
+				updateEntry(entryToChange, sourceTier!, targetTier);
+			});
 		});
 	};
 
@@ -88,7 +86,7 @@ export default function TierList({
 			...entryToChange,
 			tier: targetTier,
 			score: targetTier.adjustedScore,
-		}
+		};
 
 		setEntriesByTierId((prevMap) => {
 			const newMap = new Map(prevMap);
@@ -110,13 +108,9 @@ export default function TierList({
 
 	if (tiersError || entriesError) {
 		if (tiersError?.status === 404 || entriesError?.status === 404) {
-			return (
-				<div>Tierlist of user does not exist or is private.</div>
-			)
+			return <div>Tierlist of user does not exist or is private.</div>;
 		}
-		return (
-			<div>Error occurred while fetching your data. Please try again later. If the error persists contact the server admin.</div>
-		)
+		return <div>Error occurred while fetching your data. Please try again later. If the error persists contact the server admin.</div>;
 	}
 
 	if (!mappingCompleted) {
@@ -126,13 +120,7 @@ export default function TierList({
 	return (
 		<DragDropProvider onDragEnd={onDragEnd}>
 			{tiers.map((tier) => (
-				<TierContainerDroppable
-					key={tier.id}
-					id={tier.id}
-					label={tier.name}
-					color={tier.color}
-					disabled={!modificationEnabled}
-				>
+				<TierContainerDroppable key={tier.id} id={tier.id} label={tier.name} color={tier.color} disabled={!modificationEnabled}>
 					{entriesByTierId.get(tier.id)!.map((entry) => (
 						<TierlistEntryDraggable key={entry.id} entry={entry} disabled={!modificationEnabled} />
 					))}

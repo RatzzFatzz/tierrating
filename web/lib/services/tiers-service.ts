@@ -10,5 +10,5 @@ export function useTiers(username: string, service: string, type: string, token?
 }
 
 export function useTiersUpdate(username: string, service: string, type: string, token: string) {
-	return useApiMutation<void, {tiers: Tier[]}>(`/tiers/${username}/${service}/${type}`, {token});
+	return useApiMutation<void, { tiers: Tier[] }>(`/tiers/${username}/${service}/${type}`, { token });
 }

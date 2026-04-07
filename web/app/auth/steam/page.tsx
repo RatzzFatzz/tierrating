@@ -3,7 +3,6 @@ import React, { Suspense } from "react";
 import { REDIRECT_URL_PLACEHOLDER } from "@/lib/config/global-config";
 import OpenIdAuth from "@/app/auth/openid-auth";
 
-
 export default function AuthSteam() {
 	return (
 		<ProtectedRoute>

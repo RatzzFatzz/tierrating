@@ -24,12 +24,7 @@ export default function ThirdPartyConnectedButton({
 				</Link>
 			</Button>
 
-			<TierConfigModal
-				service={service}
-				type={type}
-				username={username}
-				decimals={getServiceConfig(service)!.scoreDecimal}
-			/>
+			<TierConfigModal service={service} type={type} username={username} decimals={getServiceConfig(service)!.scoreDecimal} />
 		</ButtonGroup>
 	);
 }

@@ -17,18 +17,18 @@ export function useSignup() {
 	return useApiMutation<SignupResponse, SignupRequest>(`/auth/signup`);
 }
 
-export function useRemoveThirdPartyService(username: string, token:  string)  {
+export function useRemoveThirdPartyService(username: string, token: string) {
 	// direct usage of useSWRMutation to allow the usage of a dynamic url
 	return useSWRMutation<void, ApiRequestError, string, { service: string }>(`/user/${username}/remove`, async (url, { arg }) => {
 		return apiClient<void>(`${url}/${arg.service}`, {
 			method: "DELETE",
-			token
+			token,
 		});
 	});
 }
 
 export function useChangePassword(token: string) {
-	return useApiMutation<void, ChangePasswordReqest>("/auth/change-password", { token })
+	return useApiMutation<void, ChangePasswordReqest>("/auth/change-password", { token });
 }
 
 export function useAccountDeletion(token: string) {

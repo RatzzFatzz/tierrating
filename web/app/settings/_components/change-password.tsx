@@ -29,7 +29,7 @@ export default function ChangePassword() {
 	const [showConfirmNew, setShowConfirmNew] = useState(false);
 	const { user, token, logout } = useAuth();
 
-	const {trigger: changePassword, error, isMutating } = useChangePassword(token!);
+	const { trigger: changePassword, error, isMutating } = useChangePassword(token!);
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
@@ -41,13 +41,13 @@ export default function ChangePassword() {
 	});
 
 	function onSubmit(data: z.infer<typeof FormSchema>) {
-		changePassword({username: user!, oldPassword: data.old, newPassword: data.new})
+		changePassword({ username: user!, oldPassword: data.old, newPassword: data.new })
 			.then(() => {
-				toast.success("Successfully changed password. Please login again.")
-				logout()
+				toast.success("Successfully changed password. Please login again.");
+				logout();
 			})
 			.catch((error) => {
-				toast.error(`Error occurred changing password: ${error.message}`)
+				toast.error(`Error occurred changing password: ${error.message}`);
 			});
 	}
 
