@@ -22,3 +22,7 @@ Installation guide is available at [tierrating docs](https://docs.tierrating.de/
 ## Contributing
 
 Read about it [here](CONTRIBUTING.md).
+
+## AI Usage Disclaimer
+
+This project leverages AI tools to assist in various aspects of development including debugging, problem-solving, and research planning. However, all code contributions are made by human contributors who review, modify, and verify any AI-assisted suggestions. The project maintains full human oversight of all code changes.
