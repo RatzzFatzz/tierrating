@@ -30,8 +30,8 @@ import java.util.Map;
 public class AniListAuthenticatorService implements ThirdPartyOAuthAuthenticatorService {
 	private final UserRepository userRepository;
 	private final ThirdPartyConnectionRepository thirdPartyConnectionRepository;
-	private final ObjectMapper objectMapper;
 	private final ThirdPartyConfig thirdPartyConfig;
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
 	public ThirdPartyService getService() {

@@ -34,7 +34,7 @@ public class SteamAuthenticatorService implements ThirdPartyOpenIdAuthenticatorS
 	private final UserRepository userRepository;
 	private final ThirdPartyConnectionRepository thirdPartyConnectionRepository;
 	private final ThirdPartyConfig thirdPartyConfig;
-	private final RestClient.Builder restClientBuilder;
+	private final RestClient.Builder restClientBuilder = RestClient.builder();
 
 	@Override
 	public ThirdPartyService getService() {

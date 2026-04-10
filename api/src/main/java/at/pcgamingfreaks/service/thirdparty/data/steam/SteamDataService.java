@@ -37,7 +37,7 @@ public abstract class SteamDataService implements DataService {
 	private final SteamEntryRepository steamEntryRepository;
 	private final SteamEntryScoreRepository steamEntryScoreRepository;
 
-	private final RestClient.Builder restClientBuilder;
+	private final RestClient.Builder restClientBuilder = RestClient.builder();
 
 	@Override
 	public ThirdPartyService getService() {
