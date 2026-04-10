@@ -31,14 +31,12 @@ sync:
 
 services:
   anilist:
-    client:
-      key: ${ANILIST_CLIENT_KEY:}
-      secret: ${ANILIST_CLIENT_SECRET:}
+    key: ${ANILIST_CLIENT_KEY:}
+    secret: ${ANILIST_CLIENT_SECRET:}
     redirectUrl: ${ANILIST_REDIRECT_URL:}
   trakt:
-    client:
-      key: ${TRAKT_CLIENT_KEY:}
-      secret: ${TRAKT_CLIENT_SECRET:}
+    key: ${TRAKT_CLIENT_KEY:}
+    secret: ${TRAKT_CLIENT_SECRET:}
     redirectUrl: ${TRAKT_REDIRECT_URL:}
   steam:
     key: ${STEAM_API_KEY}
