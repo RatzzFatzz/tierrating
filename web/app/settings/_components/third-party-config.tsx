@@ -32,36 +32,39 @@ export default function ThirdPartyConfig() {
 
 	if (userError || servicesError) return <div>error occurred</div>;
 
+	const connectedServices: ThirdPartyServiceConfig[] = Object.keys(THIRD_PARTY_SERVICE_CONFIG)
+		.filter((key) => userData!.connectedServices.includes(key))
+		.map((key) => THIRD_PARTY_SERVICE_CONFIG[key]);
+	const availableServices: ThirdPartyServiceConfig[]= Object.keys(THIRD_PARTY_SERVICE_CONFIG)
+		.filter((key) => services!.includes(key) && !userData!.connectedServices.includes(key))
+		.map((key) => THIRD_PARTY_SERVICE_CONFIG[key]);;
+
 	return (
-		<div className={"w-full grid gap-4"}>
-			<div className="grid columns-1 gap-2">
-				{Object.entries(THIRD_PARTY_SERVICE_CONFIG).map(([key, service]) =>
-					services!.includes(key) && !userData!.connectedServices.includes(key) ? (
-						<ThirdPartyLoginButton
-							key={service.id}
-							title={`Connect ${service.name}`}
-							path={`/auth/${service.id}`}
-							service={service.id}
-						/>
-					) : null
-				)}
-			</div>
-			<div className="grid columns-1 gap-2">
-				{Object.entries(THIRD_PARTY_SERVICE_CONFIG).map(([key, service]) =>
-					userData!.connectedServices.includes(key) ? (
-						<ThirdPartyConnection
-							key={service.id}
-							service={{ id: service.id, title: service.name }}
-							types={service.types.map((type) => ({ id: type.id, title: type.name }))}
-							removeConnection={removeService}
-							isRemovingService={isRemovingService}
-							username={user!}
-							token={token}
-							logout={logout}
-						/>
-					) : null
-				)}
-			</div>
+		<div className={"w-full grid gap-2"}>
+			{
+				availableServices && availableServices.length > 0 && availableServices.map((service) =>
+					<ThirdPartyLoginButton
+						key={service.id}
+						title={`Connect ${service.name}`}
+						path={`/auth/${service.id}`}
+						service={service.id}
+					/>
+				)
+			}
+			{
+				connectedServices && connectedServices.length > 0 && connectedServices.map((service) =>
+					<ThirdPartyConnection
+						key={service.id}
+						service={{ id: service.id, title: service.name }}
+						types={service.types.map((type) => ({ id: type.id, title: type.name }))}
+						removeConnection={removeService}
+						isRemovingService={isRemovingService}
+						username={user!}
+						token={token}
+						logout={logout}
+					/>
+				)
+			}
 		</div>
 	);
 }
