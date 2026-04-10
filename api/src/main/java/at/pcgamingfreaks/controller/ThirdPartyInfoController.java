@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,7 +41,7 @@ public class ThirdPartyInfoController {
 		List<ThirdPartyService> services = new ArrayList<>();
 		Method[] methods = thirdPartyConfig.getClass().getMethods();
 		for (Method method : methods) {
-			if (method.getReturnType().equals(ServiceConfig.class)) {
+			if (Arrays.asList(method.getReturnType().getInterfaces()).contains(ThirdPartyServiceConfig.class)) {
 				ThirdPartyServiceConfig serviceConfig = (ThirdPartyServiceConfig) method.invoke(thirdPartyConfig);
 				Matcher matcher = configValidPattern.matcher(method.getName());
 				if (serviceConfig.isValid() && matcher.find()) {
