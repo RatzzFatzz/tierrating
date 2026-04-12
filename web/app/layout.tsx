@@ -6,6 +6,7 @@ import NavBar from "@/components/navbar/navbar";
 import { ThemeProvider } from "@/components/themes/theme-provider";
 import Starfield from "react-starfield";
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,7 +25,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 						<div className="min-h-screen flex flex-col">
 							<NavBar />
 							<Toaster />
-							<main className="flex-grow pt-24 z-20">{children}</main>
+							<main className="flex-grow pt-24 z-20">
+								<TooltipProvider>{children}</TooltipProvider>
+							</main>
 						</div>
 					</AuthProvider>
 				</ThemeProvider>
