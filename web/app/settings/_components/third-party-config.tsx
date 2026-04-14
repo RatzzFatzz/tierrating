@@ -6,7 +6,7 @@ import { LoadingDiv } from "@/components/loading-skeletons/loading-page";
 import ThirdPartyLoginButton from "@/app/settings/_components/third-party-login-button";
 import ThirdPartyConnection from "@/app/settings/_components/third-party-connection";
 import { useRemoveThirdPartyService, useUser } from "@/lib/services/user-service";
-import { THIRD_PARTY_SERVICE_CONFIG } from "@/lib/config/third-party-services-config";
+import { getServiceConfig, ThirdPartyServiceConfig } from "@/lib/config/third-party-services-config";
 import { toast } from "sonner";
 import { useThirdPartyServices } from "@/lib/services/third-party-info-service";
 
@@ -32,27 +32,27 @@ export default function ThirdPartyConfig() {
 
 	if (userError || servicesError) return <div>error occurred</div>;
 
-	const connectedServices: ThirdPartyServiceConfig[] = Object.keys(THIRD_PARTY_SERVICE_CONFIG)
-		.filter((key) => userData!.connectedServices.includes(key))
-		.map((key) => THIRD_PARTY_SERVICE_CONFIG[key]);
-	const availableServices: ThirdPartyServiceConfig[]= Object.keys(THIRD_PARTY_SERVICE_CONFIG)
-		.filter((key) => services!.includes(key) && !userData!.connectedServices.includes(key))
-		.map((key) => THIRD_PARTY_SERVICE_CONFIG[key]);;
+	const connectedServices: ThirdPartyServiceConfig[] = userData!.connectedServices
+		.map((service) => getServiceConfig(service)!);
+	const availableServices: ThirdPartyServiceConfig[] = services!
+		.filter((service) => !userData!.connectedServices.includes(service))
+		.map((service) => getServiceConfig(service)!);
 
 	return (
 		<div className={"w-full grid gap-2"}>
-			{
-				availableServices && availableServices.length > 0 && availableServices.map((service) =>
+			{availableServices &&
+				availableServices.length > 0 &&
+				availableServices.map((service) => (
 					<ThirdPartyLoginButton
 						key={service.id}
 						title={`Connect ${service.name}`}
 						path={`/auth/${service.id}`}
 						service={service.id}
 					/>
-				)
-			}
-			{
-				connectedServices && connectedServices.length > 0 && connectedServices.map((service) =>
+				))}
+			{connectedServices &&
+				connectedServices.length > 0 &&
+				connectedServices.map((service) => (
 					<ThirdPartyConnection
 						key={service.id}
 						service={{ id: service.id, title: service.name }}
@@ -63,8 +63,7 @@ export default function ThirdPartyConfig() {
 						token={token}
 						logout={logout}
 					/>
-				)
-			}
+				))}
 		</div>
 	);
 }

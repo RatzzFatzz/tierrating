@@ -1,4 +1,4 @@
-interface ThirdPartyServiceConfig {
+export interface ThirdPartyServiceConfig {
 	id: string;
 	name: string;
 	scoreDecimal: string;
@@ -10,7 +10,7 @@ interface ThirdPartyServiceTypeConfig {
 	name: string;
 }
 
-type ThirdPartyService = "ANILIST" | "TRAKT" | "STEAM";
+export type ThirdPartyService = "ANILIST" | "TRAKT" | "STEAM";
 
 export const THIRD_PARTY_SERVICE_CONFIG: Record<ThirdPartyService, ThirdPartyServiceConfig> = {
 	ANILIST: {
