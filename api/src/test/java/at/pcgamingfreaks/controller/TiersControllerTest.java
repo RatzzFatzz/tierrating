@@ -18,6 +18,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 class TiersControllerTest {
 	@Mock
 	private UserRepository userRepository;
