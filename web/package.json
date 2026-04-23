@@ -41,6 +41,7 @@
 		"label": "^0.2.2",
 		"lucide-react": "^0.511.0",
 		"next": "16.0.10",
+		"next-public-env": "^1.1.0",
 		"next-themes": "^0.4.6",
 		"popover": "^2.4.1",
 		"postcss": "^8.5.6",

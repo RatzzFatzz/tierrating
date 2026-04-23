@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/themes/theme-provider";
 import Starfield from "react-starfield";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { PublicEnv } from "@/lib/public-env";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,6 +22,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 			<body className={inter.className}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
 					<Starfield starCount={500} starColor={[255, 255, 255]} speedFactor={0.05} backgroundColor="black" />
+					<PublicEnv />
 					<AuthProvider>
 						<div className="min-h-screen flex flex-col">
 							<NavBar />
