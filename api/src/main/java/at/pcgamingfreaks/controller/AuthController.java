@@ -54,7 +54,6 @@ public class AuthController {
 	@PostMapping("/oauth/{service}/{username}")
 	@PreAuthorize("authentication.principal.username == #username")
 	@Validated
-	@CrossOrigin
 	public void authThirdPartyOAuthAccount(
 			@PathVariable ThirdPartyService service,
 			@PathVariable String username,
@@ -67,7 +66,6 @@ public class AuthController {
 	@PostMapping("/openid/{service}/{username}")
 	@PreAuthorize("authentication.principal.username == #username")
 	@Validated
-	@CrossOrigin
 	public void authThirdPartyOpenIdAccount(
 			@PathVariable ThirdPartyService service,
 			@PathVariable String username,

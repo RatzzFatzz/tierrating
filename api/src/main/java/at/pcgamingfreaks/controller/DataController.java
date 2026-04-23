@@ -24,7 +24,6 @@ import static at.pcgamingfreaks.model.ThirdPartyService.hasUserConnection;
 @Slf4j
 @RestController
 @RequestMapping("data")
-@CrossOrigin
 @RequiredArgsConstructor
 public class DataController {
 	private final DataFactory dataFactory;
