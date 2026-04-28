@@ -33,12 +33,12 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static at.pcgamingfreaks.config.GlobalProperties.ANILIST_API_URL;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public abstract class AnilistDataService implements DataService {
+	private static final String ANILIST_API_URL = "https://graphql.anilist.co";
+
 	private final UserRepository userRepository;
 	private final AniListEntryScoreRepository aniListEntryScoreRepository;
 	private final AniListEntryRepository aniListEntryRepository;

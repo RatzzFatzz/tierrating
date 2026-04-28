@@ -32,6 +32,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public abstract class TraktDataService implements DataService {
+	protected static final String TRAKT_API = "https://api.trakt.tv";
+
 	protected final UserRepository userRepository;
 	protected final TraktEntryScoreRepository entryScoreRepository;
 	protected final TraktEntryRepository entryRepository;

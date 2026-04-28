@@ -92,7 +92,7 @@ public class TraktTvShowSeasonsData extends TraktDataService {
 	protected void pushSingleChange(long id, float score, User user) {
 		String body = "{\"seasons\":[{\"ids\":{\"trakt\":" + id + "},\"rating\":" + (int) score + "}]}";
 		RestClient.builder()
-				.baseUrl("https://api.trakt.tv")
+				.baseUrl(TRAKT_API)
 				.defaultHeader("Authorization", user.getConnections().get(ThirdPartyService.TRAKT).getAccessToken())
 				.build()
 				.post()
