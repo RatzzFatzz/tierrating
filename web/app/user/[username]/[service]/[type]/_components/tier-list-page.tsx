@@ -68,21 +68,21 @@ export default function TierListPage({
 											{pushText}
 										</Button>
 									</TooltipTrigger>
+									<TooltipContent>Pushing data to third-party service overwriting external scores.</TooltipContent>
+								</Tooltip>
+
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button variant="outline" disabled={isPullRunning} onClick={pullUpdate} aria-label={pullText}>
+											<PullIcon data-icon="inline-start" />
+											{pullText}
+										</Button>
+									</TooltipTrigger>
 									<TooltipContent>
 										Pulling data from third-party service adding new entries and overwriting local scores.
 									</TooltipContent>
 								</Tooltip>
-
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button variant="outline" disabled={isPullRunning} onClick={pullUpdate} aria-label={pullText}>
-                                            <PullIcon data-icon="inline-start" />
-                                            {pullText}
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>Pushing data to third-party service overwriting external scores.</TooltipContent>
-                                </Tooltip>
-                            </ButtonGroup>
+							</ButtonGroup>
 						)}
 						<ButtonGroup>
 							<Toggle variant="outline" aria-label={"Toggle full width"} onPressedChange={() => setIsFullWidth(!isFullWidth)}>
