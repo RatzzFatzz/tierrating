@@ -12,6 +12,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Slf4j
 @RestControllerAdvice
@@ -55,5 +56,14 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponseDTO> handleThirdPartySyncException(ThirdPartySyncException ex) {
 		log.warn("Third-party sync error: {}", ex.getMessage());
 		return ResponseEntity.internalServerError().body(new ErrorResponseDTO("Third-party synchronization failed"));
+	}
+
+	@ExceptionHandler(WebClientResponseException.class)
+	public ResponseEntity<ErrorResponseDTO> handleWebClientResponseException(WebClientResponseException ex) {
+		log.warn(ex.getMessage());
+		return ResponseEntity.internalServerError().body(new ErrorResponseDTO(switch (ex.getStatusCode().value()) {
+			case 401, 403 -> "Remote service rejected request: " + ex.getStatusText();
+			default -> "Unknown error occurred requesting data from third-party";
+		}));
 	}
 }
