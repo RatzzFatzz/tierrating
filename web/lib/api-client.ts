@@ -1,4 +1,3 @@
-import { API_URL } from "@/lib/config/global-config";
 import { ErrorResponseDTO } from "@/types/response-types";
 import { ApiRequestError } from "@/types/api-request-error";
 
@@ -22,7 +21,7 @@ export async function apiClient<T>(endpoint: string, options: ApiRequestOptions 
 	}
 
 	try {
-		const response = await fetch(`${API_URL}/api${endpoint}`, {
+		const response = await fetch(`/api${endpoint}`, {
 			method,
 			headers,
 			body: body ? JSON.stringify(body) : undefined,
