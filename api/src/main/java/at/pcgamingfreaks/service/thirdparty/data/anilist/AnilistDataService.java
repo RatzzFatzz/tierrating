@@ -26,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -143,8 +140,10 @@ public abstract class AnilistDataService implements DataService {
 
 			// Update existing entry or create a new one
 			AniListEntry entry = existingEntries.getOrDefault(mediaId, new AniListEntry());
-			if (!(entry.getId() == mediaId && entry.getTitle().equals(title.getEnglish())
-					&& entry.getTitleRomaji().equals(title.getRomaji()) && entry.getCover().equals(resolvedCover)
+			if (!(entry.getId() != null && entry.getId() == mediaId
+					&& Objects.equals(entry.getTitle(), title.getEnglish())
+					&& entry.getTitleRomaji().equals(title.getRomaji())
+					&& entry.getCover().equals(resolvedCover)
 					&& entry.getType().equals(getContentType()))) {
 				entry.setId(mediaId);
 				entry.setTitle(title.getEnglish());
@@ -156,10 +155,12 @@ public abstract class AnilistDataService implements DataService {
 
 			// Update existing score or create a new one
 			AniListEntryScore entryScore = existingScores.getOrDefault(mediaId, new AniListEntryScore());
-			entryScore.setScore(queryResult.getScore());
-			entryScore.setUser(user);
-			entryScore.setEntry(entry);
-			scoresToSave.add(entryScore);
+			if (!(entryScore.getScore() == queryResult.getScore())) {
+				entryScore.setScore(queryResult.getScore());
+				entryScore.setUser(user);
+				entryScore.setEntry(entry);
+				scoresToSave.add(entryScore);
+			}
 		}
 
 		aniListEntryRepository.saveAll(entriesToSave);

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.domain.Persistable;
 
 import java.time.LocalDateTime;
 
@@ -15,19 +16,24 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @Entity(name = "steam_entries")
-public class SteamEntry {
+public class SteamEntry implements Persistable<Long> {
 	@Id
-	private long id;
+	private Long id;
 
 	private String title;
 
 	private String cover;
 
 	@CreationTimestamp
-	@Column(nullable = false)
+	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
 	@UpdateTimestamp
 	@Column(nullable = false)
 	private LocalDateTime updatedAt;
+
+	@Override
+	public boolean isNew() {
+		return createdAt == null;
+	}
 }

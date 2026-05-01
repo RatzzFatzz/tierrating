@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.domain.Persistable;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -16,7 +17,7 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @Entity(name = "trakt_entries")
-public class TraktEntry {
+public class TraktEntry implements Persistable<Long> {
 
 	public TraktEntry(long id, ContentType type, @Nullable Integer season, String title, String cover) {
 		this.id = id;
@@ -27,7 +28,7 @@ public class TraktEntry {
 	}
 
 	@Id
-	private long id;
+	private Long id;
 
 	@Enumerated(EnumType.STRING)
 	private ContentType type;
@@ -39,7 +40,7 @@ public class TraktEntry {
 	private String cover;
 
 	@CreationTimestamp
-	@Column(nullable = false)
+	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
 	@UpdateTimestamp
@@ -61,5 +62,10 @@ public class TraktEntry {
 		result = 31 * result + Objects.hashCode(title);
 		result = 31 * result + Objects.hashCode(cover);
 		return result;
+	}
+
+	@Override
+	public boolean isNew() {
+		return createdAt == null;
 	}
 }
