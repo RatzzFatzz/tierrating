@@ -26,6 +26,10 @@ security:
     # - See: https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/
     expiration-minutes: ${TOKEN_EXPIRATION:60}
 
+server:
+  servlet:
+    context-path: "/api"
+
 sync:
   interval: ${SYNC_INTERVAL:0 0 */4 * * *}
 
