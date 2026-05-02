@@ -8,7 +8,6 @@ Fetch ratings from third-party providers like AniList & Trakt and organize them 
 * Import your ratings from Anilist and Trakt
 * View and organize your content in tier lists
 * Automatically keep rating changes in sync
-* Fully selfhostable
 
 ## Screenshots
 
@@ -17,7 +16,7 @@ You can find more screenshots [here](https://github.com/tierrating/tierrating/tr
 
 ## Installation
 
-Installation guide is available at [tierrating docs](https://docs.tierrating.de/docs/installation/).
+Installation guide is available at [tierrating wiki](https://github.com/RatzzFatzz/tierrating/wiki/01-Installation).
 
 ## Contributing
 

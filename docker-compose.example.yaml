@@ -1,11 +1,11 @@
 name: tierrating
 
 services:
-  server:
+  api:
     image: ghcr.io/ratzzfatzz/tierrating-api:latest
     restart: unless-stopped
     ports:
-      - 8080
+      - 8080:8080
     depends_on:
       - db
     environment:
@@ -30,7 +30,7 @@ services:
     ports:
       - 3000:3000
     environment:
-      API_URL: ${API_URL:?api url needs to be defined}
+      API_URL: ${API_URL:http://api:8080}
 
   db:
     image: postgres
