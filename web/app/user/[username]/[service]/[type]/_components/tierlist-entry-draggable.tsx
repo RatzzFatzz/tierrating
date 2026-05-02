@@ -2,7 +2,7 @@ import { TierlistEntry } from "@/types/types";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useDraggable } from "@dnd-kit/react";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function TierlistEntryDraggable({ entry, disabled }: { entry: TierlistEntry; disabled: boolean }) {
 	const { ref } = useDraggable({
@@ -28,12 +28,12 @@ export function TierlistEntryCard({ entry }: { entry: TierlistEntry }) {
 			<div className="relative w-full h-full">
 				<Image src={entry.cover} alt={entry.title} fill unoptimized={true} className="object-cover rounded-t-md" sizes="80px" />
 			</div>
-			<HoverCard>
-				<HoverCardTrigger asChild>
+			<Tooltip delayDuration={500} >
+				<TooltipTrigger asChild>
 					<div className="text-xs line-clamp-2 h-11 w-full text-center p-1 text-foreground">{entry.title}</div>
-				</HoverCardTrigger>
-				<HoverCardContent className="w-64 p-2">{entry.title}</HoverCardContent>
-			</HoverCard>
+				</TooltipTrigger>
+				<TooltipContent side={"bottom"}>{entry.title}</TooltipContent>
+			</Tooltip>
 		</div>
 	);
 }
