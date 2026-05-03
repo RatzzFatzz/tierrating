@@ -1,10 +1,19 @@
 "use client";
 
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
 import { useAccountDeletion } from "@/lib/services/user-service";
 import { toast } from "sonner";
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function AccountModification() {
 	const { user, token, logout } = useAuth();
@@ -23,20 +32,29 @@ export default function AccountModification() {
 
 	return (
 		<div className={"w-full"}>
-			<Popover>
-				<PopoverTrigger asChild>
+			<Dialog>
+				<DialogTrigger asChild>
 					<Button className={"w-full"} variant={"destructive"}>
 						Delete Account
 					</Button>
-				</PopoverTrigger>
-				<PopoverContent>
-					<div className={"gap-4 w-full"}>
-						<Button className={"w-full"} variant={"destructive"} type={"submit"} disabled={isMutating} onClick={submitDeletion}>
-							Are you sure?
+				</DialogTrigger>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Are you absolutely sure?</DialogTitle>
+						<DialogDescription>
+							This action cannot be undone. This will permanently delete your account and remove all your data.
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter>
+						<DialogClose asChild>
+							<Button variant="outline">Cancel</Button>
+						</DialogClose>
+						<Button type="submit" variant={"destructive"} disabled={isMutating} onClick={submitDeletion}>
+							Delete permanently
 						</Button>
-					</div>
-				</PopoverContent>
-			</Popover>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }
