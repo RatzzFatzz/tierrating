@@ -32,8 +32,7 @@ export default function ThirdPartyConfig() {
 
 	if (userError || servicesError) return <div>error occurred</div>;
 
-	const connectedServices: ThirdPartyServiceConfig[] = userData!.connectedServices
-		.map((service) => getServiceConfig(service)!);
+	const connectedServices: ThirdPartyServiceConfig[] = userData!.connectedServices.map((service) => getServiceConfig(service)!);
 	const availableServices: ThirdPartyServiceConfig[] = services!
 		.filter((service) => !userData!.connectedServices.includes(service))
 		.map((service) => getServiceConfig(service)!);

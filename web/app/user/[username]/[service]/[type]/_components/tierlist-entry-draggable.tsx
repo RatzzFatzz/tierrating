@@ -28,7 +28,7 @@ export function TierlistEntryCard({ entry }: { entry: TierlistEntry }) {
 			<div className="relative w-full h-full">
 				<Image src={entry.cover} alt={entry.title} fill unoptimized={true} className="object-cover rounded-t-md" sizes="80px" />
 			</div>
-			<Tooltip delayDuration={500} >
+			<Tooltip delayDuration={500}>
 				<TooltipTrigger asChild>
 					<div className="text-xs line-clamp-2 h-11 w-full text-center p-1 text-foreground">{entry.title}</div>
 				</TooltipTrigger>

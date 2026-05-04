@@ -18,4 +18,3 @@ export interface UserResponse {
 export interface ThirdPartyInfoResponse {
 	clientId: string;
 }
-

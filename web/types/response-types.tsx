@@ -7,4 +7,3 @@ export interface ServerResponse<T> {
 export interface ErrorResponseDTO {
 	error: string;
 }
-

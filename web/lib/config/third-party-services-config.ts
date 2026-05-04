@@ -36,9 +36,7 @@ export const THIRD_PARTY_SERVICE_CONFIG: Record<ThirdPartyService, ThirdPartySer
 		id: "steam",
 		name: "Steam",
 		scoreDecimal: "0.01",
-		types: [
-			{ id: "games", name: "Games" },
-		],
+		types: [{ id: "games", name: "Games" }],
 	},
 } as const;
 
