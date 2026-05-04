@@ -13,8 +13,8 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 	useEffect(() => {
 		console.debug(`User ${user} isAuthenticated: ${isAuthenticated}; isLoading ${isLoading}; isExpired: ${isExpired}`);
 		if (!isLoading && (!isAuthenticated || isExpired)) {
+			console.debug(`Redirect from ${currentPath} to /login`);
 			router.push("/login");
-			console.debug(`Redirected from ${currentPath} to /login`);
 		}
 	}, [user, isAuthenticated, isLoading, isExpired, router, currentPath]);
 
@@ -33,8 +33,8 @@ export function AnonymousAllowedRoute({ children }: { children: React.ReactNode 
 	useEffect(() => {
 		console.debug(`User ${user} isAuthenticated: ${isAuthenticated}; isLoading ${isLoading}; isExpired: ${isExpired}`);
 		if (!isLoading && isAuthenticated && (currentPath == "/login" || currentPath == "/signup")) {
+			console.debug(`Redirect from /login to /user/${user}`);
 			router.push(`/user/${user}`);
-			console.debug(`Redirected from /login to /user/${user}`);
 		}
 	}, [user, isAuthenticated, isLoading, isExpired, router, currentPath]);
 

@@ -30,7 +30,6 @@ export default function OpenIdAuth({ service, openidUrl, returnToUrl }: { servic
 		} else {
 			const params: Record<string, string> = {};
 			searchParams.forEach((value, name) => {
-				console.debug(`params for ${name}: ${value}`);
 				params[name] = value;
 			});
 			authorizeOpenId({ params })
