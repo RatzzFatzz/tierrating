@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class GenericResponseDTO {
-    protected boolean success;
-    protected String message;
+	protected boolean success;
+	protected String message;
 }

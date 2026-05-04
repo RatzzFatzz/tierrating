@@ -1,7 +1,13 @@
 package at.pcgamingfreaks.service;
 
 import at.pcgamingfreaks.model.auth.User;
-import at.pcgamingfreaks.model.dto.*;
+import at.pcgamingfreaks.model.dto.ChangePasswordRequestDTO;
+import at.pcgamingfreaks.model.dto.LoginResponseDTO;
+import at.pcgamingfreaks.model.dto.SignupRequestDTO;
+import at.pcgamingfreaks.model.dto.SignupResponseDTO;
+import at.pcgamingfreaks.model.repo.AniListEntryScoreRepository;
+import at.pcgamingfreaks.model.repo.SteamEntryScoreRepository;
+import at.pcgamingfreaks.model.repo.TraktEntryScoreRepository;
 import at.pcgamingfreaks.model.repo.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,73 +21,79 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class AuthService {
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
+	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
+	private final AuthenticationManager authenticationManager;
+	private final JwtService jwtService;
 
-    public LoginResponseDTO authenticate(String username, String password) {
-        Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        User user = (User) auth.getPrincipal();
-        String token = jwtService.create(user.getUsername());
-        return new LoginResponseDTO(token);
-    }
+	private final AniListEntryScoreRepository aniListEntryScoreRepository;
+	private final TraktEntryScoreRepository traktEntryScoreRepository;
+	private final SteamEntryScoreRepository steamEntryScoreRepository;
 
-    @Transactional
-    public SignupResponseDTO signup(SignupRequestDTO request) {
-        SignupResponseDTO response = new SignupResponseDTO();
-        response.setUsernameTaken(userRepository.findByUsername(request.getUsername()).isPresent());
-        response.setEmailTaken(userRepository.findByEmail(request.getEmail()).isPresent());
+	public LoginResponseDTO authenticate(String username, String password) {
+		Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+		User user = (User) auth.getPrincipal();
+		String token = jwtService.create(user.getUsername());
+		return new LoginResponseDTO(token);
+	}
 
-        if (!(response.isUsernameTaken() || response.isEmailTaken())) {
-            User user = new User();
-            user.setUsername(request.getUsername());
-            user.setEmail(request.getEmail());
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.setCreatedAt(LocalDateTime.now());
-            user.setUpdatedAt(LocalDateTime.now());
-            userRepository.save(user);
-            response.setSignupSuccess(true);
-        }
+	@Transactional
+	public SignupResponseDTO signup(SignupRequestDTO request) {
+		SignupResponseDTO response = new SignupResponseDTO();
+		response.setUsernameTaken(userRepository.findByUsername(request.getUsername()).isPresent());
+		response.setEmailTaken(userRepository.findByEmail(request.getEmail()).isPresent());
 
-        return response;
-    }
+		if (!(response.isUsernameTaken() || response.isEmailTaken())) {
+			User user = new User();
+			user.setUsername(request.getUsername());
+			user.setEmail(request.getEmail());
+			user.setPassword(passwordEncoder.encode(request.getPassword()));
+			user.setCreatedAt(LocalDateTime.now());
+			user.setUpdatedAt(LocalDateTime.now());
+			userRepository.save(user);
+			response.setSignupSuccess(true);
+		}
 
-    public LoginResponseDTO refreshToken(String token) {
-        if (jwtService.isTokenExpired(token)) throw new CredentialsExpiredException("Token expired");
+		return response;
+	}
 
-        String username = jwtService.extractUsername(token);
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(username));
+	public LoginResponseDTO refreshToken(String token) {
+		if (jwtService.isTokenExpired(token)) throw new CredentialsExpiredException("Token expired");
 
-        String refreshedToken = jwtService.create(user.getUsername());
+		String username = jwtService.extractUsername(token);
+		User user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException(username));
 
-        return new LoginResponseDTO(refreshedToken);
-    }
+		String refreshedToken = jwtService.create(user.getUsername());
 
-    @Transactional
-    public void changePassword(ChangePasswordRequestDTO request) {
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException(request.getUsername()));
+		return new LoginResponseDTO(refreshedToken);
+	}
 
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getOldPassword()));
-        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        userRepository.save(user);
-    }
+	@Transactional
+	public void changePassword(ChangePasswordRequestDTO request) {
+		User user = userRepository.findByUsername(request.getUsername())
+				.orElseThrow(() -> new UsernameNotFoundException(request.getUsername()));
 
-    @Transactional
-    public void deleteAccount(AccountDeletionRequestDTO request) {
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException(request.getUsername()));
+		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getOldPassword()));
+		user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+		userRepository.save(user);
+	}
 
-        userRepository.delete(user);
-        log.info("Deleted {} successfully", user.getUsername());
-    }
+	@Transactional
+	public void deleteAccount(String username) {
+		User user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException(username));
+
+		aniListEntryScoreRepository.deleteAllByUser(user);
+		traktEntryScoreRepository.deleteAllByUser(user);
+		steamEntryScoreRepository.deleteAllByUser(user);
+		userRepository.delete(user);
+		log.info("Deleted {} successfully", user.getUsername());
+	}
 
 }

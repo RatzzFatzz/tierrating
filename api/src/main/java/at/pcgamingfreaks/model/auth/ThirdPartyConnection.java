@@ -12,26 +12,26 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "third_party_user_id", "service"})
+		@UniqueConstraint(columnNames = {"third_party_user_id", "service"})
 })
 public class ThirdPartyConnection {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private UUID id;
 
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    private User user;
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	private User user;
 
-    @Enumerated(EnumType.STRING)
-    private ThirdPartyService service;
-    private String thirdPartyUserId;
+	@Enumerated(EnumType.STRING)
+	private ThirdPartyService service;
+	private String thirdPartyUserId;
 
-    private LocalDateTime expiresOn;
-    @Column(length = 2047)
-    private String accessToken;
-    @Column(length = 2047)
-    private String refreshToken;
+	private LocalDateTime expiresOn;
+	@Column(length = 2047)
+	private String accessToken;
+	@Column(length = 2047)
+	private String refreshToken;
 
-    private boolean autoUpdateSync = true;
-    private boolean autoImportSync = true;
+	private boolean autoUpdateSync = true;
+	private boolean autoImportSync = true;
 }

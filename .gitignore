@@ -30,6 +30,12 @@ replay_pid*
 .idea/
 **/*.iml
 
+# Eclipse
+.classpath
+.project
+.settings/
+.factorypath
+
 # Secrets and local configuration
 .env
 .env.*

@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AniListMediaCoverImage {
-    private String large;
-    private String extraLarge;
+	private String large;
+	private String extraLarge;
 }

@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "services")
 public class ThirdPartyConfig {
-    private ServiceConfig anilist;
-    private ServiceConfig trakt;
+	private ServiceConfig anilist;
+	private ServiceConfig trakt;
+	private ApiKeyConfig steam;
+	private ApiKeyConfig tmdb;
 }

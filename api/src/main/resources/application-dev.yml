@@ -19,17 +19,30 @@ security:
     secret-key: ${JWT_SECRET_KEY:dev-secret-key-change-in-production}
     expiration-time: ${JWT_EXPIRATION_TIME:3600000}
 
+server:
+  servlet:
+    context-path: "/api"
+
+sync:
+  interval: "0 0 */4 * * *"
+
 services:
   anilist:
     client:
-      key: ${ANILIST_CLIENT_KEY:}
-      secret: ${ANILIST_CLIENT_SECRET:}
-    url: ${ANILIST_REDIRECT_URL:}
+      key: ${ANILIST_CLIENT_KEY:27404}
+      secret: ${ANILIST_CLIENT_SECRET:xIEtzpqYI7jXaWJ4wuB4UKcGlWankJNeqXLIWsro}
+    url: ${ANILIST_REDIRECT_URL:http://localhost:3000/auth/anilist}
   trakt:
     client:
-      key: ${TRAKT_CLIENT_KEY:}
-      secret: ${TRAKT_CLIENT_SECRET:}
-    url: ${TRAKT_REDIRECT_URL:}
+      key: ${TRAKT_CLIENT_KEY:cacfbd22e5d5539c7bdce10370bf50ce8a85e33a19c3645db7b75387195cf85c}
+      secret: ${TRAKT_CLIENT_SECRET:6c085c7b8ff09ed371049b1704c852d4b225aefdefd6c3f68f638ecd58636056}
+    url: ${TRAKT_REDIRECT_URL:http://localhost:3000/auth/trakt}
+  steam:
+    client:
+      key: "arst"
+      secret: ${STEAM_CLIENT_KEY:48E3E23923B42B0B61956A1FE4C3A2DA}
+    url: "arst
+    "
 tmdb:
   api:
-    key: ${TMDB_API_KEY:}
+    key: ${TMDB_API_KEY:eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzZGJhZGU4MDI2NTc1ODlhYjUxODJiMDY1M2Y4ZTliOCIsIm5iZiI6MTc2Mjc4NDQxMy43OCwic3ViIjoiNjkxMWY0OWQ4MDQ3NzZkYmUyZDI1Y2FjIiwic2NvcGVzIjpbImFwaV9yZWFkIl0sInZlcnNpb24iOjF9.iJWmmP6WPkcTqNSmdkoam5ZS3fDHeG1JsFKodhVJRQs}

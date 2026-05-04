@@ -1,0 +1,47 @@
+import { Tier, TierlistEntry } from "@/types/types";
+
+export function assignTiersAndGroupEntriesByTier(tiers: Tier[], entries: TierlistEntry[]): Map<string, TierlistEntry[]> {
+	if (!tiers || tiers.length <= 0 || !entries || entries.length <= 0) return new Map<string, TierlistEntry[]>();
+
+	// Proper order (sorted descending by score) is assured by the server
+	let itemsIndex = 0;
+	let tiersIndex = 0;
+	let positionIndex = 0;
+
+	const entriesByTier = new Map<string, TierlistEntry[]>();
+	tiers.forEach((tier) => entriesByTier.set(tier.id, []));
+
+	while (itemsIndex < entries.length && tiersIndex < tiers.length) {
+		if (entries[itemsIndex].score >= tiers[tiersIndex].score) {
+			entries[itemsIndex].tier = tiers[tiersIndex];
+			entries[itemsIndex].index = positionIndex;
+
+			if (entriesByTier.has(tiers[tiersIndex].id)) {
+				const currentEntries = entriesByTier.get(tiers[tiersIndex].id)!;
+				entriesByTier.set(tiers[tiersIndex].id, [...currentEntries, entries[itemsIndex]]);
+			}
+
+			positionIndex++;
+			itemsIndex++;
+		} else {
+			tiersIndex++;
+			positionIndex = 0;
+		}
+	}
+
+	Array.from(entriesByTier.keys()).forEach((key) => entriesByTier.set(key, entriesByTier.get(key)!.sort(sortByName)));
+
+	return entriesByTier;
+}
+
+export function groupBySingle<T, K>(arr: T[], key: (i: T) => K): Map<K, T> {
+	const map = new Map<K, T>();
+	arr.forEach((elem) => map.set(key(elem), elem));
+	return map;
+}
+
+export function sortByName(a: TierlistEntry, b: TierlistEntry) {
+	const textA = a.title.toLowerCase();
+	const textB = b.title.toLowerCase();
+	return textA < textB ? -1 : textA > textB ? 1 : 0;
+}

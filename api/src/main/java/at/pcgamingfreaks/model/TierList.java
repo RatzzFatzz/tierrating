@@ -14,21 +14,21 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity(name = "tierlists")
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "user_id", "service", "type"})
+		@UniqueConstraint(columnNames = {"user_id", "service", "type"})
 })
 public class TierList {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private UUID id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    private User user;
+	@ManyToOne(fetch = FetchType.EAGER)
+	private User user;
 
-    @Enumerated(EnumType.STRING)
-    private ThirdPartyService service;
-    @Enumerated(EnumType.STRING)
-    private ContentType type;
+	@Enumerated(EnumType.STRING)
+	private ThirdPartyService service;
+	@Enumerated(EnumType.STRING)
+	private ContentType type;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "tierlist")
-    private List<Tier> tiers;
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "tierlist")
+	private List<Tier> tiers;
 }

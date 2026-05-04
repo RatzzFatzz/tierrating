@@ -25,78 +25,78 @@ import static at.pcgamingfreaks.model.ThirdPartyService.hasUserConnection;
 @Service
 @RequiredArgsConstructor
 public class TiersService {
-    private final UserRepository userRepository;
-    private final TierListsRepository tierListsRepository;
-    private final TiersRepository tiersRepository;
+	private final UserRepository userRepository;
+	private final TierListsRepository tierListsRepository;
+	private final TiersRepository tiersRepository;
 
-    public List<TierDTO> getTierlist(String username, ThirdPartyService service, ContentType type) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
-        if (!hasUserConnection(user, service)) throw new ThirdPartyUnconfiguredException(service);
+	public List<TierDTO> getTierlist(String username, ThirdPartyService service, ContentType type) {
+		User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
+		if (!hasUserConnection(user, service)) throw new ThirdPartyUnconfiguredException(service);
 
-        Optional<TierList> tierlist = tierListsRepository.findByUserAndServiceAndType(user, service, type);
+		Optional<TierList> tierlist = tierListsRepository.findByUserAndServiceAndType(user, service, type);
 
-        List<TierDTO> tiers = tierlist.map(tierList -> tierList.getTiers().stream()
-                .map(TierDtoMapper::map)
-                .sorted(Comparator.comparing(TierDTO::getScore).reversed())
-                .collect(Collectors.toList())
-        ).orElseGet(ArrayList::new);
+		List<TierDTO> tiers = tierlist.map(tierList -> tierList.getTiers().stream()
+				.map(TierDtoMapper::map)
+				.sorted(Comparator.comparing(TierDTO::getScore).reversed())
+				.collect(Collectors.toList())
+		).orElseGet(ArrayList::new);
 
-        return tiers;
-    }
+		return tiers;
+	}
 
-    @Transactional
-    public void updateTierlist(String username, ThirdPartyService service, ContentType type, List<TierDTO> changedTierlist) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
-        if (!hasUserConnection(user, service)) throw new ThirdPartyUnconfiguredException(service);
+	@Transactional
+	public void updateTierlist(String username, ThirdPartyService service, ContentType type, List<TierDTO> changedTierlist) {
+		User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
+		if (!hasUserConnection(user, service)) throw new ThirdPartyUnconfiguredException(service);
 
-        tierListsRepository.findByUserAndServiceAndType(user, service, type).ifPresentOrElse(existingTierlist -> {
-            Set<UUID> changedTiers = changedTierlist.stream().map(TierDTO::getId).collect(Collectors.toSet());
-            List<Tier> existingTiers = existingTierlist.getTiers();
-            List<Tier> removedTiers = new ArrayList<>();
-            // handle removed tiers
-            int i = 0;
-            while (i < existingTiers.size()) {
-                if (!changedTiers.contains(existingTiers.get(i).getId())) {
-                    removedTiers.add(existingTiers.get(i));
-                    existingTiers.remove(i);
-                } else {
-                    i++;
-                }
-            }
+		tierListsRepository.findByUserAndServiceAndType(user, service, type).ifPresentOrElse(existingTierlist -> {
+			Set<UUID> changedTiers = changedTierlist.stream().map(TierDTO::getId).collect(Collectors.toSet());
+			List<Tier> existingTiers = existingTierlist.getTiers();
+			List<Tier> removedTiers = new ArrayList<>();
+			// handle removed tiers
+			int i = 0;
+			while (i < existingTiers.size()) {
+				if (!changedTiers.contains(existingTiers.get(i).getId())) {
+					removedTiers.add(existingTiers.get(i));
+					existingTiers.remove(i);
+				} else {
+					i++;
+				}
+			}
 
-            // handle added and modified tiers
-            Map<UUID, Tier> existingTiersMap = existingTierlist.getTiers().stream().collect(Collectors.toMap(Tier::getId, Function.identity()));
-            for (TierDTO changedTier: changedTierlist) {
-                if (existingTiersMap.containsKey(changedTier.getId())) {
-                    Tier tier = existingTiersMap.get(changedTier.getId());
-                    tier.setName(changedTier.getName());
-                    tier.setColor(changedTier.getColor());
-                    tier.setScore(changedTier.getScore());
-                    tier.setAdjustedScore(changedTier.getAdjustedScore());
-                } else {
-                    Tier tier = TierDtoMapper.map(changedTier);
-                    tier.setTierlist(existingTierlist);
-                    existingTiers.add(tier);
-                }
-            }
+			// handle added and modified tiers
+			Map<UUID, Tier> existingTiersMap = existingTierlist.getTiers().stream().collect(Collectors.toMap(Tier::getId, Function.identity()));
+			for (TierDTO changedTier : changedTierlist) {
+				if (existingTiersMap.containsKey(changedTier.getId())) {
+					Tier tier = existingTiersMap.get(changedTier.getId());
+					tier.setName(changedTier.getName());
+					tier.setColor(changedTier.getColor());
+					tier.setScore(changedTier.getScore());
+					tier.setAdjustedScore(changedTier.getAdjustedScore());
+				} else {
+					Tier tier = TierDtoMapper.map(changedTier);
+					tier.setTierlist(existingTierlist);
+					existingTiers.add(tier);
+				}
+			}
 
-            tierListsRepository.save(existingTierlist);
-            tiersRepository.deleteAll(removedTiers);
-        }, () -> {
-            TierList tierlist = new TierList();
-            tierlist.setUser(user);
-            tierlist.setService(service);
-            tierlist.setType(type);
+			tierListsRepository.save(existingTierlist);
+			tiersRepository.deleteAll(removedTiers);
+		}, () -> {
+			TierList tierlist = new TierList();
+			tierlist.setUser(user);
+			tierlist.setService(service);
+			tierlist.setType(type);
 
-            tierlist.setTiers(new ArrayList<>());
-            // recreate tiers to be mapped by JPA
-            changedTierlist.forEach(tier -> {
-                Tier newTier = TierDtoMapper.map(tier);
-                newTier.setTierlist(tierlist);
-                tierlist.getTiers().add(newTier);
-            });
+			tierlist.setTiers(new ArrayList<>());
+			// recreate tiers to be mapped by JPA
+			changedTierlist.forEach(tier -> {
+				Tier newTier = TierDtoMapper.map(tier);
+				newTier.setTierlist(tierlist);
+				tierlist.getTiers().add(newTier);
+			});
 
-            tierListsRepository.save(tierlist);
-        });
-    }
+			tierListsRepository.save(tierlist);
+		});
+	}
 }

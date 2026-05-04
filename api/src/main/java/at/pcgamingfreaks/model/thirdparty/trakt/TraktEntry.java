@@ -8,40 +8,64 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.domain.Persistable;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity(name = "trakt_entries")
-public class TraktEntry {
+public class TraktEntry implements Persistable<Long> {
 
-    public TraktEntry(long id, ContentType type, @Nullable Integer season, String title, String cover) {
-        this.id = id;
-        this.type = type;
-        this.season = season;
-        this.title = title;
-        this.cover = cover;
-    }
+	public TraktEntry(long id, ContentType type, @Nullable Integer season, String title, String cover) {
+		this.id = id;
+		this.type = type;
+		this.season = season;
+		this.title = title;
+		this.cover = cover;
+	}
 
-    @Id
-    private long id;
+	@Id
+	private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private ContentType type;
+	@Enumerated(EnumType.STRING)
+	private ContentType type;
 
-    @Nullable
-    private Integer season;
+	@Nullable
+	private Integer season;
 
-    private String title;
-    private String cover;
+	private String title;
+	private String cover;
 
-    @CreationTimestamp
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
+	@CreationTimestamp
+	@Column(nullable = false, updatable = false)
+	private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
+	@UpdateTimestamp
+	@Column(nullable = false)
+	private LocalDateTime updatedAt;
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+
+		TraktEntry that = (TraktEntry) o;
+		return type == that.type && Objects.equals(season, that.season) && Objects.equals(title, that.title) && Objects.equals(cover, that.cover);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = Objects.hashCode(type);
+		result = 31 * result + Objects.hashCode(season);
+		result = 31 * result + Objects.hashCode(title);
+		result = 31 * result + Objects.hashCode(cover);
+		return result;
+	}
+
+	@Override
+	public boolean isNew() {
+		return createdAt == null;
+	}
 }

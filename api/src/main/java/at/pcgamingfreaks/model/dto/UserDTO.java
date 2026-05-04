@@ -10,10 +10,10 @@ import java.util.UUID;
 @Getter
 @Setter
 public class UserDTO {
-    private UUID id;
+	private UUID id;
 
-    private String username;
-    private String bio;
+	private String username;
+	private String bio;
 
-    private Set<ThirdPartyService> connectedServices;
+	private Set<ThirdPartyService> connectedServices;
 }

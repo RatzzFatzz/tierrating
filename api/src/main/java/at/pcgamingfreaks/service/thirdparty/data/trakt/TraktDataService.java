@@ -1,13 +1,12 @@
 package at.pcgamingfreaks.service.thirdparty.data.trakt;
 
-import at.pcgamingfreaks.model.exceptions.ThirdPartySyncException;
-import at.pcgamingfreaks.model.exceptions.EntryNotFoundException;
-import at.pcgamingfreaks.model.ContentType;
 import at.pcgamingfreaks.config.ThirdPartyConfig;
 import at.pcgamingfreaks.mapper.ListEntryDtoMapper;
 import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.auth.User;
 import at.pcgamingfreaks.model.dto.ListEntryDTO;
+import at.pcgamingfreaks.model.exceptions.EntryNotFoundException;
+import at.pcgamingfreaks.model.exceptions.ThirdPartySyncException;
 import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
 import at.pcgamingfreaks.model.repo.TraktEntryRepository;
 import at.pcgamingfreaks.model.repo.TraktEntryScoreRepository;
@@ -33,110 +32,118 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public abstract class TraktDataService implements DataService {
-    protected final UserRepository userRepository;
-    protected final TraktEntryScoreRepository entryScoreRepository;
-    protected final TraktEntryRepository entryRepository;
-    protected final TmdbCoverFinder coverFinder;
-    protected final ThirdPartyConfig thirdPartyConfig;
-    protected final ListEntryDtoMapper listEntryDtoMapper;
+	protected static final String TRAKT_API = "https://api.trakt.tv";
 
-    @Override
-    public ThirdPartyService getService() {
-        return ThirdPartyService.TRAKT;
-    }
+	protected final UserRepository userRepository;
+	protected final TraktEntryScoreRepository entryScoreRepository;
+	protected final TraktEntryRepository entryRepository;
+	protected final TmdbCoverFinder coverFinder;
+	protected final ThirdPartyConfig thirdPartyConfig;
+	protected final ListEntryDtoMapper listEntryDtoMapper;
 
-    @Override
-    public List<ListEntryDTO> fetch(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
-        Set<TraktEntryScore> existingScores = entryScoreRepository.findAllByUserAndEntry_TypeOrderByScoreDesc(user, getContentType());
+	@Override
+	public ThirdPartyService getService() {
+		return ThirdPartyService.TRAKT;
+	}
 
-        if (existingScores.isEmpty()) {
-            pull(username);
-            existingScores = entryScoreRepository.findAllByUserAndEntry_TypeOrderByScoreDesc(user, getContentType()); // TODO: improve?
-        }
+	@Override
+	public List<ListEntryDTO> fetch(String username) {
+		User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
+		Set<TraktEntryScore> existingScores = entryScoreRepository.findAllByUserAndEntry_TypeOrderByScoreDesc(user, getContentType());
 
-        return existingScores.stream().map(listEntryDtoMapper::map).toList();
-    }
+		if (existingScores.isEmpty()) {
+			pull(username);
+			existingScores = entryScoreRepository.findAllByUserAndEntry_TypeOrderByScoreDesc(user, getContentType()); // TODO: improve?
+		}
 
-    @Transactional
-    @Override
-    public void pull(String username) {
-        if (!thirdPartyConfig.getTrakt().isValid()) throw new ThirdPartySyncException("Trakt config is invalid");
-        long duration = System.currentTimeMillis();
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
+		return existingScores.stream().map(listEntryDtoMapper::map).toList();
+	}
 
-        List<TraktEntryScore> remoteScores = pull(user);
+	@Transactional
+	@Override
+	public void pull(String username) {
+		if (!thirdPartyConfig.getTrakt().isValid()) throw new ThirdPartySyncException("Trakt config is invalid");
+		long duration = System.currentTimeMillis();
+		User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
 
-        // Collect all remote IDs from this sync for batch lookup
-        Set<Long> remoteIds = remoteScores.stream()
-                .map(s -> s.getEntry().getId())
-                .collect(Collectors.toSet());
+		List<TraktEntryScore> remoteScores = pull(user);
 
-        // Fetch all existing entries and scores in bulk to avoid N+1 queries
-        Map<Long, TraktEntry> existingEntries = entryRepository
-                .findAllByIdIn(remoteIds)
-                .stream()
-                .collect(Collectors.toMap(TraktEntry::getId, Function.identity()));
+		// Collect all remote IDs from this sync for batch lookup
+		Set<Long> remoteIds = remoteScores.stream()
+				.map(s -> s.getEntry().getId())
+				.collect(Collectors.toSet());
 
-        Map<Long, TraktEntryScore> existingScores = entryScoreRepository
-                .findAllByUserAndEntryIdIn(user, remoteIds)
-                .stream()
-                .collect(Collectors.toMap(s -> s.getEntry().getId(), Function.identity()));
+		// Fetch all existing entries and scores in bulk to avoid N+1 queries
+		Map<Long, TraktEntry> existingEntries = entryRepository
+				.findAllByIdIn(remoteIds)
+				.stream()
+				.collect(Collectors.toMap(TraktEntry::getId, Function.identity()));
 
-        List<TraktEntryScore> scoresToSave = new ArrayList<>();
+		Map<Long, TraktEntryScore> existingScores = entryScoreRepository
+				.findAllByUserAndEntryIdIn(user, remoteIds)
+				.stream()
+				.collect(Collectors.toMap(s -> s.getEntry().getId(), Function.identity()));
 
-        for (TraktEntryScore remoteScore : remoteScores) {
-            TraktEntry remoteEntry = remoteScore.getEntry();
-            long entryId = remoteEntry.getId();
+		List<TraktEntry> entriesToSave = new ArrayList<>();
+		List<TraktEntryScore> scoresToSave = new ArrayList<>();
 
-            // Update existing entry or use the new one
-            TraktEntry entry = existingEntries.getOrDefault(entryId, remoteEntry);
-            if (entry != remoteEntry) {
-                entry.setTitle(remoteEntry.getTitle());
-                entry.setCover(remoteEntry.getCover());
-                entry.setSeason(remoteEntry.getSeason());
-                entry.setType(remoteEntry.getType());
-            }
+		for (TraktEntryScore remoteScore : remoteScores) {
+			TraktEntry remoteEntry = remoteScore.getEntry();
+			long entryId = remoteEntry.getId();
 
-            // Update existing score or create a new one
-            TraktEntryScore entryScore = existingScores.getOrDefault(entryId, new TraktEntryScore());
-            entryScore.setScore(remoteScore.getScore());
-            entryScore.setUser(user);
-            entryScore.setEntry(entry);
-            scoresToSave.add(entryScore);
-        }
+			// Update existing entry or use the new one
+			TraktEntry entry = existingEntries.getOrDefault(entryId, new TraktEntry());
+			if (!entry.equals(remoteEntry)) {
+				entry.setId(remoteEntry.getId());
+				entry.setTitle(remoteEntry.getTitle());
+				entry.setCover(remoteEntry.getCover());
+				entry.setSeason(remoteEntry.getSeason());
+				entry.setType(remoteEntry.getType());
+				entriesToSave.add(entry);
+			}
 
-        entryScoreRepository.saveAll(scoresToSave);
+			// Update existing score or create a new one
+			TraktEntryScore entryScore = existingScores.getOrDefault(entryId, new TraktEntryScore());
+			if (!(entryScore.getScore() == remoteScore.getScore())) {
+				entryScore.setScore(remoteScore.getScore());
+				entryScore.setUser(user);
+				entryScore.setEntry(entry);
+				scoresToSave.add(entryScore);
+			}
+		}
 
-        log.info("Synced {} {} for {} in {}s",
-                getService(),
-                getContentType(),
-                username,
-                (System.currentTimeMillis() - duration) / 1000);
-    }
+		entryRepository.saveAll(entriesToSave);
+		entryScoreRepository.saveAll(scoresToSave);
 
-    protected abstract List<TraktEntryScore> pull(User user);
+		log.info("Synced {} {} for {} in {}s",
+				getService(),
+				getContentType(),
+				username,
+				(System.currentTimeMillis() - duration) / 1000);
+	}
 
-    abstract protected List<?> pullRated(User user);
+	protected abstract List<TraktEntryScore> pull(User user);
 
-    abstract protected List<?> pullWatched(User user);
+	abstract protected List<?> pullRated(User user);
 
-    @Transactional
-    @Override
-    public void update(long id, float score, User user) {
-        if (!thirdPartyConfig.getTrakt().isValid()) throw new ThirdPartyUnconfiguredException(ThirdPartyService.TRAKT);
+	abstract protected List<?> pullWatched(User user);
 
-        TraktEntryScore entryScore = entryScoreRepository.findByUserAndEntry_Id(user, id).orElseThrow(() -> new EntryNotFoundException(getContentType(), id));
-        entryScore.setScore((int) score);
-        entryScoreRepository.save(entryScore);
+	@Transactional
+	@Override
+	public void update(long id, float score, User user) {
+		if (!thirdPartyConfig.getTrakt().isValid()) throw new ThirdPartyUnconfiguredException(getService());
 
-        if (user.getConnections().get(ThirdPartyService.TRAKT).isAutoUpdateSync()) pushSingleChange(id, score, user);
-    }
+		TraktEntryScore entryScore = entryScoreRepository.findByUserAndEntry_Id(user, id).orElseThrow(() -> new EntryNotFoundException(getContentType(), id));
+		entryScore.setScore((int) score);
+		entryScoreRepository.save(entryScore);
 
-    abstract protected void pushSingleChange(long id, float score, User user);
+		if (user.getConnections().get(getService()).isAutoUpdateSync()) pushSingleChange(id, score, user);
+	}
 
-    @Override
-    public void push(String username) {
+	abstract protected void pushSingleChange(long id, float score, User user);
 
-    }
+	@Override
+	public void push(String username) {
+
+	}
 }

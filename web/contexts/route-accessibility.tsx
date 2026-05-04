@@ -1,0 +1,56 @@
+"use client";
+
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useAuth } from "@/contexts/auth-context";
+import { LoadingPage } from "@/components/loading-skeletons/loading-page";
+
+export function ProtectedRoute({ children }: { children: React.ReactNode }) {
+	const { user, isAuthenticated, isLoading, isExpired } = useAuth();
+	const router = useRouter();
+	const currentPath = usePathname();
+
+	useEffect(() => {
+		console.debug(`User ${user} isAuthenticated: ${isAuthenticated}; isLoading ${isLoading}; isExpired: ${isExpired}`);
+		if (!isLoading && (!isAuthenticated || isExpired)) {
+			console.debug(`Redirect from ${currentPath} to /login`);
+			router.push("/login");
+		}
+	}, [user, isAuthenticated, isLoading, isExpired, router, currentPath]);
+
+	if (isLoading || !isAuthenticated || (!isLoading && (!isAuthenticated || isExpired))) {
+		return <LoadingPage />;
+	}
+
+	return <>{children}</>;
+}
+
+export function AnonymousAllowedRoute({ children }: { children: React.ReactNode }) {
+	const { user, isAuthenticated, isLoading, isExpired } = useAuth();
+	const router = useRouter();
+	const currentPath = usePathname();
+
+	useEffect(() => {
+		console.debug(`User ${user} isAuthenticated: ${isAuthenticated}; isLoading ${isLoading}; isExpired: ${isExpired}`);
+		if (!isLoading && isAuthenticated && (currentPath == "/login" || currentPath == "/signup")) {
+			console.debug(`Redirect from /login to /user/${user}`);
+			router.push(`/user/${user}`);
+		}
+	}, [user, isAuthenticated, isLoading, isExpired, router, currentPath]);
+
+	if (isLoading || (!isLoading && isAuthenticated && (currentPath == "/login" || currentPath == "/signup"))) {
+		return <LoadingPage />;
+	}
+
+	return <>{children}</>;
+}
+
+export function RestrictedRenderingRoute({ children }: { children: React.ReactNode }) {
+	const pathname = usePathname();
+
+	if (pathname === "/login" || pathname === "/signup") {
+		return null;
+	}
+
+	return <>{children}</>;
+}

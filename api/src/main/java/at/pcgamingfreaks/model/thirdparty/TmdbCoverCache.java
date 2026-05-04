@@ -1,7 +1,10 @@
 package at.pcgamingfreaks.model.thirdparty;
 
 import jakarta.annotation.Nullable;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,11 +12,12 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "id", "season"})
-})public class TmdbCoverCache {
-    @Id
-    private long id;
-    @Nullable
-    private Long season;
-    private String coverUrl;
+		@UniqueConstraint(columnNames = {"id", "season"})
+})
+public class TmdbCoverCache {
+	@Id
+	private long id;
+	@Nullable
+	private Long season;
+	private String coverUrl;
 }

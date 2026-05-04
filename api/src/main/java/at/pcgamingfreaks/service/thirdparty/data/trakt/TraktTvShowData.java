@@ -6,7 +6,6 @@ import at.pcgamingfreaks.model.ContentType;
 import at.pcgamingfreaks.model.ThirdPartyService;
 import at.pcgamingfreaks.model.auth.User;
 import at.pcgamingfreaks.model.exceptions.ThirdPartySyncException;
-import at.pcgamingfreaks.model.exceptions.ThirdPartyUnconfiguredException;
 import at.pcgamingfreaks.model.repo.TraktEntryRepository;
 import at.pcgamingfreaks.model.repo.TraktEntryScoreRepository;
 import at.pcgamingfreaks.model.repo.UserRepository;
@@ -31,108 +30,108 @@ import java.util.Map;
 @Service
 public class TraktTvShowData extends TraktDataService {
 
-    public TraktTvShowData(UserRepository userRepository, TraktEntryScoreRepository entryScoreRepository, TraktEntryRepository entryRepository, TmdbCoverFinder coverFinder, ThirdPartyConfig thirdPartyConfig, ListEntryDtoMapper listEntryDtoMapper) {
-        super(userRepository, entryScoreRepository, entryRepository, coverFinder, thirdPartyConfig, listEntryDtoMapper);
-    }
+	public TraktTvShowData(UserRepository userRepository, TraktEntryScoreRepository entryScoreRepository, TraktEntryRepository entryRepository, TmdbCoverFinder coverFinder, ThirdPartyConfig thirdPartyConfig, ListEntryDtoMapper listEntryDtoMapper) {
+		super(userRepository, entryScoreRepository, entryRepository, coverFinder, thirdPartyConfig, listEntryDtoMapper);
+	}
 
-    @Override
-    public ContentType getContentType() {
-        return ContentType.TVSHOWS;
-    }
+	@Override
+	public ContentType getContentType() {
+		return ContentType.TVSHOWS;
+	}
 
-    @Override
-    protected List<TraktEntryScore> pull(User user) {
-        Map<Long, TraktEntryScore> entries = new HashMap<>();
-        pullRated(user).stream()
-                .map(ratedShow -> {
-                    TraktEntry entry = new TraktEntry(
-                            ratedShow.show.ids.trakt,
-                            ContentType.TVSHOWS, null,
-                            ratedShow.show.title,
-                            coverFinder.findShow(ratedShow.show.ids.tmdb)
-                    );
-                    TraktEntryScore entryScore = new TraktEntryScore();
-                    entryScore.setUser(user);
-                    entryScore.setEntry(entry);
-                    entryScore.setScore(ratedShow.rating.value);
-                    return entryScore;
-                })
-                .forEach(entry -> entries.put(entry.getEntry().getId(), entry));
-        pullWatched(user).stream()
-                .map(baseShow -> {
-                    TraktEntry entry = new TraktEntry(
-                            baseShow.show.ids.trakt,
-                            ContentType.TVSHOWS, null,
-                            baseShow.show.title,
-                            coverFinder.findShow(baseShow.show.ids.tmdb)
-                    );
-                    TraktEntryScore entryScore = new TraktEntryScore();
-                    entryScore.setUser(user);
-                    entryScore.setEntry(entry);
-                    entryScore.setScore(0);
-                    return entryScore;
-                })
-                .forEach(entry -> entries.computeIfAbsent(entry.getEntry().getId(), key -> entry));
-        return entries.values().stream().toList();
-    }
+	@Override
+	protected List<TraktEntryScore> pull(User user) {
+		Map<Long, TraktEntryScore> entries = new HashMap<>();
+		pullRated(user).stream()
+				.map(ratedShow -> {
+					TraktEntry entry = new TraktEntry(
+							ratedShow.show.ids.trakt,
+							ContentType.TVSHOWS, null,
+							ratedShow.show.title,
+							coverFinder.findShow(ratedShow.show.ids.tmdb)
+					);
+					TraktEntryScore entryScore = new TraktEntryScore();
+					entryScore.setUser(user);
+					entryScore.setEntry(entry);
+					entryScore.setScore(ratedShow.rating.value);
+					return entryScore;
+				})
+				.forEach(entry -> entries.put(entry.getEntry().getId(), entry));
+		pullWatched(user).stream()
+				.map(baseShow -> {
+					TraktEntry entry = new TraktEntry(
+							baseShow.show.ids.trakt,
+							ContentType.TVSHOWS, null,
+							baseShow.show.title,
+							coverFinder.findShow(baseShow.show.ids.tmdb)
+					);
+					TraktEntryScore entryScore = new TraktEntryScore();
+					entryScore.setUser(user);
+					entryScore.setEntry(entry);
+					entryScore.setScore(0);
+					return entryScore;
+				})
+				.forEach(entry -> entries.computeIfAbsent(entry.getEntry().getId(), key -> entry));
+		return entries.values().stream().toList();
+	}
 
-    @Override
-    protected List<RatedShow> pullRated(User user) {
-        try {
-            Response<List<RatedShow>> response = new TraktV2(
-                        thirdPartyConfig.getTrakt().getClient().getKey(),
-                        thirdPartyConfig.getTrakt().getClient().getSecret(),
-                        thirdPartyConfig.getTrakt().getRedirectUrl())
-                    .users()
-                    .ratingsShows(
-                            UserSlug.fromUsername(user.getConnections().get(ThirdPartyService.TRAKT).getThirdPartyUserId()),
-                            RatingsFilter.ALL,
-                            Extended.NOSEASONS)
-                    .execute();
+	@Override
+	protected List<RatedShow> pullRated(User user) {
+		try {
+			Response<List<RatedShow>> response = new TraktV2(
+					thirdPartyConfig.getTrakt().getKey(),
+					thirdPartyConfig.getTrakt().getSecret(),
+					thirdPartyConfig.getTrakt().getRedirectUrl())
+					.users()
+					.ratingsShows(
+							UserSlug.fromUsername(user.getConnections().get(ThirdPartyService.TRAKT).getThirdPartyUserId()),
+							RatingsFilter.ALL,
+							Extended.NOSEASONS)
+					.execute();
 
-            if (!response.isSuccessful())
-                throw new ThirdPartySyncException("Error retrieving rated shows of " + user.getUsername());
+			if (!response.isSuccessful())
+				throw new ThirdPartySyncException("Error retrieving rated shows of " + user.getUsername());
 
-            return response.body();
-        } catch (IOException e) {
-            throw new ThirdPartySyncException("Error retrieving rated shows: " + e.getMessage());
-        }
-    }
+			return response.body();
+		} catch (IOException e) {
+			throw new ThirdPartySyncException("Error retrieving rated shows: " + e.getMessage());
+		}
+	}
 
-    @Override
-    protected List<BaseShow> pullWatched(User user) {
-        try {
-            Response<List<BaseShow>> response = new TraktV2(
-                        thirdPartyConfig.getTrakt().getClient().getKey(),
-                        thirdPartyConfig.getTrakt().getClient().getSecret(),
-                        thirdPartyConfig.getTrakt().getRedirectUrl())
-                    .users()
-                    .watchedShows(
-                            UserSlug.fromUsername(user.getConnections().get(ThirdPartyService.TRAKT).getThirdPartyUserId()),
-                            Extended.NOSEASONS)
-                    .execute();
+	@Override
+	protected List<BaseShow> pullWatched(User user) {
+		try {
+			Response<List<BaseShow>> response = new TraktV2(
+					thirdPartyConfig.getTrakt().getKey(),
+					thirdPartyConfig.getTrakt().getSecret(),
+					thirdPartyConfig.getTrakt().getRedirectUrl())
+					.users()
+					.watchedShows(
+							UserSlug.fromUsername(user.getConnections().get(ThirdPartyService.TRAKT).getThirdPartyUserId()),
+							Extended.NOSEASONS)
+					.execute();
 
-            if (!response.isSuccessful())
-                throw new ThirdPartySyncException("Error retrieving watched shows of " + user.getUsername());
+			if (!response.isSuccessful())
+				throw new ThirdPartySyncException("Error retrieving watched shows of " + user.getUsername());
 
-            return response.body();
-        } catch (IOException e) {
-            throw new ThirdPartySyncException("Error retrieving watched shows: " + e.getMessage());
-        }
-    }
+			return response.body();
+		} catch (IOException e) {
+			throw new ThirdPartySyncException("Error retrieving watched shows: " + e.getMessage());
+		}
+	}
 
-    protected void pushSingleChange(long id, float score, User user) {
-        try {
-            new TraktV2(thirdPartyConfig.getTrakt().getClient().getKey(), thirdPartyConfig.getTrakt().getClient().getSecret(), thirdPartyConfig.getTrakt().getRedirectUrl())
-                    .accessToken(user.getConnections().get(ThirdPartyService.TRAKT).getAccessToken())
-                    .sync()
-                    .addRatings(new SyncItems().shows(new SyncShow()
-                            .id(ShowIds.trakt((int) id))
-                            .rating(Rating.fromValue((int) score))))
-                    .execute();
-        } catch (IOException e) {
-            log.error("Error pushing rating change to Trakt: {}", e.getMessage(), e);
-            throw new ThirdPartySyncException("Failed to push rating change to Trakt: " + e.getMessage());
-        }
-    }
+	protected void pushSingleChange(long id, float score, User user) {
+		try {
+			new TraktV2(thirdPartyConfig.getTrakt().getKey(), thirdPartyConfig.getTrakt().getSecret(), thirdPartyConfig.getTrakt().getRedirectUrl())
+					.accessToken(user.getConnections().get(ThirdPartyService.TRAKT).getAccessToken())
+					.sync()
+					.addRatings(new SyncItems().shows(new SyncShow()
+							.id(ShowIds.trakt((int) id))
+							.rating(Rating.fromValue((int) score))))
+					.execute();
+		} catch (IOException e) {
+			log.error("Error pushing rating change to Trakt: {}", e.getMessage(), e);
+			throw new ThirdPartySyncException("Failed to push rating change to Trakt: " + e.getMessage());
+		}
+	}
 }

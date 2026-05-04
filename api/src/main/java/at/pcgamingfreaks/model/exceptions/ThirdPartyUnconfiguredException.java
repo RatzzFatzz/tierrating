@@ -5,10 +5,10 @@ import lombok.Getter;
 
 public class ThirdPartyUnconfiguredException extends RuntimeException {
 
-    @Getter
-    private final ThirdPartyService unconfiguredService;
+	@Getter
+	private final ThirdPartyService unconfiguredService;
 
-    public ThirdPartyUnconfiguredException(ThirdPartyService unconfiguredService) {
-        this.unconfiguredService = unconfiguredService;
-    }
+	public ThirdPartyUnconfiguredException(ThirdPartyService unconfiguredService) {
+		this.unconfiguredService = unconfiguredService;
+	}
 }

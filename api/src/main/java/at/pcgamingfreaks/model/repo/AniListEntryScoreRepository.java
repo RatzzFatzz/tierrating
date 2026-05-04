@@ -9,7 +9,11 @@ import java.util.*;
 
 public interface AniListEntryScoreRepository extends CrudRepository<AniListEntryScore, UUID> {
 
-    Set<AniListEntryScore> findAllByUserAndEntry_TypeOrderByScoreDesc(User user, ContentType type);
-    Optional<AniListEntryScore> findByUserAndEntry_Id(User user, long id);
-    List<AniListEntryScore> findAllByUserAndEntryIdIn(User user, Collection<Long> ids);
+	Set<AniListEntryScore> findAllByUserAndEntry_TypeOrderByScoreDesc(User user, ContentType type);
+
+	Optional<AniListEntryScore> findByUserAndEntry_Id(User user, long id);
+
+	List<AniListEntryScore> findAllByUserAndEntryIdIn(User user, Collection<Long> ids);
+
+	void deleteAllByUser(User user);
 }
