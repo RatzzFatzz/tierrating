@@ -1,6 +1,5 @@
 # TierRating
-[![Server Release Build](https://github.com/tierrating/tierrating/actions/workflows/build-api-release.yml/badge.svg)](https://github.com/tierrating/tierrating/actions/workflows/build-api-release.yml)
-[![UI Release Build](https://github.com/tierrating/tierrating/actions/workflows/build-web-release.yml/badge.svg)](https://github.com/tierrating/tierrating-ui/actions/workflows/build-web-release.yml)
+[![build release](https://github.com/RatzzFatzz/tierrating/actions/workflows/build-release.yml/badge.svg)](https://github.com/RatzzFatzz/tierrating/actions/workflows/build-release.yml)
 
 > [!IMPORTANT]  
 > This project is still under active development and will likely change in the future.
