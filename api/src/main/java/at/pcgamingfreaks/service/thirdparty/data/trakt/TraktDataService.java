@@ -104,7 +104,7 @@ public abstract class TraktDataService implements DataService {
 
 			// Update existing score or create a new one
 			TraktEntryScore entryScore = existingScores.getOrDefault(entryId, new TraktEntryScore());
-			if (!(entryScore.getScore() == remoteScore.getScore())) {
+			if (entryScore.getScore() != remoteScore.getScore() || entryScore.getId() == null) {
 				entryScore.setScore(remoteScore.getScore());
 				entryScore.setUser(user);
 				entryScore.setEntry(entry);
