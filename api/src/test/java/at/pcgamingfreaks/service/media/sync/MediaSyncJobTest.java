@@ -6,6 +6,7 @@ import at.pcgamingfreaks.model.enums.MediaSource;
 import at.pcgamingfreaks.model.enums.MediaType;
 import at.pcgamingfreaks.model.enums.SyncStatus;
 import at.pcgamingfreaks.model.repo.SyncJobRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -19,20 +20,25 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class MediaSyncJobTest {
 
+	private SyncJob syncJob;
+
 	@Mock
 	private MediaSyncProcessor mediaSyncProcessor;
 
 	@Mock
 	private SyncJobRepository syncJobRepository;
 
-	@Test
-	void run_successful() {
-		SyncJob syncJob = new SyncJob();
+	@BeforeEach
+	void setup() {
+		syncJob = new SyncJob();
 		syncJob.setId(1L);
 		syncJob.setUser(new User());
 		syncJob.setMediaSource(MediaSource.ANILIST);
 		syncJob.setMediaType(MediaType.ANIME);
+	}
 
+	@Test
+	void run_successful() {
 		MediaSyncJob underTest = new MediaSyncJob(syncJob, mediaSyncProcessor, syncJobRepository);
 		underTest.run();
 
@@ -45,12 +51,6 @@ class MediaSyncJobTest {
 	@Test
 	void run_failed() {
 		doThrow(RuntimeException.class).when(mediaSyncProcessor).processSync(any(), any(), any());
-
-		SyncJob syncJob = new SyncJob();
-		syncJob.setId(1L);
-		syncJob.setUser(new User());
-		syncJob.setMediaSource(MediaSource.ANILIST);
-		syncJob.setMediaType(MediaType.ANIME);
 
 		MediaSyncJob underTest = new MediaSyncJob(syncJob, mediaSyncProcessor, syncJobRepository);
 		underTest.run();

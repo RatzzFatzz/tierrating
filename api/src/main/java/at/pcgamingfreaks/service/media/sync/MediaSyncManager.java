@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static at.pcgamingfreaks.model.enums.SyncStatus.IN_PROGRESS;
 import static at.pcgamingfreaks.model.enums.SyncStatus.PENDING;
@@ -28,13 +27,13 @@ public class MediaSyncManager {
 
 	private final SyncJobRepository syncJobRepository;
 	private final MediaSyncProcessor mediaSyncProcessor;
-	private final ExecutorService executor = Executors.newSingleThreadExecutor();
+	private final ExecutorService syncExecutorService;
 
 	@PostConstruct
 	public void restartExistingSyncs() {
 		List<SyncJob> existingJobs = syncJobRepository.findAllByStatus(List.of(PENDING, IN_PROGRESS));
 		existingJobs.forEach((job) -> {
-			executor.submit(new MediaSyncJob(job, mediaSyncProcessor, syncJobRepository));
+			syncExecutorService.submit(new MediaSyncJob(job, mediaSyncProcessor, syncJobRepository));
 			log.debug("Resubmitted sync job (id: {}) for {} {} {}", job.getId(), job.getUser().getUsername(), job.getMediaSource(), job.getMediaType());
 		});
 	}
@@ -57,7 +56,7 @@ public class MediaSyncManager {
 		job.setStatus(PENDING);
 		syncJobRepository.saveAndFlush(job);
 
-		executor.submit(new MediaSyncJob(job, mediaSyncProcessor, syncJobRepository));
+		syncExecutorService.submit(new MediaSyncJob(job, mediaSyncProcessor, syncJobRepository));
 		log.debug("Submitted sync job (id: {}) for {} {} {}", job.getId(), user.getUsername(), source, type);
 	}
 
