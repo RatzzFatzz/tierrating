@@ -47,8 +47,8 @@ CREATE TABLE tierlists
     user_id    BIGINT       NOT NULL,
     service    VARCHAR(255) NOT NULL,
     type       VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP WITHOUT TIME ZONE,
-    updated_at TIMESTAMP WITHOUT TIME ZONE,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT pk_tierlists PRIMARY KEY (id)
 );
 
@@ -81,6 +81,8 @@ CREATE TABLE tmdb_cover_cache
     id        BIGINT NOT NULL,
     season    BIGINT,
     cover_url VARCHAR(255),
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT pk_tmdbcovercache PRIMARY KEY (id)
 );
 
@@ -97,6 +99,8 @@ CREATE TABLE media_source_connections
     access_token        VARCHAR(2047),
     refresh_token       VARCHAR(2047),
     expires_on          TIMESTAMP WITHOUT TIME ZONE,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT pk_media_source_connections PRIMARY KEY (id)
 );
 
@@ -123,6 +127,8 @@ CREATE TABLE media_type_settings
     auto_push     BOOLEAN  NOT NULL,
     show_public   BOOLEAN  NOT NULL,
     hidden        BOOLEAN  NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT pk_media_type_settings PRIMARY KEY (id)
 );
 
@@ -183,6 +189,8 @@ CREATE TABLE user_media_entry_states
     entry_id BIGINT       NOT NULL,
     score    FLOAT        NOT NULL,
     state    VARCHAR(255),
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT pk_user_media_entry_states PRIMARY KEY (id)
 );
 

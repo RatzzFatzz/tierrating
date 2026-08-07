@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -51,6 +53,14 @@ public class MediaSourceConnection {
 	@OneToMany(mappedBy = "connection", orphanRemoval = true, fetch = FetchType.EAGER)
 	@MapKey(name = "type")
 	Map<MediaType, MediaTypeSettings> mediaTypeSettings = new HashMap<>();
+	
+	@CreationTimestamp
+	@Column(nullable = false, updatable = false)
+	private LocalDateTime createdAt;
+
+	@UpdateTimestamp
+	@Column(nullable = false)
+	private LocalDateTime updatedAt;
 
 	public void putMediaTypeSettings(MediaTypeSettings settings) {
 		if (settings.getType() == null) throw new IllegalStateException("Type is required for MediaTypeSettings");

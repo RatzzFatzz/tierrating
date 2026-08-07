@@ -54,8 +54,10 @@ public class Tierlist {
 	private List<Tier> tiers = new ArrayList<>();
 
 	@CreationTimestamp
+	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
 	@UpdateTimestamp
+	@Column(nullable = false)
 	private LocalDateTime updatedAt;
 }
