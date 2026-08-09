@@ -44,6 +44,8 @@ public class UserMediaEntryState {
 	@Enumerated(EnumType.STRING)
 	private MediaState state;
 
+	private boolean dirty = false;
+
 	@CreationTimestamp
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;
