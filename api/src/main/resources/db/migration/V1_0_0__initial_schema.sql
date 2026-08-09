@@ -1,10 +1,10 @@
 -- user
 CREATE TABLE users
 (
-    id         BIGINT                      NOT NULL,
-    username   VARCHAR(255)                NOT NULL,
-    email      VARCHAR(255)                NOT NULL,
-    password   VARCHAR(255)                NOT NULL,
+    id         BIGINT       NOT NULL,
+    username   VARCHAR(255) NOT NULL,
+    email      VARCHAR(255) NOT NULL,
+    password   VARCHAR(255) NOT NULL,
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     bio        VARCHAR(255),
@@ -20,11 +20,11 @@ ALTER TABLE users
 -- SyncJob
 CREATE TABLE sync_jobs
 (
-    id           BIGINT                      NOT NULL,
-    user_id      BIGINT                      NOT NULL,
-    media_source VARCHAR(255)                NOT NULL,
-    media_type   VARCHAR(255)                NOT NULL,
-    status       VARCHAR(255)                NOT NULL,
+    id           BIGINT       NOT NULL,
+    user_id      BIGINT       NOT NULL,
+    media_source VARCHAR(255) NOT NULL,
+    media_type   VARCHAR(255) NOT NULL,
+    status       VARCHAR(255) NOT NULL,
     error        VARCHAR(255),
     started_at   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     completed_at TIMESTAMP WITHOUT TIME ZONE,
@@ -37,8 +37,7 @@ ALTER TABLE sync_jobs
 CREATE INDEX idx_syncjob_user_id ON sync_jobs (user_id);
 
 CREATE UNIQUE INDEX idx_unique_active_sync_job
-    ON sync_jobs (user_id, media_source, media_type)
-    WHERE status IN ('PENDING', 'IN_PROGRESS');
+    ON sync_jobs (user_id, media_source, media_type) WHERE status IN ('PENDING', 'IN_PROGRESS');
 
 -- Tierlist
 CREATE TABLE tierlists
@@ -78,9 +77,9 @@ ALTER TABLE tiers
 -- TMDB cover cache
 CREATE TABLE tmdb_cover_cache
 (
-    id        BIGINT NOT NULL,
-    season    BIGINT,
-    cover_url VARCHAR(255),
+    id         BIGINT NOT NULL,
+    season     BIGINT,
+    cover_url  VARCHAR(255),
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT pk_tmdbcovercache PRIMARY KEY (id)
@@ -99,8 +98,8 @@ CREATE TABLE media_source_connections
     access_token        VARCHAR(2047),
     refresh_token       VARCHAR(2047),
     expires_on          TIMESTAMP WITHOUT TIME ZONE,
-    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    created_at          TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_at          TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT pk_media_source_connections PRIMARY KEY (id)
 );
 
@@ -120,15 +119,15 @@ CREATE TABLE hidden_states
 
 CREATE TABLE media_type_settings
 (
-    id            BIGINT   NOT NULL,
+    id            BIGINT       NOT NULL,
     connection_id BIGINT,
-    type          SMALLINT NOT NULL,
-    login_pull    BOOLEAN  NOT NULL,
-    auto_push     BOOLEAN  NOT NULL,
-    show_public   BOOLEAN  NOT NULL,
-    hidden        BOOLEAN  NOT NULL,
-    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    type          VARCHAR(255) NOT NULL,
+    login_pull    BOOLEAN      NOT NULL,
+    auto_push     BOOLEAN      NOT NULL,
+    show_public   BOOLEAN      NOT NULL,
+    hidden        BOOLEAN      NOT NULL,
+    created_at    TIMESTAMP(6) WITHOUT TIME ZONE NOT NULL,
+    updated_at    TIMESTAMP(6) WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT pk_media_type_settings PRIMARY KEY (id)
 );
 
@@ -139,12 +138,11 @@ CREATE INDEX idx_media_type_settings_connection_id ON media_type_settings (conne
 
 ALTER TABLE hidden_states
     ADD CONSTRAINT fk_hidden_states_on_media_type_settings FOREIGN KEY (media_type_settings_id) REFERENCES media_type_settings (id);
-
 -- media entries
 
 CREATE TABLE anilist_media_entries
 (
-    id           BIGINT                      NOT NULL,
+    id           BIGINT NOT NULL,
     type         VARCHAR(255),
     title        VARCHAR(255),
     cover_url    VARCHAR(1023),
@@ -157,7 +155,7 @@ CREATE TABLE anilist_media_entries
 
 CREATE TABLE steam_media_entries
 (
-    id         BIGINT                      NOT NULL,
+    id         BIGINT NOT NULL,
     type       VARCHAR(255),
     title      VARCHAR(255),
     cover_url  VARCHAR(1023),
@@ -169,7 +167,7 @@ CREATE TABLE steam_media_entries
 
 CREATE TABLE trakt_media_entries
 (
-    id         BIGINT                      NOT NULL,
+    id         BIGINT NOT NULL,
     type       VARCHAR(255),
     title      VARCHAR(255),
     cover_url  VARCHAR(1023),
@@ -183,12 +181,12 @@ CREATE TABLE trakt_media_entries
 -- media entry states
 CREATE TABLE user_media_entry_states
 (
-    id       BIGINT       NOT NULL,
-    user_id  BIGINT       NOT NULL,
-    source   VARCHAR(255) NOT NULL,
-    entry_id BIGINT       NOT NULL,
-    score    FLOAT        NOT NULL,
-    state    VARCHAR(255),
+    id         BIGINT       NOT NULL,
+    user_id    BIGINT       NOT NULL,
+    source     VARCHAR(255) NOT NULL,
+    entry_id   BIGINT       NOT NULL,
+    score      FLOAT        NOT NULL,
+    state      VARCHAR(255),
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT pk_user_media_entry_states PRIMARY KEY (id)

@@ -32,6 +32,8 @@ public class MediaTypeSettings {
 	private MediaSourceConnection connection;
 
 	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
 	private MediaType type;
 
 	private boolean loginPull = true;
