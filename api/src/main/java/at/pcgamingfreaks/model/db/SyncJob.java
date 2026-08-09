@@ -3,6 +3,7 @@ package at.pcgamingfreaks.model.db;
 import at.pcgamingfreaks.model.enums.MediaType;
 import at.pcgamingfreaks.model.enums.SyncStatus;
 import at.pcgamingfreaks.model.enums.MediaSource;
+import at.pcgamingfreaks.model.enums.SyncType;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -44,6 +45,11 @@ public class SyncJob {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private SyncStatus status;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private SyncType type;
 
 	@Nullable
 	private String error;

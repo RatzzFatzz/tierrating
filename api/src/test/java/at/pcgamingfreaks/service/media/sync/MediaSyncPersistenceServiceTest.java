@@ -97,6 +97,15 @@ class MediaSyncPersistenceServiceTest {
 						List.of(localStateEntry(1L, user,1L, 9, MediaState.COMPLETED))
 				),
 				Arguments.of(
+						"Set dirty = false when score and state match",
+						userId, user,
+						List.of(mediaEntry(1L)),
+						List.of(localStateEntry(1L, user,1L, 10, MediaState.COMPLETED, true)),
+						List.of(remoteEntry(1L, 10, MediaState.COMPLETED)),
+						List.of(),
+						List.of(localStateEntry(1L, user,1L, 10, MediaState.COMPLETED, false))
+				),
+				Arguments.of(
 						"Add new state",
 						userId, user,
 						List.of(mediaEntry(1L)),
@@ -187,6 +196,10 @@ class MediaSyncPersistenceServiceTest {
 	}
 
 	private static UserMediaEntryState localStateEntry(Long id, User user, Long entryId, float score, MediaState state) {
+		return localStateEntry(id, user, entryId, score, state, false);
+	}
+
+	private static UserMediaEntryState localStateEntry(Long id, User user, Long entryId, float score, MediaState state, boolean isDirty) {
 		UserMediaEntryState entryState = new UserMediaEntryState();
 		entryState.setId(id);
 		entryState.setUser(user);
@@ -194,6 +207,7 @@ class MediaSyncPersistenceServiceTest {
 		entryState.setSource(MediaSource.ANILIST);
 		entryState.setScore(score);
 		entryState.setState(state);
+		entryState.setDirty(isDirty);
 		return entryState;
 	}
 }

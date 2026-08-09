@@ -89,12 +89,14 @@ public class MediaSyncPersistenceService {
 		}
 
 		if (!remoteMediaClient.shouldOverwriteLocal(localState.getScore(), remoteResult.score())
-				&& Objects.equals(localState.getState(), remoteResult.status())) {
+				&& Objects.equals(localState.getState(), remoteResult.status())
+				&& !localState.isDirty()) {
 			return null;
 		}
 
 		localState.setScore(remoteResult.score());
 		localState.setState(remoteResult.status());
+		localState.setDirty(false);
 		return localState;
 	}
 }

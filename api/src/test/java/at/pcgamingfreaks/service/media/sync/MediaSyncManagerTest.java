@@ -8,6 +8,7 @@ import at.pcgamingfreaks.model.db.User;
 import at.pcgamingfreaks.model.enums.MediaSource;
 import at.pcgamingfreaks.model.enums.MediaType;
 import at.pcgamingfreaks.model.enums.SyncStatus;
+import at.pcgamingfreaks.model.enums.SyncType;
 import at.pcgamingfreaks.model.repo.SyncJobRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +19,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,7 +37,7 @@ class MediaSyncManagerTest {
 	private MediaSyncProcessor mediaSyncProcessor;
 
 	@Mock
-	private ExecutorService syncExecutorService;
+	private ScheduledExecutorService syncExecutorService;
 
 	@InjectMocks
 	private MediaSyncManager mediaSyncManager;
@@ -73,7 +75,7 @@ class MediaSyncManagerTest {
 		when(syncJobRepository.findActiveSyncByUserAndSourceAndTypeAndStatus(any(), any(), any(), anyList()))
 				.thenReturn(Optional.of(syncJob));
 
-		assertThrows(MediaSyncAlreadyQueued.class, () -> mediaSyncManager.enqueueSync(new User(), MediaSource.ANILIST, MediaType.ANIME));
+		assertThrows(MediaSyncAlreadyQueued.class, () -> mediaSyncManager.enqueueSync(new User(), MediaSource.ANILIST, MediaType.ANIME, SyncType.PULL));
 	}
 
 	@Test
@@ -83,7 +85,7 @@ class MediaSyncManagerTest {
 		User user = new User();
 		user.setConnections(Map.of());
 
-		assertThrows(MediaSourceNotConnectedException.class, () -> mediaSyncManager.enqueueSync(user, MediaSource.ANILIST, MediaType.ANIME));
+		assertThrows(MediaSourceNotConnectedException.class, () -> mediaSyncManager.enqueueSync(user, MediaSource.ANILIST, MediaType.ANIME, SyncType.PULL));
 	}
 
 	@Test
@@ -93,9 +95,9 @@ class MediaSyncManagerTest {
 		User user = new User();
 		user.setConnections(Map.of(MediaSource.ANILIST, new MediaSourceConnection()));
 
-		mediaSyncManager.enqueueSync(user, MediaSource.ANILIST, MediaType.ANIME);
+		mediaSyncManager.enqueueSync(user, MediaSource.ANILIST, MediaType.ANIME, SyncType.PULL);
 
 		verify(syncJobRepository, times(1)).saveAndFlush(any(SyncJob.class));
-		verify(syncExecutorService, times(1)).submit(any(Runnable.class));
+		verify(syncExecutorService, times(1)).schedule(any(MediaSyncJob.class), eq(0L), eq(TimeUnit.SECONDS));
 	}
 }

@@ -3,7 +3,6 @@ package at.pcgamingfreaks.service.media;
 import at.pcgamingfreaks.exceptions.UnknownMediaEntryException;
 import at.pcgamingfreaks.mapper.mediaentry.MediaEntryMapper;
 import at.pcgamingfreaks.mapper.mediaentry.MediaEntryMapperRegistry;
-import at.pcgamingfreaks.model.RemoteUpdateEntry;
 import at.pcgamingfreaks.model.db.User;
 import at.pcgamingfreaks.model.db.media.MediaEntry;
 import at.pcgamingfreaks.model.db.media.UserMediaEntryState;
@@ -21,10 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -69,8 +65,12 @@ public class MediaLibraryService {
 					.orElseThrow(() -> new UnknownMediaEntryException(request.getId()));
 			userState.setEntryId(request.getId());
 		}
+		if (Objects.equals(userState.getScore(), request.getScore())
+				&& Objects.equals(userState.getState(), request.getState())) return;
+
 		userState.setScore(request.getScore());
 		userState.setState(request.getState());
+		userState.setDirty(true);
 		userMediaEntryStateRepository.save(userState);
 
 		// TODO: should this be done directly here? dirtyState would be a idea, would work nicely with push function. sync could be async

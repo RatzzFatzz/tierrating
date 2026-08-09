@@ -1,0 +1,5 @@
+ALTER TABLE sync_jobs ADD COLUMN type VARCHAR(255);
+
+UPDATE sync_jobs SET type = 'PULL' WHERE type IS NULL;
+
+ALTER TABLE sync_jobs ALTER COLUMN type SET NOT NULL;
