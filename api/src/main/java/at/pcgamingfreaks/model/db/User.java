@@ -58,4 +58,9 @@ public class User {
 	public boolean hasMediaSourceConnection(MediaSource source) {
 		return connections.containsKey(source) && connections.get(source) != null;
 	}
+
+	public void putMediaSourceConnection(MediaSourceConnection connection) {
+		this.connections.put(connection.getSource(), connection);
+		connection.setUser(this);
+	}
 }

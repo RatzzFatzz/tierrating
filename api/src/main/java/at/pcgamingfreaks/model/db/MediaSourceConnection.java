@@ -50,7 +50,7 @@ public class MediaSourceConnection {
 
 	private LocalDateTime expiresOn;
 
-	@OneToMany(mappedBy = "connection", orphanRemoval = true, fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "connection", orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@MapKey(name = "type")
 	Map<MediaType, MediaTypeSettings> mediaTypeSettings = new HashMap<>();
 	

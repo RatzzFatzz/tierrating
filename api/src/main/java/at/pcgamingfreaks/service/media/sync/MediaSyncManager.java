@@ -1,5 +1,6 @@
 package at.pcgamingfreaks.service.media.sync;
 
+import at.pcgamingfreaks.model.db.MediaSourceConnection;
 import at.pcgamingfreaks.model.db.SyncJob;
 import at.pcgamingfreaks.model.db.User;
 import at.pcgamingfreaks.model.enums.MediaSource;
@@ -7,10 +8,13 @@ import at.pcgamingfreaks.model.enums.MediaType;
 import at.pcgamingfreaks.exceptions.MediaSourceNotConnectedException;
 import at.pcgamingfreaks.exceptions.MediaSyncAlreadyQueued;
 import at.pcgamingfreaks.model.enums.SyncType;
+import at.pcgamingfreaks.model.repo.MediaSourceConnectionRepository;
 import at.pcgamingfreaks.model.repo.SyncJobRepository;
+import at.pcgamingfreaks.model.repo.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -27,6 +31,8 @@ import static at.pcgamingfreaks.model.enums.SyncStatus.PENDING;
 @RequiredArgsConstructor
 public class MediaSyncManager {
 
+	private final UserRepository userRepository;
+	private final MediaSourceConnectionRepository mediaSourceConnectionRepository;
 	private final SyncJobRepository syncJobRepository;
 	private final MediaSyncProcessor mediaSyncProcessor;
 	private final ScheduledExecutorService syncExecutorService;
@@ -40,18 +46,20 @@ public class MediaSyncManager {
 		});
 	}
 
-	public void enqueueSync(User user, MediaSource source, MediaType type, SyncType syncType) {
-		enqueueSync(user, source, type, syncType, 0);
+	public void enqueueSync(Long userId, MediaSource source, MediaType type, SyncType syncType) {
+		enqueueSync(userId, source, type, syncType, 0);
 	}
 
-	public void enqueueSync(User user, MediaSource source, MediaType type, SyncType syncType, long delay) {
+	public void enqueueSync(Long userId, MediaSource source, MediaType type, SyncType syncType, long delay) {
+		User user = userRepository.getReferenceById(userId);
 		Optional<SyncJob> runningJob = syncJobRepository.findActiveSyncByUserAndSourceAndTypeAndStatus(user, source, type, List.of(IN_PROGRESS, PENDING));
 		if (runningJob.isPresent()) {
 			log.debug("Tried to enqueue sync for {} {} {}, but sync already queued or in progress", user.getUsername(), source, type);
 			throw new MediaSyncAlreadyQueued(user.getUsername(), source, type);
 		}
 
-		if (!user.getConnections().containsKey(source)) {
+		Optional<MediaSourceConnection> connection = mediaSourceConnectionRepository.findByUserIdAndSource(userId, source);
+		if (connection.isEmpty()) {
 			throw new MediaSourceNotConnectedException(user.getUsername(), source);
 		}
 

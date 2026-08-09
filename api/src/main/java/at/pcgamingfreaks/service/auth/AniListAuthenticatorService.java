@@ -2,15 +2,18 @@ package at.pcgamingfreaks.service.auth;
 
 import at.pcgamingfreaks.config.ThirdPartyConfig;
 import at.pcgamingfreaks.model.db.MediaSourceConnection;
+import at.pcgamingfreaks.model.db.MediaTypeSettings;
 import at.pcgamingfreaks.model.enums.MediaSource;
 import at.pcgamingfreaks.model.db.User;
 import at.pcgamingfreaks.model.dto.AuthTokenResponseDTO;
 import at.pcgamingfreaks.model.dto.ThirdPartyOAuthRequestDTO;
 import at.pcgamingfreaks.exceptions.ThirdPartyAuthenticationException;
 import at.pcgamingfreaks.exceptions.MediaSourceUnconfiguredException;
+import at.pcgamingfreaks.model.enums.SyncType;
 import at.pcgamingfreaks.model.repo.MediaSourceConnectionRepository;
 import at.pcgamingfreaks.model.repo.UserRepository;
 import at.pcgamingfreaks.model.util.JwtPayload;
+import at.pcgamingfreaks.service.media.sync.MediaSyncManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -32,6 +35,7 @@ public class AniListAuthenticatorService implements ThirdPartyOAuthAuthenticator
 	private final MediaSourceConnectionRepository mediaSourceConnectionRepository;
 	private final ThirdPartyConfig thirdPartyConfig;
 	private final ObjectMapper objectMapper = new ObjectMapper();
+	private final MediaSyncManager mediaSyncManager;
 
 	@Override
 	public MediaSource getMediaSource() {
@@ -58,7 +62,20 @@ public class AniListAuthenticatorService implements ThirdPartyOAuthAuthenticator
 			connection.setExpiresOn(LocalDateTime.now().plusSeconds(tokenResponse.getExpiresIn()));
 			connection.setThirdPartyUserId(String.valueOf(extractUserIdFrom(connection.getAccessToken())));
 			connection.setUser(user);
+
+			MediaTypeSettings mangaSettings = new MediaTypeSettings();
+			mangaSettings.setType(at.pcgamingfreaks.model.enums.MediaType.MANGA);
+			connection.putMediaTypeSettings(mangaSettings);
+
+			MediaTypeSettings animeSettings = new MediaTypeSettings();
+			animeSettings.setType(at.pcgamingfreaks.model.enums.MediaType.ANIME);
+			connection.putMediaTypeSettings(animeSettings);
+
 			mediaSourceConnectionRepository.save(connection);
+
+			mediaSyncManager.enqueueSync(user.getId(), getMediaSource(), at.pcgamingfreaks.model.enums.MediaType.ANIME, SyncType.PULL);
+			mediaSyncManager.enqueueSync(user.getId(), getMediaSource(), at.pcgamingfreaks.model.enums.MediaType.MANGA, SyncType.PULL);
+
 		} catch (Exception e) {
 			throw new ThirdPartyAuthenticationException(e);
 		}

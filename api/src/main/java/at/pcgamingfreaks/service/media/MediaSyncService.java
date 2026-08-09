@@ -33,7 +33,6 @@ public class MediaSyncService {
 	}
 
 	public void enqueue(UserPrincipal userPrincipal, MediaSource source, MediaType type, SyncType syncType) {
-		User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new UsernameNotFoundException(userPrincipal.getUsername()));
-		syncManager.enqueueSync(user, source, type, syncType);
+		syncManager.enqueueSync(userPrincipal.getId(), source, type, syncType);
 	}
 }

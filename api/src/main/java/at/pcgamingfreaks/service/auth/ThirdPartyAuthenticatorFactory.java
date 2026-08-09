@@ -19,7 +19,7 @@ public class ThirdPartyAuthenticatorFactory {
 		this.oauthProviders = oauthProviders.stream()
 				.collect(Collectors.toMap(ThirdPartyOAuthAuthenticatorService::getMediaSource, provider -> provider));
 		this.openIdProviders = openIdProviders.stream()
-				.collect(Collectors.toMap(ThirdPartyOpenIdAuthenticatorService::getService, provider -> provider));
+				.collect(Collectors.toMap(ThirdPartyOpenIdAuthenticatorService::getMediaSource, provider -> provider));
 	}
 
 	public ThirdPartyOAuthAuthenticatorService getOauthProvider(MediaSource service) {

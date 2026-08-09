@@ -9,7 +9,9 @@ import at.pcgamingfreaks.model.enums.MediaSource;
 import at.pcgamingfreaks.model.enums.MediaType;
 import at.pcgamingfreaks.model.enums.SyncStatus;
 import at.pcgamingfreaks.model.enums.SyncType;
+import at.pcgamingfreaks.model.repo.MediaSourceConnectionRepository;
 import at.pcgamingfreaks.model.repo.SyncJobRepository;
+import at.pcgamingfreaks.model.repo.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,6 +31,12 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MediaSyncManagerTest {
+
+	@Mock
+	private UserRepository userRepository;
+
+	@Mock
+	private MediaSourceConnectionRepository mediaSourceConnectionRepository;
 
 	@Mock
 	private SyncJobRepository syncJobRepository;
@@ -72,30 +80,31 @@ class MediaSyncManagerTest {
 		SyncJob syncJob = new SyncJob();
 		syncJob.setUser(new User());
 
+		when(userRepository.getReferenceById(anyLong())).thenReturn(new User());
 		when(syncJobRepository.findActiveSyncByUserAndSourceAndTypeAndStatus(any(), any(), any(), anyList()))
 				.thenReturn(Optional.of(syncJob));
 
-		assertThrows(MediaSyncAlreadyQueued.class, () -> mediaSyncManager.enqueueSync(new User(), MediaSource.ANILIST, MediaType.ANIME, SyncType.PULL));
+		assertThrows(MediaSyncAlreadyQueued.class, () -> mediaSyncManager.enqueueSync(1L, MediaSource.ANILIST, MediaType.ANIME, SyncType.PULL));
 	}
 
 	@Test
 	void enqueueSync_noConnection() {
+		when(userRepository.getReferenceById(anyLong())).thenReturn(new User());
+		when(mediaSourceConnectionRepository.findByUserIdAndSource(anyLong(), any(MediaSource.class))).thenReturn(Optional.empty());
 		when(syncJobRepository.findActiveSyncByUserAndSourceAndTypeAndStatus(any(), any(), any(), anyList()))
 				.thenReturn(Optional.empty());
-		User user = new User();
-		user.setConnections(Map.of());
 
-		assertThrows(MediaSourceNotConnectedException.class, () -> mediaSyncManager.enqueueSync(user, MediaSource.ANILIST, MediaType.ANIME, SyncType.PULL));
+		assertThrows(MediaSourceNotConnectedException.class, () -> mediaSyncManager.enqueueSync(1L, MediaSource.ANILIST, MediaType.ANIME, SyncType.PULL));
 	}
 
 	@Test
 	void enqueueSync_successful() {
+		when(userRepository.getReferenceById(anyLong())).thenReturn(new User());
+		when(mediaSourceConnectionRepository.findByUserIdAndSource(anyLong(), any(MediaSource.class))).thenReturn(Optional.of(new MediaSourceConnection()));
 		when(syncJobRepository.findActiveSyncByUserAndSourceAndTypeAndStatus(any(), any(), any(), anyList()))
 				.thenReturn(Optional.empty());
-		User user = new User();
-		user.setConnections(Map.of(MediaSource.ANILIST, new MediaSourceConnection()));
 
-		mediaSyncManager.enqueueSync(user, MediaSource.ANILIST, MediaType.ANIME, SyncType.PULL);
+		mediaSyncManager.enqueueSync(1L, MediaSource.ANILIST, MediaType.ANIME, SyncType.PULL);
 
 		verify(syncJobRepository, times(1)).saveAndFlush(any(SyncJob.class));
 		verify(syncExecutorService, times(1)).schedule(any(MediaSyncJob.class), eq(0L), eq(TimeUnit.SECONDS));

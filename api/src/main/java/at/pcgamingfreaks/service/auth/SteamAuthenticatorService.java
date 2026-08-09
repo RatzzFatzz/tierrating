@@ -8,8 +8,10 @@ import at.pcgamingfreaks.model.db.User;
 import at.pcgamingfreaks.model.dto.ThirdPartyOpenIdAuthRequestDTO;
 import at.pcgamingfreaks.exceptions.ThirdPartyAuthenticationException;
 import at.pcgamingfreaks.exceptions.MediaSourceUnconfiguredException;
+import at.pcgamingfreaks.model.enums.SyncType;
 import at.pcgamingfreaks.model.repo.MediaSourceConnectionRepository;
 import at.pcgamingfreaks.model.repo.UserRepository;
+import at.pcgamingfreaks.service.media.sync.MediaSyncManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -37,18 +39,19 @@ public class SteamAuthenticatorService implements ThirdPartyOpenIdAuthenticatorS
 	private final MediaSourceConnectionRepository mediaSourceConnectionRepository;
 	private final ThirdPartyConfig thirdPartyConfig;
 	private final RestClient.Builder restClientBuilder = RestClient.builder();
+	private final MediaSyncManager mediaSyncManager;
 
 	@Override
-	public MediaSource getService() {
+	public MediaSource getMediaSource() {
 		return MediaSource.STEAM;
 	}
 
 	@Override
 	public void auth(String username, ThirdPartyOpenIdAuthRequestDTO request) {
-		if (!thirdPartyConfig.getSteam().isValid()) throw new MediaSourceUnconfiguredException(getService());
+		if (!thirdPartyConfig.getSteam().isValid()) throw new MediaSourceUnconfiguredException(getMediaSource());
 
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
-		if (user.getConnections().get(getService()) != null)
+		if (user.getConnections().get(getMediaSource()) != null)
 			throw new ThirdPartyAuthenticationException("Already authenticated");
 
 		if (!"id_res".equals(request.getParams().get("openid.mode"))) {
@@ -75,16 +78,18 @@ public class SteamAuthenticatorService implements ThirdPartyOpenIdAuthenticatorS
 		String steamId = extractSteamId(request.getParams().get("openid.claimed_id"));
 
 		MediaSourceConnection connection = new MediaSourceConnection();
-		connection.setSource(getService());
+		connection.setSource(getMediaSource());
 		connection.setUser(user);
 		connection.setThirdPartyUserId(steamId);
 
 		MediaTypeSettings settings = new MediaTypeSettings();
 		settings.setType(GAME);
 		settings.setAutoPush(false);
-
 		connection.putMediaTypeSettings(settings);
+
 		mediaSourceConnectionRepository.save(connection);
+
+		mediaSyncManager.enqueueSync(user.getId(), getMediaSource(), GAME, SyncType.PULL);
 	}
 
 	private String extractSteamId(String claimedId) {
