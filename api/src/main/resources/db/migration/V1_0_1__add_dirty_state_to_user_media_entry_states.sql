@@ -1,4 +1,6 @@
-alter table user_media_entry_states
-    add column IF NOT EXISTS dirty bool;
+ALTER TABLE user_media_entry_states ADD COLUMN IF NOT EXISTS dirty BOOLEAN;
 
-update user_media_entry_states set dirty = true;
+UPDATE user_media_entry_states SET dirty = true WHERE dirty IS NULL;
+
+ALTER TABLE user_media_entry_states ALTER COLUMN dirty SET DEFAULT false;
+ALTER TABLE user_media_entry_states ALTER COLUMN dirty SET NOT NULL;
