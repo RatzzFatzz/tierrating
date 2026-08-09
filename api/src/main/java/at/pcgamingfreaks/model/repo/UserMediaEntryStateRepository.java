@@ -12,6 +12,7 @@ import java.util.Optional;
 
 public interface UserMediaEntryStateRepository extends JpaRepository<UserMediaEntryState, Long> {
 	List<UserMediaEntryState> findAllByUserAndSource(User user, MediaSource source);
+	List<UserMediaEntryState> findAllByUserAndSourceAndDirty(User user, MediaSource source, boolean dirty);
 	List<UserMediaEntryState> findAllByUserAndSourceAndStateIn(User user, MediaSource source, Collection<MediaState> state);
 	Optional<UserMediaEntryState> findByUserAndSourceAndEntryId(User user, MediaSource source, Long entryId);
 }

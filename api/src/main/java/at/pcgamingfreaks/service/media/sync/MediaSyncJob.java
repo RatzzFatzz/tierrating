@@ -25,7 +25,7 @@ public class MediaSyncJob implements Runnable {
 
 			syncJobRepository.updateStatus(syncJob.getId(), SyncStatus.IN_PROGRESS);
 
-			processor.processSync(syncJob.getUser().getId(), syncJob.getMediaSource(), syncJob.getMediaType());
+			processor.processSync(syncJob.getUser().getId(), syncJob.getMediaSource(), syncJob.getMediaType(), syncJob.getType());
 
 			syncJobRepository.completeJob(syncJob.getId(), SyncStatus.COMPLETED, LocalDateTime.now());
 			log.debug("Completed sync for {} {} {} in {}ms",

@@ -5,6 +5,7 @@ import at.pcgamingfreaks.model.db.User;
 import at.pcgamingfreaks.model.enums.MediaSource;
 import at.pcgamingfreaks.model.enums.MediaType;
 import at.pcgamingfreaks.model.enums.SyncStatus;
+import at.pcgamingfreaks.model.enums.SyncType;
 import at.pcgamingfreaks.model.repo.SyncJobRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,7 @@ class MediaSyncJobTest {
 		syncJob.setUser(new User());
 		syncJob.setMediaSource(MediaSource.ANILIST);
 		syncJob.setMediaType(MediaType.ANIME);
+		syncJob.setType(SyncType.PULL);
 	}
 
 	@Test
@@ -42,7 +44,7 @@ class MediaSyncJobTest {
 		MediaSyncJob underTest = new MediaSyncJob(syncJob, mediaSyncProcessor, syncJobRepository);
 		underTest.run();
 
-		verify(mediaSyncProcessor, times(1)).processSync(any(), any(), any());
+		verify(mediaSyncProcessor, times(1)).processSync(any(), any(), any(), eq(SyncType.PULL));
 		verify(syncJobRepository, times(1)).updateStatus(anyLong(), any(SyncStatus.class));
 		verify(syncJobRepository, times(1)).completeJob(anyLong(), eq(SyncStatus.COMPLETED), any(LocalDateTime.class));
 		verify(syncJobRepository, times(0)).completeJob(anyLong(), eq(SyncStatus.FAILED), any(LocalDateTime.class));
@@ -50,12 +52,12 @@ class MediaSyncJobTest {
 
 	@Test
 	void run_failed() {
-		doThrow(RuntimeException.class).when(mediaSyncProcessor).processSync(any(), any(), any());
+		doThrow(RuntimeException.class).when(mediaSyncProcessor).processSync(any(), any(), any(), eq(SyncType.PULL));
 
 		MediaSyncJob underTest = new MediaSyncJob(syncJob, mediaSyncProcessor, syncJobRepository);
 		underTest.run();
 
-		verify(mediaSyncProcessor, times(1)).processSync(any(), any(), any());
+		verify(mediaSyncProcessor, times(1)).processSync(any(), any(), any(),eq(SyncType.PULL));
 		verify(syncJobRepository, times(1)).updateStatus(anyLong(), any(SyncStatus.class));
 		verify(syncJobRepository, times(0)).completeJob(anyLong(), eq(SyncStatus.COMPLETED), any(LocalDateTime.class));
 		verify(syncJobRepository, times(1)).completeJob(anyLong(), eq(SyncStatus.FAILED), any(LocalDateTime.class));
