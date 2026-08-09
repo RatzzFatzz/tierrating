@@ -16,7 +16,9 @@ import at.pcgamingfreaks.service.media.remote.AniListAnimeClient;
 import at.pcgamingfreaks.service.media.remote.RemoteMediaClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -24,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,53 +54,99 @@ class MediaSyncPersistenceServiceTest {
 	@InjectMocks
 	private MediaSyncPersistenceService underTest;
 
-	@Test
-	void reconcile() {
+	private static Stream<Arguments> reconcile() {
 		Long userId = 1L;
 		User user = new User();
 		user.setId(userId);
 
+		return Stream.of(
+				Arguments.of(
+						"Update nothing",
+						userId, user,
+						List.of(mediaEntry(1L)),
+						List.of(localStateEntry(1L, user,1L, 10, MediaState.COMPLETED)),
+						List.of(remoteEntry(1L, 10, MediaState.COMPLETED)),
+						List.of(),
+						List.of()
+				),
+				Arguments.of(
+						"Update score",
+						userId, user,
+						List.of(mediaEntry(1L)),
+						List.of(localStateEntry(1L, user,1L, 10, MediaState.COMPLETED)),
+						List.of(remoteEntry(1L, 9, MediaState.COMPLETED)),
+						List.of(),
+						List.of(localStateEntry(1L, user,1L, 9, MediaState.COMPLETED))
+				),
+				Arguments.of(
+						"Update state",
+						userId, user,
+						List.of(mediaEntry(1L)),
+						List.of(localStateEntry(1L, user,1L, 10, MediaState.IN_PROGRESS)),
+						List.of(remoteEntry(1L, 10, MediaState.COMPLETED)),
+						List.of(),
+						List.of(localStateEntry(1L, user,1L, 10, MediaState.COMPLETED))
+				),
+				Arguments.of(
+						"Update score and state",
+						userId, user,
+						List.of(mediaEntry(1L)),
+						List.of(localStateEntry(1L, user,1L, 10, MediaState.IN_PROGRESS)),
+						List.of(remoteEntry(1L, 9, MediaState.COMPLETED)),
+						List.of(),
+						List.of(localStateEntry(1L, user,1L, 9, MediaState.COMPLETED))
+				),
+				Arguments.of(
+						"Add new state",
+						userId, user,
+						List.of(mediaEntry(1L)),
+						List.of(),
+						List.of(remoteEntry(1L, 9, MediaState.COMPLETED)),
+						List.of(),
+						List.of(localStateEntry(null, user,1L, 9, MediaState.COMPLETED))
+				),
+				Arguments.of(
+						"Add new entry and state",
+						userId, user,
+						List.of(),
+						List.of(),
+						List.of(remoteEntry(1L, 9, MediaState.COMPLETED)),
+						List.of(mediaEntry(1L)),
+						List.of(localStateEntry(null, user,1L, 9, MediaState.COMPLETED))
+				),
+				Arguments.of(
+						"Update entry",
+						userId, user,
+						List.of(mediaEntry(1L, "old title")),
+						List.of(localStateEntry(1L, user,1L, 9, MediaState.COMPLETED)),
+						List.of(remoteEntry(1L, 9, MediaState.COMPLETED, "new title")),
+						List.of(mediaEntry(1L, "new title")),
+						List.of()
+				)
+		);
+	}
+
+	@MethodSource("reconcile")
+	@ParameterizedTest(name = "{0}")
+	void reconcile(String description, Long userId, User user, List<AniListMediaEntry> localEntries,
+				   List<UserMediaEntryState> localStates, List<RemoteSyncResult<AniListMediaEntry>> remoteEntries,
+	               List<AniListMediaEntry> expectedEntries, List<UserMediaEntryState> expectedUpdatedEntryStates) {
 		MediaSource source = MediaSource.ANILIST;
-
-		List<AniListMediaEntry> localEntries = List.of(
-				mediaEntry(1L), mediaEntry(2L), mediaEntry(3L)
-		);
-
-		List<UserMediaEntryState> localStates = List.of(
-				localStateEntry(1L, user,1L, 10, MediaState.COMPLETED),
-				localStateEntry(2L, user,2L, 8, MediaState.IN_PROGRESS),
-				localStateEntry(3L, user,3L, 6, MediaState.IN_PROGRESS)
-		);
-
-		List<RemoteSyncResult<AniListMediaEntry>> remoteEntries = List.of(
-				remoteEntry(1L, 9, MediaState.COMPLETED),
-				remoteEntry(2L, 8, MediaState.COMPLETED),
-				remoteEntry(3L, 7, MediaState.COMPLETED),
-				remoteEntry(4L, 5, MediaState.IN_PROGRESS)
-		);
-
-		List<AniListMediaEntry> expectedEntries = List.of(
-				mediaEntry(4L)
-		);
-
-		List<UserMediaEntryState> expectedUpdatedEntryStates = List.of(
-				localStateEntry(1L, user,1L, 9, MediaState.COMPLETED),
-				localStateEntry(2L, user,2L, 8, MediaState.COMPLETED),
-				localStateEntry(3L, user,3L, 7, MediaState.COMPLETED),
-				localStateEntry(null, user,4L, 5, MediaState.IN_PROGRESS)
-		);
 
 		when(userRepository.getReferenceById(userId)).thenReturn(user);
 		doReturn(anilistMediaEntryRepository).when(mediaEntryRepositoryRegistry).getRepository(source);
 		when(anilistMediaEntryRepository.findAllByIdIn(anyCollection())).thenReturn(localEntries);
 		when(userMediaEntryStateRepository.findAllByUserAndSource(eq(user), eq(source))).thenReturn(localStates);
+		lenient().when(aniListAnimeClient.shouldOverwriteLocal(anyFloat(), anyFloat())).thenCallRealMethod();
 
 		underTest.reconcile(userId, source, aniListAnimeClient, remoteEntries);
 
 		verify(userRepository, times(1)).getReferenceById(userId);
 		verify(mediaEntryRepositoryRegistry, times(1)).getRepository(source);
 		verify(userMediaEntryStateRepository, times(1)).findAllByUserAndSource(user, source);
-		verify(anilistMediaEntryRepository, times(1)).findAllByIdIn(Set.of(1L, 2L, 3L, 4L));
+		verify(anilistMediaEntryRepository, times(1)).findAllByIdIn(remoteEntries.stream()
+				.map(remoteEntry -> remoteEntry.entry().getId())
+				.collect(Collectors.toSet()));
 
 		@SuppressWarnings("unchecked")
 		ArgumentCaptor<List<AniListMediaEntry>> entryCaptor = ArgumentCaptor.forClass(List.class);
@@ -118,9 +167,22 @@ class MediaSyncPersistenceServiceTest {
 		return mediaEntry;
 	}
 
+	private static AniListMediaEntry mediaEntry(Long entryId, String title) {
+		AniListMediaEntry mediaEntry = mediaEntry(entryId);
+		mediaEntry.setTitle(title);
+		return mediaEntry;
+	}
+
 	private static RemoteSyncResult<AniListMediaEntry> remoteEntry(Long entryId, float score, MediaState state) {
 		AniListMediaEntry mediaEntry = new AniListMediaEntry();
 		mediaEntry.setId(entryId);
+		return new RemoteSyncResult<>(mediaEntry, score, state);
+	}
+
+	private static RemoteSyncResult<AniListMediaEntry> remoteEntry(Long entryId, float score, MediaState state, String title) {
+		AniListMediaEntry mediaEntry = new AniListMediaEntry();
+		mediaEntry.setId(entryId);
+		mediaEntry.setTitle(title);
 		return new RemoteSyncResult<>(mediaEntry, score, state);
 	}
 

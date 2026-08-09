@@ -88,7 +88,7 @@ public class MediaSyncPersistenceService {
 			return newState;
 		}
 
-		if (remoteMediaClient.shouldOverwriteLocal(localState.getScore(), remoteResult.score())
+		if (!remoteMediaClient.shouldOverwriteLocal(localState.getScore(), remoteResult.score())
 				&& Objects.equals(localState.getState(), remoteResult.status())) {
 			return null;
 		}
