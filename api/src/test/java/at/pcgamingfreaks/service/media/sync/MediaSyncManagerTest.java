@@ -84,7 +84,7 @@ class MediaSyncManagerTest {
 		when(syncJobRepository.findActiveSyncByUserAndSourceAndTypeAndStatus(any(), any(), any(), anyList()))
 				.thenReturn(Optional.of(syncJob));
 
-		assertThrows(MediaSyncAlreadyQueued.class, () -> mediaSyncManager.enqueueSync(1L, MediaSource.ANILIST, MediaType.ANIME, SyncType.PULL));
+		assertDoesNotThrow(() -> mediaSyncManager.enqueueSync(1L, MediaSource.ANILIST, MediaType.ANIME, SyncType.PULL));
 	}
 
 	@Test

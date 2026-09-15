@@ -10,10 +10,12 @@ import at.pcgamingfreaks.model.dto.MediaEntryDTO;
 import at.pcgamingfreaks.model.dto.UpdateMediaEntryDTO;
 import at.pcgamingfreaks.model.enums.MediaSource;
 import at.pcgamingfreaks.model.enums.MediaType;
+import at.pcgamingfreaks.model.enums.SyncType;
 import at.pcgamingfreaks.model.repo.MediaEntryRepository;
 import at.pcgamingfreaks.model.repo.UserMediaEntryStateRepository;
 import at.pcgamingfreaks.model.repo.UserRepository;
 import at.pcgamingfreaks.service.media.remote.RemoteClientRegistry;
+import at.pcgamingfreaks.service.media.sync.MediaSyncManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +35,7 @@ public class MediaLibraryService {
 	private final UserMediaEntryStateRepository userMediaEntryStateRepository;
 	private final MediaEntryRepositoryRegistry mediaEntryRepositoryRegistry;
 	private final MediaEntryMapperRegistry mediaEntryMapperRegistry;
-	private final RemoteClientRegistry remoteClientRegistry;
+	private final MediaSyncManager mediaSyncManager;
 
 	public <E extends MediaEntry> List<MediaEntryDTO> fetchLocal(String username, MediaSource source, MediaType type) {
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
@@ -73,12 +75,10 @@ public class MediaLibraryService {
 		userState.setDirty(true);
 		userMediaEntryStateRepository.save(userState);
 
-		// TODO: should this be done directly here? dirtyState would be a idea, would work nicely with push function. sync could be async
-//		if (user.getConnections().get(source).getMediaTypeSettings().get(type).isAutoPush()) {
-//			remoteClientRegistry.getClient(source, type).pushRemote(
-//					user.getConnections().get(source),
-//					List.of(new RemoteUpdateEntry(request.getId(), request.getScore(), request.getState()))
-//			);
-//		}
+		if (user.getConnections().containsKey(source)
+				&& user.getConnections().get(source).getMediaTypeSettings().containsKey(type)
+				&& user.getConnections().get(source).getMediaTypeSettings().get(type).isAutoPush()) {
+			mediaSyncManager.enqueueSync(user.getId(), source, type, SyncType.PUSH, 5);
+		}
 	}
 }

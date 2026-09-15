@@ -23,7 +23,6 @@ public class MediaController {
 
 	/**
 	 * Fetch data for username, service and type.
-	 * If no data is synced yet and auto sync is active, pull data before returning result.
 	 *
 	 * @return mapped third-party data ordered by score descending
 	 */
