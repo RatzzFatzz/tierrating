@@ -2,6 +2,7 @@ package at.pcgamingfreaks.service.media.sync;
 
 import at.pcgamingfreaks.exceptions.MediaSourceNotConnectedException;
 import at.pcgamingfreaks.exceptions.MediaSyncAlreadyQueued;
+import at.pcgamingfreaks.exceptions.MediaSyncConflictException;
 import at.pcgamingfreaks.model.db.MediaSourceConnection;
 import at.pcgamingfreaks.model.db.SyncJob;
 import at.pcgamingfreaks.model.db.User;
@@ -77,14 +78,21 @@ class MediaSyncManagerTest {
 
 	@Test
 	void enqueueSync_alreadyRunning() {
-		SyncJob syncJob = new SyncJob();
-		syncJob.setUser(new User());
+		SyncJob syncJob1 = new SyncJob();
+		syncJob1.setUser(new User());
+		syncJob1.setType(SyncType.PULL);
+
+		SyncJob syncJob2 = new SyncJob();
+		syncJob2.setUser(new User());
+		syncJob2.setType(SyncType.PUSH);
 
 		when(userRepository.getReferenceById(anyLong())).thenReturn(new User());
 		when(syncJobRepository.findActiveSyncByUserAndSourceAndTypeAndStatus(any(), any(), any(), anyList()))
-				.thenReturn(Optional.of(syncJob));
+				.thenReturn(Optional.of(syncJob1))
+				.thenReturn(Optional.of(syncJob2));
 
 		assertDoesNotThrow(() -> mediaSyncManager.enqueueSync(1L, MediaSource.ANILIST, MediaType.ANIME, SyncType.PULL));
+		assertThrows(MediaSyncConflictException.class, () -> mediaSyncManager.enqueueSync(1L, MediaSource.ANILIST, MediaType.ANIME, SyncType.PULL));
 	}
 
 	@Test

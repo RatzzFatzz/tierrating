@@ -1,8 +1,7 @@
 package at.pcgamingfreaks.model.dto.sync;
 
-import at.pcgamingfreaks.model.enums.MediaSource;
-import at.pcgamingfreaks.model.enums.MediaType;
 import at.pcgamingfreaks.model.enums.SyncStatus;
+import at.pcgamingfreaks.model.enums.SyncType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,8 +14,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SyncStatusDTO {
-	private MediaSource source;
-	private MediaType type;
+	private SyncType type;
 	private SyncStatus status;
 	private LocalDateTime startedAt;
+	private LocalDateTime completedAt;
 }

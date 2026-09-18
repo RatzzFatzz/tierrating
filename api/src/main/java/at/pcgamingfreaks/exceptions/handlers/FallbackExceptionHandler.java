@@ -1,7 +1,12 @@
-package at.pcgamingfreaks.exceptions;
+package at.pcgamingfreaks.exceptions.handlers;
 
+import at.pcgamingfreaks.exceptions.MediaSourceUnconfiguredException;
+import at.pcgamingfreaks.exceptions.ThirdPartyAuthenticationException;
+import at.pcgamingfreaks.exceptions.ThirdPartySyncException;
 import at.pcgamingfreaks.model.dto.ErrorResponseDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.CredentialsExpiredException;
@@ -13,7 +18,8 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 @Slf4j
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+@Order(Ordered.LOWEST_PRECEDENCE)
+public class FallbackExceptionHandler {
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorResponseDTO> handleUnknownException(Exception e) {

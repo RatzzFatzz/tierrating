@@ -1,6 +1,7 @@
 package at.pcgamingfreaks.service.media.sync;
 
 import at.pcgamingfreaks.exceptions.MediaSourceNotConnectedException;
+import at.pcgamingfreaks.exceptions.MediaSyncConflictException;
 import at.pcgamingfreaks.model.db.MediaSourceConnection;
 import at.pcgamingfreaks.model.db.SyncJob;
 import at.pcgamingfreaks.model.db.User;
@@ -20,8 +21,7 @@ import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static at.pcgamingfreaks.model.enums.SyncStatus.IN_PROGRESS;
-import static at.pcgamingfreaks.model.enums.SyncStatus.PENDING;
+import static at.pcgamingfreaks.model.enums.SyncStatus.*;
 
 
 @Slf4j
@@ -60,7 +60,11 @@ public class MediaSyncManager {
 	public void enqueueSync(Long userId, MediaSource source, MediaType type, SyncType syncType, long delay) {
 		User user = userRepository.getReferenceById(userId);
 		Optional<SyncJob> runningJob = syncJobRepository.findActiveSyncByUserAndSourceAndTypeAndStatus(user, source, type, List.of(IN_PROGRESS, PENDING));
+
 		if (runningJob.isPresent()) {
+			if (!runningJob.get().getType().equals(syncType)) {
+				throw new MediaSyncConflictException(user.getUsername(), source, type, runningJob.get().getType());
+			}
 			log.debug("Tried to enqueue sync for {} {} {}, but sync already queued or in progress", user.getUsername(), source, type);
 			return;
 		}
@@ -82,7 +86,17 @@ public class MediaSyncManager {
 		log.debug("Submitted sync job (id: {}) for {} {} {}", job.getId(), user.getUsername(), source, type);
 	}
 
+	/**
+	 * Find currently running sync.
+	 */
+	public Optional<SyncJob> getStatus(User user, MediaSource source, MediaType mediaType) {
+		return syncJobRepository.findActiveSyncByUserAndSourceAndTypeAndStatus(user, source, mediaType, List.of(IN_PROGRESS, PENDING));
+	}
+
+	/**
+	 * Find the last failed or completed sync of type.
+	 */
 	public Optional<SyncJob> getStatus(User user, MediaSource source, MediaType mediaType, SyncType type) {
-		return syncJobRepository.findFirstByUserAndMediaSourceAndMediaTypeAndTypeAndStatusIn(user, source, mediaType, type, List.of(IN_PROGRESS, PENDING));
+		return syncJobRepository.findFirstByUserAndMediaSourceAndMediaTypeAndTypeAndStatusIn(user, source, mediaType, type, List.of(COMPLETED, FAILED));
 	}
 }

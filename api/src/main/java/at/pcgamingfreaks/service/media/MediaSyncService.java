@@ -1,9 +1,9 @@
 package at.pcgamingfreaks.service.media;
 
+import at.pcgamingfreaks.mapper.SyncStatusDtoMapper;
 import at.pcgamingfreaks.model.UserPrincipal;
-import at.pcgamingfreaks.model.db.SyncJob;
 import at.pcgamingfreaks.model.db.User;
-import at.pcgamingfreaks.model.dto.sync.SyncStatusDTO;
+import at.pcgamingfreaks.model.dto.sync.SyncStatusResponseDTO;
 import at.pcgamingfreaks.model.enums.MediaSource;
 import at.pcgamingfreaks.model.enums.MediaType;
 import at.pcgamingfreaks.model.enums.SyncType;
@@ -14,22 +14,23 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class MediaSyncService {
 	private final UserRepository userRepository;
 	private final MediaSyncManager syncManager;
+	private final SyncStatusDtoMapper mapper;
 
 	@Transactional
-	public SyncStatusDTO status(String username, MediaSource source, MediaType type, SyncType syncType) {
+	public SyncStatusResponseDTO status(String username, MediaSource source, MediaType type) {
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
-		Optional<SyncJob> job = syncManager.getStatus(user, source, type, syncType);
-		// TODO: how should the response look when there is no running sync?
-		// there should always be at least one sync (initial sync) and returned a complete status sounds fine
-		return job.map(syncJob -> new SyncStatusDTO(syncJob.getMediaSource(), syncJob.getMediaType(), syncJob.getStatus(), syncJob.getStartedAt()))
-				.orElseGet(SyncStatusDTO::new);
+
+		SyncStatusResponseDTO response = new SyncStatusResponseDTO();
+		syncManager.getStatus(user, source, type).ifPresent(v -> response.setCurrent(mapper.map(v)));
+		syncManager.getStatus(user, source, type, SyncType.PULL).ifPresent(v -> response.setLastPull(mapper.map(v)));
+		syncManager.getStatus(user, source, type, SyncType.PUSH).ifPresent(v -> response.setLastPush(mapper.map(v)));
+
+		return response;
 	}
 
 	public void enqueue(UserPrincipal userPrincipal, MediaSource source, MediaType type, SyncType syncType) {

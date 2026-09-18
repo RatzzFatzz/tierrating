@@ -1,8 +1,8 @@
 package at.pcgamingfreaks.model.db;
 
+import at.pcgamingfreaks.model.enums.MediaSource;
 import at.pcgamingfreaks.model.enums.MediaType;
 import at.pcgamingfreaks.model.enums.SyncStatus;
-import at.pcgamingfreaks.model.enums.MediaSource;
 import at.pcgamingfreaks.model.enums.SyncType;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "sync_jobs", indexes = {
 		@Index(name = "idx_syncjob_user_id", columnList = "user_id")
-})
+}, uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "media_source", "media_type"}))
 @NoArgsConstructor
 public class SyncJob {
 	@Id

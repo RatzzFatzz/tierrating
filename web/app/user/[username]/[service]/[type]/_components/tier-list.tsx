@@ -13,6 +13,8 @@ import { useScoreMutation, useTierlistEntries } from "@/lib/services/media-servi
 import { useAuth } from "@/contexts/auth-context";
 import { getDefaultTiers } from "@/lib/config/default-tiers";
 import { LoadingPage } from "@/components/loading-skeletons/loading-page";
+import { useSyncStatus } from "@/lib/services/sync-service";
+import { SyncStatusResponse } from "@/types/responses/sync-responses";
 
 export default function TierList({
 	username,
@@ -26,6 +28,13 @@ export default function TierList({
 	modificationEnabled: boolean;
 }) {
 	const { token, user, logout } = useAuth();
+
+	const {
+		data: syncStatus,
+		error: statusError,
+		mutate: updateSyncStatus,
+		isValidating: statusIsValidating,
+	} = useSyncStatus(service, type, { refreshInterval: (latest: SyncStatusResponse) => (latest?.current ? 1000 : 0) }, token!);
 
 	const { trigger: pushEntryUpdate, error, isMutating } = useScoreMutation(username, service, type, token!);
 	const { data: tiersData, error: tiersError, isValidating: tiersIsLoading } = useTiers(username, service, type, token!);
@@ -120,9 +129,19 @@ export default function TierList({
 	return (
 		<DragDropProvider onDragEnd={onDragEnd}>
 			{tiers.map((tier) => (
-				<TierContainerDroppable key={tier.name} id={tier.name} label={tier.name} color={tier.color} disabled={!modificationEnabled}>
+				<TierContainerDroppable
+					key={tier.name}
+					id={tier.name}
+					label={tier.name}
+					color={tier.color}
+					disabled={!modificationEnabled || syncStatus?.current != null}
+				>
 					{entriesByTierName.get(tier.name)!.map((entry) => (
-						<TierlistEntryDraggable key={entry.id} entry={entry} disabled={!modificationEnabled} />
+						<TierlistEntryDraggable
+							key={entry.id}
+							entry={entry}
+							disabled={!modificationEnabled || syncStatus?.current != null}
+						/>
 					))}
 				</TierContainerDroppable>
 			))}
